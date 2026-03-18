@@ -63,19 +63,19 @@ export default function Pricing() {
 
   return (
     <section id="pricing" className="relative py-28 border-t border-border">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="container-page">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-12"
+          className="text-center mb-6"
         >
-          <h2 className="font-heading text-4xl sm:text-5xl font-bold text-white tracking-tight mb-4">
+          <h2 className="section-heading">
             Simple, transparent pricing
           </h2>
-          <p className="text-muted text-sm">
-            Start free. Upgrade when you need more.
+          <p className="section-subheading">
+            Start free. Upgrade when you need more power.
           </p>
         </motion.div>
 
@@ -85,7 +85,7 @@ export default function Pricing() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="flex items-center justify-center gap-4 mb-14"
+          className="flex items-center justify-center gap-4 mb-16"
         >
           <span
             className={`text-sm ${
@@ -116,7 +116,7 @@ export default function Pricing() {
           </span>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 gap-6 items-start">
           {tiers.map((tier, i) => (
             <motion.div
               key={tier.name}
@@ -124,87 +124,100 @@ export default function Pricing() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              className={`relative bg-surface p-8 transition-all duration-300 ${
+              className={`relative bg-surface transition-all duration-300 ${
                 tier.highlighted
                   ? "border-2 border-indigo shadow-[0_0_60px_rgba(99,102,241,0.1)]"
                   : "border border-border"
               }`}
             >
+              {/* Badge above card content */}
               {tier.highlighted && (
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-indigo text-white text-[10px] font-semibold tracking-widest uppercase">
-                  Most popular
+                <div className="flex justify-center -mt-3">
+                  <span className="px-4 py-1 bg-indigo text-white text-[10px] font-semibold tracking-widest uppercase">
+                    Most popular
+                  </span>
                 </div>
               )}
 
-              <h3 className="text-lg font-bold text-white">{tier.name}</h3>
-              <p className="text-xs text-muted mt-1 mb-5">
-                {tier.description}
-              </p>
+              <div className="p-8">
+                {/* Header */}
+                <div className={tier.highlighted ? "pt-1" : ""}>
+                  <h3 className="text-lg font-bold text-white">{tier.name}</h3>
+                  <p className="text-xs text-muted mt-1 mb-6">
+                    {tier.description}
+                  </p>
+                </div>
 
-              <div className="mb-6">
-                <motion.span
-                  key={annual ? "annual" : "monthly"}
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-4xl font-extrabold text-white"
-                >
-                  $
-                  {annual ? tier.yearlyPrice : tier.monthlyPrice}
-                </motion.span>
-                <span className="text-sm text-muted">/mo</span>
-              </div>
-
-              <Button
-                variant={tier.highlighted ? "primary" : "ghost"}
-                className="w-full text-sm mb-8"
-              >
-                {tier.cta}
-              </Button>
-
-              <div className="space-y-3">
-                {tier.features.map((feature) => (
-                  <div
-                    key={feature.text}
-                    className="flex items-center gap-3 text-sm"
+                {/* Price */}
+                <div className="mb-8">
+                  <motion.span
+                    key={annual ? "annual" : "monthly"}
+                    initial={{ opacity: 0, y: -10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    className="text-4xl font-extrabold text-white"
                   >
-                    {feature.included ? (
-                      <svg
-                        className="w-4 h-4 text-indigo shrink-0"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M5 13l4 4L19 7"
-                        />
-                      </svg>
-                    ) : (
-                      <svg
-                        className="w-4 h-4 text-white/15 shrink-0"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M18 12H6"
-                        />
-                      </svg>
-                    )}
-                    <span
-                      className={
-                        feature.included ? "text-foreground" : "text-muted"
-                      }
+                    ${annual ? tier.yearlyPrice : tier.monthlyPrice}
+                  </motion.span>
+                  <span className="text-sm text-muted">/mo</span>
+                </div>
+
+                {/* CTA */}
+                <Button
+                  variant={tier.highlighted ? "primary" : "ghost"}
+                  className="w-full text-sm mb-8"
+                >
+                  {tier.cta}
+                </Button>
+
+                {/* Divider */}
+                <div className="border-t border-border mb-6" />
+
+                {/* Feature list */}
+                <div className="space-y-3">
+                  {tier.features.map((feature) => (
+                    <div
+                      key={feature.text}
+                      className="flex items-center gap-3 text-sm"
                     >
-                      {feature.text}
-                    </span>
-                  </div>
-                ))}
+                      {feature.included ? (
+                        <svg
+                          className="w-4 h-4 text-indigo shrink-0"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M5 13l4 4L19 7"
+                          />
+                        </svg>
+                      ) : (
+                        <svg
+                          className="w-4 h-4 text-white/15 shrink-0"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M18 12H6"
+                          />
+                        </svg>
+                      )}
+                      <span
+                        className={
+                          feature.included ? "text-foreground" : "text-muted"
+                        }
+                      >
+                        {feature.text}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </motion.div>
           ))}

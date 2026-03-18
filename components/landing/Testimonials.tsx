@@ -47,10 +47,17 @@ const testimonials = [
   },
 ];
 
+function getInitials(name: string) {
+  return name
+    .split(" ")
+    .map((n) => n[0])
+    .join("");
+}
+
 export default function Testimonials() {
   return (
     <section className="relative py-28 border-t border-border">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="container-page">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -58,12 +65,15 @@ export default function Testimonials() {
           transition={{ duration: 0.5 }}
           className="text-center mb-16"
         >
-          <h2 className="font-heading text-4xl sm:text-5xl font-bold text-white tracking-tight">
+          <h2 className="section-heading">
             Loved by engineers everywhere
           </h2>
+          <p className="section-subheading">
+            Thousands of developers have landed their dream jobs with ResumeAI.
+          </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
           {testimonials.map((t, i) => (
             <motion.div
               key={t.name}
@@ -72,15 +82,15 @@ export default function Testimonials() {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.08 }}
               whileHover={{ scale: 1.02, borderColor: "rgba(99,102,241,0.3)" }}
-              className="bg-surface border border-border p-6 transition-all duration-300"
+              className="bg-surface border border-border p-6 transition-all duration-300 flex flex-col"
             >
               {/* Stars */}
               <div className="flex gap-0.5 mb-4">
                 {[...Array(5)].map((_, j) => (
                   <svg
                     key={j}
-                    className={`w-3.5 h-3.5 ${
-                      j < t.stars ? "text-indigo" : "text-white/10"
+                    className={`w-4 h-4 ${
+                      j < t.stars ? "text-amber-400" : "text-white/10"
                     }`}
                     fill="currentColor"
                     viewBox="0 0 20 20"
@@ -90,13 +100,20 @@ export default function Testimonials() {
                 ))}
               </div>
 
-              <p className="text-sm text-foreground leading-relaxed mb-5">
-                &quot;{t.quote}&quot;
+              {/* Quote */}
+              <p className="text-sm text-foreground leading-relaxed flex-1 mb-6">
+                {t.quote}
               </p>
 
-              <div>
-                <p className="text-sm font-semibold text-white">{t.name}</p>
-                <p className="text-xs text-muted">{t.title}</p>
+              {/* Author */}
+              <div className="flex items-center gap-3 pt-4 border-t border-border">
+                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo/60 to-cyan/40 flex items-center justify-center text-[10px] font-bold text-white shrink-0">
+                  {getInitials(t.name)}
+                </div>
+                <div>
+                  <p className="text-sm font-semibold text-white">{t.name}</p>
+                  <p className="text-xs text-muted">{t.title}</p>
+                </div>
               </div>
             </motion.div>
           ))}

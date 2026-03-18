@@ -48,7 +48,7 @@ export default function Hero() {
       {/* Background glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-indigo/5 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="relative z-10 max-w-7xl mx-auto px-6 pt-32 pb-20 w-full">
+      <div className="relative z-10 container-page pt-32 pb-24 w-full">
         <motion.div
           variants={stagger}
           initial="hidden"
@@ -82,7 +82,7 @@ export default function Hero() {
             {/* Subtext */}
             <motion.p
               variants={fadeUp}
-              className="text-lg text-muted max-w-lg leading-relaxed mb-8"
+              className="text-lg text-muted max-w-lg leading-relaxed mb-10"
             >
               Connect your GitHub, LeetCode, or Codeforces. Upload your old
               resume. Our AI reads everything and builds a job-winning resume in
@@ -90,7 +90,7 @@ export default function Hero() {
             </motion.p>
 
             {/* CTAs */}
-            <motion.div variants={fadeUp} className="flex flex-wrap gap-4 mb-8">
+            <motion.div variants={fadeUp} className="flex flex-wrap gap-4 mb-10">
               <Button variant="primary" className="text-sm px-7 py-3.5">
                 Build my resume free
                 <span aria-hidden="true">&rarr;</span>
@@ -106,12 +106,12 @@ export default function Hero() {
                 {[...Array(5)].map((_, i) => (
                   <div
                     key={i}
-                    className="w-7 h-7 rounded-full border-2 border-background bg-gradient-to-br from-indigo/60 to-cyan/40"
+                    className="w-8 h-8 rounded-full border-2 border-background bg-gradient-to-br from-indigo/60 to-cyan/40"
                     style={{ zIndex: 5 - i }}
                   />
                 ))}
               </div>
-              <p className="text-xs text-muted">
+              <p className="text-sm text-muted">
                 Joined by{" "}
                 <span className="text-white font-semibold">12,400+</span>{" "}
                 engineers from Google, Meta, Amazon

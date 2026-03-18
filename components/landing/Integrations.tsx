@@ -48,18 +48,18 @@ const integrations = [
 export default function Integrations() {
   return (
     <section className="relative py-20 border-t border-border">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="container-page">
         <motion.p
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center text-sm text-muted tracking-widest uppercase mb-10"
+          className="text-center text-sm text-muted tracking-widest uppercase mb-12"
         >
           Pull data from anywhere
         </motion.p>
 
-        <div className="flex flex-wrap justify-center gap-4">
+        <div className="flex flex-wrap justify-center gap-5">
           {integrations.map((item, i) => (
             <motion.div
               key={item.name}
@@ -68,7 +68,7 @@ export default function Integrations() {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.08 }}
               whileHover={{ y: -2, borderColor: "rgba(99,102,241,0.4)" }}
-              className="flex items-center gap-3 px-5 py-3 bg-surface border border-border text-sm text-foreground transition-all duration-200"
+              className="flex items-center gap-3 px-6 py-4 bg-surface border border-border text-sm text-foreground transition-all duration-200"
             >
               <span className="text-muted">{item.icon}</span>
               {item.name}

@@ -7,12 +7,13 @@ const footerLinks = {
 
 export default function Footer() {
   return (
-    <footer className="border-t border-border py-16">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-10">
-          {/* Brand */}
-          <div className="col-span-2 md:col-span-1">
-            <div className="flex items-center gap-2 mb-3">
+    <footer className="border-t border-border py-20">
+      <div className="container-page">
+        {/* Top: logo + columns */}
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-10 mb-16">
+          {/* Brand — takes 2 cols */}
+          <div className="col-span-2">
+            <div className="flex items-center gap-2 mb-4">
               <svg
                 width="18"
                 height="18"
@@ -27,23 +28,23 @@ export default function Footer() {
               </svg>
               <span className="text-sm font-bold text-white">ResumeAI</span>
             </div>
-            <p className="text-xs text-muted leading-relaxed">
-              AI-powered resumes that get you hired.
+            <p className="text-sm text-muted leading-relaxed max-w-[240px]">
+              AI-powered resumes that get you hired. Built for engineers, by engineers.
             </p>
           </div>
 
           {/* Link columns */}
           {Object.entries(footerLinks).map(([category, links]) => (
             <div key={category}>
-              <h4 className="text-xs font-semibold text-white tracking-wider uppercase mb-4">
+              <h4 className="text-xs font-semibold text-white tracking-wider uppercase mb-5">
                 {category}
               </h4>
-              <ul className="space-y-2.5">
+              <ul className="space-y-3">
                 {links.map((link) => (
                   <li key={link}>
                     <a
                       href="#"
-                      className="text-xs text-muted hover:text-white transition-colors duration-200"
+                      className="text-sm text-muted hover:text-white transition-colors duration-200"
                     >
                       {link}
                     </a>
@@ -55,7 +56,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-14 pt-6 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="pt-8 border-t border-border flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-muted">
             &copy; {new Date().getFullYear()} ResumeAI. All rights reserved.
           </p>

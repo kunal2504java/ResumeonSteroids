@@ -9,7 +9,7 @@ const steps = [
     description:
       "Link your GitHub, LeetCode, or Codeforces accounts. We pull your repos, contributions, and problem-solving stats automatically.",
     icons: (
-      <div className="flex gap-3 mt-4">
+      <div className="flex gap-3 mt-5">
         {["GitHub", "LeetCode", "CF"].map((label) => (
           <span
             key={label}
@@ -27,7 +27,7 @@ const steps = [
     description:
       "Our model analyzes your code contributions, competitive programming stats, and old resume to understand your skills and achievements.",
     icons: (
-      <div className="mt-4 font-mono text-xs text-muted space-y-1.5">
+      <div className="mt-5 font-mono text-xs text-muted space-y-2">
         <div className="flex items-center gap-2">
           <span className="w-1 h-3 bg-indigo animate-pulse" />
           <span>Analyzing 847 commits...</span>
@@ -49,7 +49,7 @@ const steps = [
     description:
       "Get a polished, ATS-optimized resume in PDF or LaTeX. Tailored for each job description. Ready to send in seconds.",
     icons: (
-      <div className="mt-4 flex gap-2">
+      <div className="mt-5 flex gap-3">
         {["PDF", "LaTeX", "DOCX"].map((fmt) => (
           <span
             key={fmt}
@@ -66,7 +66,7 @@ const steps = [
 export default function HowItWorks() {
   return (
     <section id="how-it-works" className="relative py-28">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="container-page">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -74,9 +74,12 @@ export default function HowItWorks() {
           transition={{ duration: 0.5 }}
           className="text-center mb-16"
         >
-          <h2 className="font-heading text-4xl sm:text-5xl font-bold text-white tracking-tight">
+          <h2 className="section-heading">
             From zero to hired in 3 steps
           </h2>
+          <p className="section-subheading">
+            Import your profiles, let AI craft your resume, and start applying — all in under a minute.
+          </p>
         </motion.div>
 
         <div className="grid md:grid-cols-3 gap-6">
@@ -99,7 +102,7 @@ export default function HowItWorks() {
                 <span className="text-xs font-semibold text-indigo tracking-widest uppercase">
                   Step {step.number}
                 </span>
-                <h3 className="text-xl font-bold text-white mt-2 mb-3">
+                <h3 className="text-xl font-bold text-white mt-3 mb-3">
                   {step.title}
                 </h3>
                 <p className="text-sm text-muted leading-relaxed">

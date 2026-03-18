@@ -37,14 +37,14 @@ const dots = [
 
 export default function CTA() {
   return (
-    <section className="relative py-28">
-      <div className="max-w-7xl mx-auto px-6">
+    <section className="relative py-20">
+      <div className="container-page">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="relative overflow-hidden bg-surface p-16 text-center"
+          className="relative overflow-hidden bg-surface py-20 px-8 sm:px-16 text-center"
           style={{
             border: "2px solid transparent",
             backgroundClip: "padding-box",
@@ -59,10 +59,10 @@ export default function CTA() {
           ))}
 
           <div className="relative z-10">
-            <h2 className="font-heading text-3xl sm:text-5xl font-bold text-white tracking-tight mb-6">
+            <h2 className="section-heading mb-4">
               Build your resume in 60 seconds.
             </h2>
-            <p className="text-muted text-sm max-w-md mx-auto mb-8">
+            <p className="text-muted text-base max-w-md mx-auto mb-10">
               Join thousands of engineers who landed their dream jobs with
               ResumeAI.
             </p>

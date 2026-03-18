@@ -47,7 +47,7 @@ const features = [
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.12 }}
-            className="flex items-center justify-between p-3 bg-white/[0.02] border border-border"
+            className="flex items-center justify-between p-3 bg-white/[0.02] border border-[#1E2535]"
           >
             <div className="flex items-center gap-3">
               <span className="text-indigo font-mono">/</span>
@@ -74,13 +74,13 @@ const features = [
     preview: (
       <div className="text-xs">
         <div className="text-muted mb-4 font-mono">LeetCode Profile:</div>
-        <div className="grid grid-cols-3 gap-3 mb-4">
+        <div className="grid grid-cols-3 gap-3 mb-5">
           {[
             { label: "Solved", value: "847", color: "text-indigo-light" },
             { label: "Contest Rating", value: "1,923", color: "text-cyan" },
             { label: "Top %", value: "4.2%", color: "text-indigo" },
           ].map((stat) => (
-            <div key={stat.label} className="p-3 bg-white/[0.02] border border-border text-center">
+            <div key={stat.label} className="p-3 bg-white/[0.02] border border-[#1E2535] text-center">
               <div className={`text-lg font-bold ${stat.color}`}>
                 {stat.value}
               </div>
@@ -107,8 +107,8 @@ const features = [
     description:
       "Paste any job description — AI rewrites your resume to match keywords, tone, and requirements for maximum relevance.",
     preview: (
-      <div className="text-xs space-y-3">
-        <div className="p-3 bg-white/[0.02] border border-border">
+      <div className="text-xs space-y-4">
+        <div className="p-4 bg-white/[0.02] border border-[#1E2535]">
           <div className="text-muted font-mono mb-2">Job Description:</div>
           <p className="text-foreground leading-relaxed">
             &quot;Looking for a <span className="text-indigo-light font-medium">senior backend engineer</span> with
@@ -124,7 +124,7 @@ const features = [
         </div>
         <div className="flex flex-wrap gap-2">
           {["distributed systems", "cloud infrastructure", "backend", "scalability"].map((kw) => (
-            <span key={kw} className="px-2 py-0.5 bg-indigo/10 text-indigo-light border border-indigo/20 text-[10px]">
+            <span key={kw} className="px-2.5 py-1 bg-indigo/10 text-indigo-light border border-indigo/20 text-[10px]">
               {kw}
             </span>
           ))}
@@ -138,11 +138,11 @@ const features = [
       "Instant ATS compatibility score. See exactly what's missing and fix it before you apply.",
     preview: (
       <div className="text-xs">
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center justify-between mb-5">
           <span className="text-muted font-mono">ATS Score</span>
           <span className="text-3xl font-bold text-indigo-light">94%</span>
         </div>
-        <div className="space-y-2.5">
+        <div className="space-y-3">
           {[
             { label: "Keyword match", score: 96, color: "bg-indigo" },
             { label: "Formatting", score: 100, color: "bg-cyan" },
@@ -150,11 +150,11 @@ const features = [
             { label: "Readability", score: 88, color: "bg-indigo" },
           ].map((item) => (
             <div key={item.label}>
-              <div className="flex justify-between text-muted mb-1">
+              <div className="flex justify-between text-muted mb-1.5">
                 <span>{item.label}</span>
                 <span className="text-foreground">{item.score}%</span>
               </div>
-              <div className="h-1 bg-white/5 overflow-hidden">
+              <div className="h-1.5 bg-white/5 overflow-hidden">
                 <motion.div
                   initial={{ width: 0 }}
                   animate={{ width: `${item.score}%` }}
@@ -175,17 +175,20 @@ export default function Features() {
 
   return (
     <section id="features" className="relative py-28 border-t border-border">
-      <div className="max-w-7xl mx-auto px-6">
+      <div className="container-page">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="mb-16"
+          className="text-center mb-16"
         >
-          <h2 className="font-heading text-4xl sm:text-5xl font-bold text-white tracking-tight">
+          <h2 className="section-heading">
             Everything you need to land interviews
           </h2>
+          <p className="section-subheading">
+            From AI-powered bullet writing to ATS optimization — every tool a job seeker needs, in one place.
+          </p>
         </motion.div>
 
         <div className="grid lg:grid-cols-2 gap-12">
@@ -195,7 +198,7 @@ export default function Features() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="space-y-1"
+            className="space-y-2"
           >
             {features.map((feature, i) => (
               <button
@@ -212,7 +215,7 @@ export default function Features() {
                   <motion.p
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
-                    className="text-xs text-muted leading-relaxed"
+                    className="text-xs text-muted leading-relaxed mt-2"
                   >
                     {feature.description}
                   </motion.p>
@@ -227,19 +230,32 @@ export default function Features() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="bg-surface border border-border p-8 min-h-[400px]"
+            className="bg-surface border border-border overflow-hidden"
           >
-            <AnimatePresence mode="wait">
-              <motion.div
-                key={active}
-                initial={{ opacity: 0, y: 12 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -12 }}
-                transition={{ duration: 0.3 }}
-              >
-                {features[active].preview}
-              </motion.div>
-            </AnimatePresence>
+            {/* Terminal-style header bar */}
+            <div className="flex items-center gap-2 px-5 py-3 border-b border-border bg-white/[0.02]">
+              <div className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
+              <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
+              <div className="w-2.5 h-2.5 rounded-full bg-green-500/50" />
+              <span className="ml-2 text-[10px] text-muted font-mono">
+                {features[active].title}
+              </span>
+            </div>
+
+            {/* Animated content */}
+            <div className="p-8 min-h-[380px]">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={active}
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -12 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  {features[active].preview}
+                </motion.div>
+              </AnimatePresence>
+            </div>
           </motion.div>
         </div>
       </div>
