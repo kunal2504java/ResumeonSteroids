@@ -11,6 +11,7 @@
   --color-border: rgba(255, 255, 255, 0.1);
   --font-heading: var(--font-bricolage);
   --font-body: var(--font-bricolage);
+  --font-mono: var(--font-jetbrains);
 }
 
 * {
@@ -29,6 +30,11 @@ body {
   font-family: var(--font-body), system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Editor pages use DM Sans */
+.font-editor {
+  font-family: var(--font-dm-sans), system-ui, sans-serif;
 }
 
 /* Dot grid background */
@@ -74,6 +80,15 @@ body {
 
 ::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.2);
+}
+
+/* Thin scrollbar variant */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
 
 /* Reduced motion */
