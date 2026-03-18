@@ -65,24 +65,25 @@ const steps = [
 
 export default function HowItWorks() {
   return (
-    <section id="how-it-works" className="relative py-28">
-      <div className="container-page">
+    <section id="how-it-works" className="section-md bg-background relative border-t border-white/5">
+      <div className="page-wrap">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-16"
+          className="text-center"
         >
-          <h2 className="section-heading">
+          <p className="section-eyebrow">How it works</p>
+          <h2 className="section-title">
             From zero to hired in 3 steps
           </h2>
-          <p className="section-subheading">
+          <p className="section-sub">
             Import your profiles, let AI craft your resume, and start applying — all in under a minute.
           </p>
         </motion.div>
 
-        <div className="grid md:grid-cols-3 gap-6">
+        <div className="grid md:grid-cols-3 gap-8 mt-16">
           {steps.map((step, i) => (
             <motion.div
               key={step.number}
@@ -90,25 +91,24 @@ export default function HowItWorks() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.1 }}
-              whileHover={{ y: -4, borderColor: "rgba(99,102,241,0.4)" }}
-              className="relative bg-surface border border-border p-8 overflow-hidden transition-all duration-300 group hover:shadow-[0_8px_40px_rgba(99,102,241,0.08)]"
+              className="bg-white/[0.02] border border-white/5 rounded-2xl p-8 relative overflow-hidden group hover:bg-white/[0.04] transition-colors"
             >
               {/* Big faded number */}
-              <span className="absolute top-4 right-4 text-[120px] font-extrabold leading-none text-white/[0.03] select-none pointer-events-none">
-                {step.number}
+              <span className="absolute -top-10 -right-4 text-[140px] font-black text-white/[0.02] select-none pointer-events-none group-hover:text-indigo-500/[0.05] transition-colors">
+                0{i + 1}
               </span>
 
-              <div className="relative z-10">
-                <span className="text-xs font-semibold text-indigo tracking-widest uppercase">
-                  Step {step.number}
-                </span>
-                <h3 className="text-xl font-bold text-white mt-3 mb-3">
+              <div className="relative z-10 h-full flex flex-col">
+                <h3 className="text-xl font-bold text-white mb-3">
                   {step.title}
                 </h3>
-                <p className="text-sm text-muted leading-relaxed">
+                <p className="text-sm text-zinc-400 leading-relaxed mb-8">
                   {step.description}
                 </p>
-                {step.icons}
+                {/* Step-specific visual */}
+                <div className="mt-auto relative z-10 pt-6 border-t border-white/5">
+                  {step.icons}
+                </div>
               </div>
             </motion.div>
           ))}

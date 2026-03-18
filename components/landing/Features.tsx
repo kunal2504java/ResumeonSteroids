@@ -9,24 +9,30 @@ const features = [
     description:
       "Automatically generates impactful, quantified bullet points from your raw experience. No more staring at a blank page.",
     preview: (
-      <div className="space-y-3 font-mono text-xs">
-        <div className="text-muted mb-4">Generated bullets:</div>
+      <div className="font-mono text-[11px] leading-relaxed space-y-3">
+        <div className="text-indigo-400/80 mb-4">// Analyzing your GitHub + experience...</div>
         {[
-          "Architected real-time data pipeline handling 2M+ events/day, reducing processing latency by 65%",
-          "Led migration from monolith to microservices, improving deployment frequency from weekly to 15x/day",
-          "Built ML-powered recommendation engine serving 50K daily active users with 94% relevance score",
+          'Architected real-time data pipeline handling 2M+ events/day, reducing processing latency by 65%',
+          'Led migration from monolith to microservices, improving deployment frequency from weekly to 15x/day',
+          'Built ML-powered recommendation engine serving 50K daily active users with 94% relevance score',
+          'Reduced infrastructure costs by $40K/year through automated scaling and resource optimization',
+          'Mentored 4 junior engineers, conducting 200+ code reviews that reduced bug rate by 38%',
         ].map((bullet, i) => (
           <motion.div
             key={i}
             initial={{ opacity: 0, x: -10 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: i * 0.15 }}
-            className="flex gap-2 text-foreground"
+            className="flex gap-3 text-zinc-300"
           >
-            <span className="text-indigo shrink-0">&#8226;</span>
-            <span className="leading-relaxed">{bullet}</span>
+            <span className="text-zinc-600 select-none">•</span>
+            <span>{bullet}</span>
           </motion.div>
         ))}
+        <div className="flex items-center gap-2 mt-4 pt-4 border-t border-white/5">
+          <div className="w-1.5 h-3 bg-indigo-500 animate-pulse" />
+          <span className="text-indigo-400">Generating more suggestions...</span>
+        </div>
       </div>
     ),
   },
@@ -174,48 +180,54 @@ export default function Features() {
   const [active, setActive] = useState(0);
 
   return (
-    <section id="features" className="relative py-28 border-t border-border">
-      <div className="container-page">
+    <section id="features" className="section-lg border-t border-white/5 bg-[#0A0A0F]">
+      <div className="page-wrap">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-16"
+          className="text-center"
         >
-          <h2 className="section-heading">
+          <p className="section-eyebrow">Features</p>
+          <h2 className="section-title">
             Everything you need to land interviews
           </h2>
-          <p className="section-subheading">
+          <p className="section-sub">
             From AI-powered bullet writing to ATS optimization — every tool a job seeker needs, in one place.
           </p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-2 gap-12">
+        <div className="grid lg:grid-cols-2 gap-16 items-start mt-16">
           {/* Feature list */}
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
-            className="space-y-2"
+            className="flex flex-col gap-2"
           >
             {features.map((feature, i) => (
               <button
                 key={feature.title}
                 onClick={() => setActive(i)}
-                className={`w-full text-left px-5 py-4 transition-all duration-200 cursor-pointer border-l-2 ${
+                className={`text-left px-5 py-4 rounded-xl transition-all duration-200 cursor-pointer ${
                   active === i
-                    ? "border-l-indigo bg-indigo/5 text-white"
-                    : "border-l-transparent text-muted hover:text-foreground hover:bg-white/[0.02]"
+                    ? "bg-indigo-500/10 border border-indigo-500/25 text-white"
+                    : "border border-transparent text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.03]"
                 }`}
               >
-                <h3 className="text-sm font-semibold mb-1">{feature.title}</h3>
+                <h3 className="text-base font-semibold mb-1 flex items-center">
+                  <span className={`mr-3 ${active === i ? "text-indigo-400" : "text-zinc-600"}`}>
+                    0{i + 1}
+                  </span>
+                  {feature.title}
+                </h3>
                 {active === i && (
                   <motion.p
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: "auto" }}
-                    className="text-xs text-muted leading-relaxed mt-2"
+                    className="text-sm text-indigo-200/70 leading-relaxed pl-8 mt-2"
                   >
                     {feature.description}
                   </motion.p>
@@ -230,20 +242,20 @@ export default function Features() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="bg-surface border border-border overflow-hidden"
+            className="bg-[#0D0D14] rounded-2xl border border-white/10 overflow-hidden shadow-2xl sticky top-32"
           >
-            {/* Terminal-style header bar */}
-            <div className="flex items-center gap-2 px-5 py-3 border-b border-border bg-white/[0.02]">
+            {/* Terminal header */}
+            <div className="flex items-center gap-2 px-4 py-3 bg-white/[0.02] border-b border-white/5">
               <div className="w-2.5 h-2.5 rounded-full bg-red-500/50" />
               <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50" />
               <div className="w-2.5 h-2.5 rounded-full bg-green-500/50" />
-              <span className="ml-2 text-[10px] text-muted font-mono">
+              <span className="ml-2 text-[10px] text-zinc-500 font-mono tracking-wider">
                 {features[active].title}
               </span>
             </div>
 
-            {/* Animated content */}
-            <div className="p-8 min-h-[380px]">
+            {/* Content — FIXED height, content fills it */}
+            <div className="p-8 h-[340px] flex flex-col justify-center">
               <AnimatePresence mode="wait">
                 <motion.div
                   key={active}

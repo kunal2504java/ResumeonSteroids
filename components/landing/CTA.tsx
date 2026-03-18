@@ -37,39 +37,37 @@ const dots = [
 
 export default function CTA() {
   return (
-    <section className="relative py-20">
-      <div className="container-page">
+    <section className="section-lg relative overflow-hidden bg-[#0A0A0F]">
+      <div className="page-wrap relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="relative overflow-hidden bg-surface py-20 px-8 sm:px-16 text-center"
-          style={{
-            border: "2px solid transparent",
-            backgroundClip: "padding-box",
-            backgroundImage:
-              "linear-gradient(#111118, #111118), linear-gradient(135deg, #6366f1, #22d3ee, #6366f1)",
-            backgroundOrigin: "padding-box, border-box",
-          }}
+          className="relative overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.02] py-[148px] md:py-[212px] px-8 md:px-16 text-center shadow-2xl"
         >
+          {/* Background glow */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full max-w-2xl h-full bg-indigo-500/20 rounded-full blur-[100px] pointer-events-none" />
+
           {/* Floating particles */}
           {dots.map((dot, i) => (
             <FloatingDot key={i} {...dot} />
           ))}
 
-          <div className="relative z-10">
-            <h2 className="section-heading mb-4">
+          <div className="relative z-10 flex flex-col items-center">
+            <h2 className="text-4xl md:text-6xl font-extrabold text-white tracking-tight mb-6">
               Build your resume in 60 seconds.
             </h2>
-            <p className="text-muted text-base max-w-md mx-auto mb-10">
+            <p className="text-lg md:text-xl text-zinc-400 max-w-2xl mb-10 leading-relaxed">
               Join thousands of engineers who landed their dream jobs with
               ResumeAI.
             </p>
-            <Button variant="primary" className="text-sm px-10 py-4">
+            <button
+              className="mt-6 bg-indigo-500 text-white font-semibold tracking-wide py-4 px-12 rounded-full shadow-[0_0_24px_rgba(99,102,241,0.25)] hover:shadow-[0_0_32px_rgba(99,102,241,0.4)] hover:bg-indigo-400 hover:scale-105 transition-all flex items-center gap-3 text-base"
+            >
               Get started free
               <span aria-hidden="true">&rarr;</span>
-            </Button>
+            </button>
           </div>
         </motion.div>
       </div>

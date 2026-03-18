@@ -44,22 +44,22 @@ const resumeLines = [
 
 export default function Hero() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden dot-grid noise-overlay">
+    <section className="section-lg relative overflow-hidden bg-background">
       {/* Background glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[600px] bg-indigo/5 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-indigo-500/10 rounded-full blur-[120px] pointer-events-none" />
 
-      <div className="relative z-10 container-page pt-32 pb-24 w-full">
+      <div className="page-wrap relative z-10">
         <motion.div
           variants={stagger}
           initial="hidden"
           animate="visible"
-          className="flex flex-col lg:flex-row items-center gap-16"
+          className="flex flex-col lg:flex-row items-center gap-16 lg:gap-24"
         >
           {/* Left content */}
-          <div className="flex-1 max-w-2xl">
+          <div className="flex-1 max-w-2xl flex flex-col justify-center">
             {/* Announcement pill */}
             <motion.div variants={fadeUp} className="mb-8">
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 text-xs font-medium text-indigo-light border border-indigo/30 bg-indigo/5 tracking-wide">
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 text-xs font-medium text-indigo-400 border border-indigo-500/30 bg-indigo-500/10 rounded-full tracking-wide">
                 <span className="animate-pulse">&#10022;</span>
                 Now with GitHub + LeetCode sync
               </span>
@@ -68,12 +68,12 @@ export default function Hero() {
             {/* Heading */}
             <motion.h1
               variants={fadeUp}
-              className="font-heading text-5xl sm:text-6xl lg:text-[80px] font-extrabold leading-[0.95] tracking-tight text-white mb-6"
+              className="font-heading text-5xl sm:text-6xl lg:text-[80px] font-extrabold leading-[1] tracking-tight text-white mb-6"
             >
               Your resume,
               <br />
               written by{" "}
-              <span className="bg-gradient-to-r from-indigo via-indigo-light to-cyan bg-clip-text text-transparent">
+              <span className="bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">
                 AI
               </span>
               .
@@ -82,7 +82,7 @@ export default function Hero() {
             {/* Subtext */}
             <motion.p
               variants={fadeUp}
-              className="text-lg text-muted max-w-lg leading-relaxed mb-10"
+              className="text-lg text-zinc-400 max-w-lg leading-relaxed mb-10"
             >
               Connect your GitHub, LeetCode, or Codeforces. Upload your old
               resume. Our AI reads everything and builds a job-winning resume in
@@ -91,30 +91,28 @@ export default function Hero() {
 
             {/* CTAs */}
             <motion.div variants={fadeUp} className="flex flex-wrap gap-4 mb-10">
-              <Button variant="primary" className="text-sm px-7 py-3.5">
+              <Button variant="primary" className="text-sm px-8 py-4 font-semibold">
                 Build my resume free
-                <span aria-hidden="true">&rarr;</span>
+                <span aria-hidden="true" className="ml-2">&rarr;</span>
               </Button>
-              <Button variant="ghost" className="text-sm px-7 py-3.5">
+              <Button variant="ghost" className="text-sm px-8 py-4 font-semibold text-zinc-300 hover:text-white">
                 See how it works
               </Button>
             </motion.div>
 
             {/* Social proof */}
-            <motion.div variants={fadeUp} className="flex items-center gap-3">
-              <div className="flex -space-x-2">
+            <motion.div variants={fadeUp} className="flex items-center gap-4 mt-4">
+              <div className="flex -space-x-3">
                 {[...Array(5)].map((_, i) => (
                   <div
                     key={i}
-                    className="w-8 h-8 rounded-full border-2 border-background bg-gradient-to-br from-indigo/60 to-cyan/40"
+                    className="w-10 h-10 rounded-full border-2 border-background bg-gradient-to-br from-indigo-500/60 to-cyan-500/40 shadow-sm"
                     style={{ zIndex: 5 - i }}
                   />
                 ))}
               </div>
-              <p className="text-sm text-muted">
-                Joined by{" "}
-                <span className="text-white font-semibold">12,400+</span>{" "}
-                engineers from Google, Meta, Amazon
+              <p className="text-sm text-zinc-400">
+                Joined by <span className="text-white font-semibold">12,400+</span> engineers<br/>from Google, Meta, Amazon
               </p>
             </motion.div>
           </div>
@@ -122,55 +120,56 @@ export default function Hero() {
           {/* Right: Resume mockup */}
           <motion.div
             variants={fadeUp}
-            className="flex-1 max-w-md w-full relative"
+            className="flex-1 w-full max-w-[500px] relative"
           >
             {/* Glow behind card */}
-            <div className="absolute -inset-8 bg-gradient-to-br from-indigo/20 via-transparent to-cyan/10 blur-[60px] pointer-events-none" />
+            <div className="absolute -inset-8 bg-gradient-to-br from-indigo-500/20 via-transparent to-cyan-500/10 blur-[60px] pointer-events-none rounded-full" />
 
             <motion.div
               animate={{ y: [0, -12, 0] }}
               transition={{
-                duration: 4,
+                duration: 5,
                 ease: "easeInOut",
                 repeat: Infinity,
               }}
-              className="relative"
+              className="relative rounded-2xl overflow-hidden border border-white/10 bg-[#0D0D14] shadow-2xl"
             >
-              <div className="bg-[#0D0D14] border border-white/10 p-6 shadow-2xl">
-                {/* Editor chrome */}
-                <div className="flex items-center gap-1.5 mb-4">
-                  <div className="w-2.5 h-2.5 rounded-full bg-red-500/60" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/60" />
-                  <div className="w-2.5 h-2.5 rounded-full bg-green-500/60" />
-                  <span className="ml-3 text-[10px] text-muted">
-                    resume_final.pdf
-                  </span>
+              {/* Editor chrome */}
+              <div className="flex items-center gap-2 px-4 py-3 bg-white/[0.02] border-b border-white/5">
+                <div className="w-3 h-3 rounded-full bg-red-500/60" />
+                <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
+                <div className="w-3 h-3 rounded-full bg-green-500/60" />
+                <span className="ml-2 text-xs text-zinc-500 font-mono">
+                  resume_final.pdf
+                </span>
+              </div>
+
+              {/* Resume content - white paper simulation */}
+              <div className="p-8 bg-[#FAFAFA] m-4 rounded shadow-sm min-h-[400px]">
+                <div className="text-center border-b border-zinc-200 pb-4 mb-4">
+                  <h3 className="text-2xl font-bold text-zinc-900 font-serif">Jake Ryan</h3>
+                  <p className="text-[11px] text-zinc-600 mt-1 font-sans">
+                    jake@resume.ai | github.com/jakeryan | (555) 012-3456
+                  </p>
                 </div>
 
-                {/* Resume content */}
-                <div className="space-y-0.5 font-mono">
-                  {resumeLines.map((line, i) =>
-                    line.label === "" ? (
-                      <div key={i} className="h-2" />
-                    ) : (
-                      <p
-                        key={i}
-                        className={`${line.size} ${
-                          line.bold
-                            ? "font-bold text-white"
-                            : "text-zinc-400"
-                        } leading-snug`}
-                      >
-                        {line.label}
-                      </p>
-                    )
-                  )}
+                <div className="space-y-4 font-sans">
+                  {['Education', 'Experience', 'Projects', 'Skills'].map(section => (
+                    <div key={section} className="space-y-2">
+                       <h4 className="text-xs font-bold text-zinc-800 uppercase tracking-widest">{section}</h4>
+                       <div className="space-y-1.5 pl-2">
+                         <div className="w-full h-1.5 bg-zinc-200 rounded-full" />
+                         <div className="w-5/6 h-1.5 bg-zinc-200 rounded-full" />
+                         <div className="w-4/6 h-1.5 bg-zinc-200 rounded-full" />
+                       </div>
+                    </div>
+                  ))}
                 </div>
 
                 {/* AI cursor indicator */}
-                <div className="mt-3 flex items-center gap-2">
-                  <div className="w-1.5 h-4 bg-indigo animate-pulse" />
-                  <span className="text-[10px] text-indigo-light">
+                <div className="mt-8 flex items-center gap-2 bg-indigo-500/10 text-indigo-600 px-3 py-1.5 rounded-full w-max mx-auto shadow-sm border border-indigo-500/20">
+                  <div className="w-1.5 h-3 bg-indigo-600 animate-pulse rounded-full" />
+                  <span className="text-[10px] font-bold uppercase tracking-wider">
                     AI writing...
                   </span>
                 </div>

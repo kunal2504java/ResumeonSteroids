@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { v4 as uuid } from "uuid";
@@ -10,11 +10,14 @@ import { createDefaultResume, type Resume } from "@/types/resume";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const [resumes, setResumes] = useState<Resume[]>(() => {
-    if (typeof window === "undefined") return [];
+  const [resumes, setResumes] = useState<Resume[]>([]);
+  const [hydrated, setHydrated] = useState(false);
+
+  useEffect(() => {
     const stored = localStorage.getItem("resumeai_resumes");
-    return stored ? JSON.parse(stored) : [];
-  });
+    if (stored) setResumes(JSON.parse(stored));
+    setHydrated(true);
+  }, []);
 
   function persist(updated: Resume[]) {
     setResumes(updated);
@@ -67,9 +70,11 @@ export default function DashboardPage() {
           <div>
             <h1 className="text-3xl font-bold text-white mb-1">Your Resumes</h1>
             <p className="text-sm text-[#71717A]">
-              {resumes.length === 0
-                ? "Create your first AI-powered resume"
-                : `${resumes.length} resume${resumes.length > 1 ? "s" : ""}`}
+              {!hydrated
+                ? "\u00A0"
+                : resumes.length === 0
+                  ? "Create your first AI-powered resume"
+                  : `${resumes.length} resume${resumes.length > 1 ? "s" : ""}`}
             </p>
           </div>
           <button
@@ -84,7 +89,7 @@ export default function DashboardPage() {
         </motion.div>
 
         {/* Empty state */}
-        {resumes.length === 0 && (
+        {hydrated && resumes.length === 0 && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -113,7 +118,7 @@ export default function DashboardPage() {
         )}
 
         {/* Resume grid */}
-        {resumes.length > 0 && (
+        {hydrated && resumes.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             <NewResumeCard onClick={createNew} />
             {resumes.map((r, i) => (

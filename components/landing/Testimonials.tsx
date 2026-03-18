@@ -56,24 +56,25 @@ function getInitials(name: string) {
 
 export default function Testimonials() {
   return (
-    <section className="relative py-28 border-t border-border">
-      <div className="container-page">
+    <section className="section-md bg-[#0A0A0F] relative border-t border-white/5">
+      <div className="page-wrap">
         <motion.div
           initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ duration: 0.5 }}
-          className="text-center mb-16"
+          className="text-center"
         >
-          <h2 className="section-heading">
+          <p className="section-eyebrow">Testimonials</p>
+          <h2 className="section-title">
             Loved by engineers everywhere
           </h2>
-          <p className="section-subheading">
+          <p className="section-sub">
             Thousands of developers have landed their dream jobs with ResumeAI.
           </p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-16">
           {testimonials.map((t, i) => (
             <motion.div
               key={t.name}
@@ -81,38 +82,35 @@ export default function Testimonials() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: i * 0.08 }}
-              whileHover={{ scale: 1.02, borderColor: "rgba(99,102,241,0.3)" }}
-              className="bg-surface border border-border p-6 transition-all duration-300 flex flex-col"
+              className="bg-white/[0.02] border border-white/5 rounded-2xl p-8 flex flex-col h-full hover:bg-white/[0.04] transition-colors"
             >
               {/* Stars */}
-              <div className="flex gap-0.5 mb-4">
-                {[...Array(5)].map((_, j) => (
+              <div className="flex gap-1 mb-6">
+                {[...Array(t.stars)].map((_, j) => (
                   <svg
                     key={j}
-                    className={`w-4 h-4 ${
-                      j < t.stars ? "text-amber-400" : "text-white/10"
-                    }`}
+                    className="w-4 h-4 text-amber-500"
                     fill="currentColor"
                     viewBox="0 0 20 20"
                   >
-                    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    <path d="M10 15l-5.878 3.09 1.122-6.545L.488 6.91l6.572-.955L10 0l2.94 5.955 6.572.955-4.756 4.635 1.122 6.545z" />
                   </svg>
                 ))}
               </div>
 
               {/* Quote */}
-              <p className="text-sm text-foreground leading-relaxed flex-1 mb-6">
-                {t.quote}
+              <p className="text-zinc-300 leading-relaxed mb-8 flex-1">
+                "{t.quote}"
               </p>
 
-              {/* Author */}
-              <div className="flex items-center gap-3 pt-4 border-t border-border">
-                <div className="w-9 h-9 rounded-full bg-gradient-to-br from-indigo/60 to-cyan/40 flex items-center justify-center text-[10px] font-bold text-white shrink-0">
+              {/* Author — always at bottom, never clipped */}
+              <div className="flex items-center gap-4 mt-auto pt-6 border-t border-white/5">
+                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500/60 to-cyan-500/40 flex items-center justify-center text-xs font-bold text-white shrink-0">
                   {getInitials(t.name)}
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-white">{t.name}</p>
-                  <p className="text-xs text-muted">{t.title}</p>
+                  <p className="font-semibold text-white text-sm">{t.name}</p>
+                  <p className="text-xs text-zinc-500">{t.title}</p>
                 </div>
               </div>
             </motion.div>
