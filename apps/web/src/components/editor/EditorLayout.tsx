@@ -75,7 +75,8 @@ export default function EditorLayout() {
 
   const commands = [
     { id: "save", label: "Save Resume", shortcut: "⌘S", action: () => save() },
-    { id: "pdf", label: "Download PDF", shortcut: "", action: handleDownloadPDF },
+    { id: "pdf", label: "Download PDF (LaTeX)", shortcut: "", action: handleDownloadLatexPDF },
+    { id: "pdf-quick", label: "Download PDF (Quick)", shortcut: "", action: handleDownloadPDF },
     { id: "latex", label: "Copy LaTeX", shortcut: "", action: handleCopyLaTeX },
     { id: "tailor", label: "Tailor to Job", shortcut: "", action: () => setTailorOpen(true) },
     { id: "add-exp", label: "Add Experience", shortcut: "", action: () => { addExperience(); setActiveSection("experience"); } },
@@ -84,6 +85,56 @@ export default function EditorLayout() {
     { id: "skills", label: "Edit Skills", shortcut: "", action: () => setActiveSection("skills") },
   ];
 
+  /**
+   * Primary PDF download — sends resume data to the API which compiles
+   * LaTeX with pdflatex and returns a real PDF. Falls back to the quick
+   * (html-to-image) method if pdflatex is not available.
+   */
+  async function handleDownloadLatexPDF() {
+    if (!resume) return;
+    try {
+      addToast("Compiling LaTeX PDF...", "info");
+      const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+      const res = await fetch(`${API_URL}/api/export/latex`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          personalInfo: resume.personalInfo,
+          summary: resume.summary,
+          experience: resume.experience,
+          education: resume.education,
+          projects: resume.projects,
+          skills: resume.skills,
+          achievements: resume.achievements,
+        }),
+      });
+
+      if (!res.ok) {
+        const err = await res.json().catch(() => ({ error: "Compilation failed" }));
+        throw new Error((err as { error?: string }).error ?? `HTTP ${res.status}`);
+      }
+
+      // Stream the PDF blob and trigger download
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${resume.personalInfo.name || "resume"}_resume.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+      addToast("PDF downloaded", "success");
+    } catch (err) {
+      console.error("[LaTeX PDF Error]", err);
+      addToast(
+        `LaTeX PDF failed: ${(err as Error).message}. Try Quick PDF instead.`,
+        "error"
+      );
+    }
+  }
+
+  /** Fallback: client-side PDF from the HTML preview (html-to-image + jsPDF) */
   async function handleDownloadPDF() {
     const el = document.querySelector("[data-resume-preview]") as HTMLElement;
     if (!el) return;
@@ -129,7 +180,7 @@ export default function EditorLayout() {
   return (
     <div className="h-screen flex flex-col bg-[#0D1117] text-white overflow-hidden">
       <Toolbar
-        onDownloadPDF={handleDownloadPDF}
+        onDownloadPDF={handleDownloadLatexPDF}
         onCopyLaTeX={handleCopyLaTeX}
         onTailor={() => setTailorOpen(true)}
         onCommandPalette={() => setCmdOpen(true)}

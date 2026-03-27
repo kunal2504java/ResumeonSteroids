@@ -18,12 +18,11 @@ route.post("/", optionalAuthMiddleware, async (c) => {
     let text = "";
 
     if (file.name.endsWith(".pdf")) {
-      const pdfMod = await import("pdf-parse");
-      const pdfParse = (pdfMod.default ?? pdfMod) as (
-        buf: Buffer
-      ) => Promise<{ text: string }>;
-      const data = await pdfParse(buffer);
-      text = data.text;
+      const { PDFParse } = await import("pdf-parse");
+      const parser = new PDFParse({ data: new Uint8Array(buffer) });
+      const result = await parser.getText();
+      text = result.text;
+      await parser.destroy();
     } else if (
       file.name.endsWith(".docx") ||
       file.name.endsWith(".doc")

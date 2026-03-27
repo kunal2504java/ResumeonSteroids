@@ -3,6 +3,35 @@
 import { useResumeStore } from "@/lib/store/resumeStore";
 import { forwardRef } from "react";
 
+/**
+ * Format "YYYY-MM" or "YYYY" into "November 2025" style.
+ * Pass-through if already human-readable (e.g. "Present").
+ */
+function formatDate(date: string): string {
+  if (!date) return "";
+  const MONTHS: Record<string, string> = {
+    "01": "January", "02": "February", "03": "March", "04": "April",
+    "05": "May", "06": "June", "07": "July", "08": "August",
+    "09": "September", "10": "October", "11": "November", "12": "December",
+    "1": "January", "2": "February", "3": "March", "4": "April",
+    "5": "May", "6": "June", "7": "July", "8": "August",
+    "9": "September", "10": "October", "11": "November", "12": "December",
+  };
+  if (date.includes("-")) {
+    const [year, month] = date.split("-");
+    return month ? `${MONTHS[month] || month} ${year}` : year;
+  }
+  return date;
+}
+
+function dateRange(start: string, end: string): string {
+  const s = formatDate(start);
+  const e = formatDate(end);
+  if (!s && !e) return "";
+  if (!e || e === "Present") return `${s} \u2013 Present`;
+  return `${s} \u2013 ${e}`;
+}
+
 const JakeTemplate = forwardRef<HTMLDivElement>(function JakeTemplate(_, ref) {
   const resume = useResumeStore((s) => s.resume);
 
@@ -10,6 +39,7 @@ const JakeTemplate = forwardRef<HTMLDivElement>(function JakeTemplate(_, ref) {
 
   const { personalInfo: p, education, experience, projects, skills } = resume;
 
+  /* ---- contact line fragments ---- */
   const contactParts = [
     p.phone,
     p.email && (
@@ -38,26 +68,24 @@ const JakeTemplate = forwardRef<HTMLDivElement>(function JakeTemplate(_, ref) {
     <div
       ref={ref}
       data-resume-preview
-      className="bg-white text-black w-[816px] min-h-[1056px] px-[48px] py-[36px]"
+      className="bg-white text-black w-[816px] min-h-[1056px]"
       style={{
-        fontFamily: '"CMU Serif", Georgia, "Times New Roman", serif',
-        fontSize: "10.5pt",
-        lineHeight: "1.25",
+        fontFamily: '"Computer Modern Serif", "CMU Serif", Georgia, "Times New Roman", serif',
+        fontSize: "10pt",
+        lineHeight: "1.2",
+        padding: "36px 48px",
       }}
     >
-      {/* Header */}
+      {/* ===== HEADING ===== */}
       <div className="text-center mb-1">
         <h1
-          className="font-bold tracking-wide"
-          style={{ fontSize: "22pt", fontVariant: "small-caps" }}
+          className="font-bold"
+          style={{ fontSize: "24pt", fontVariant: "small-caps", letterSpacing: "0.03em" }}
         >
           {p.name || "Your Name"}
         </h1>
         {contactParts.length > 0 && (
-          <div
-            className="text-[9pt] mt-0.5 flex items-center justify-center flex-wrap gap-0"
-            style={{ color: "#000" }}
-          >
+          <div className="flex items-center justify-center flex-wrap mt-0.5" style={{ fontSize: "9pt" }}>
             {contactParts.map((part, i) => (
               <span key={i} className="flex items-center">
                 {i > 0 && <span className="mx-1.5">|</span>}
@@ -68,120 +96,76 @@ const JakeTemplate = forwardRef<HTMLDivElement>(function JakeTemplate(_, ref) {
         )}
       </div>
 
-      {/* Education */}
+      {/* ===== EDUCATION ===== */}
       {education.length > 0 && (
         <Section title="Education">
           {education.map((edu) => (
-            <div key={edu.id} className="mb-1.5">
-              <div className="flex justify-between items-baseline">
-                <span className="font-bold">{edu.institution}</span>
-                <span className="text-[9.5pt]">{edu.location}</span>
-              </div>
-              <div className="flex justify-between items-baseline italic text-[9.5pt]">
+            <SubHeading
+              key={edu.id}
+              topLeft={edu.institution}
+              topRight={edu.location}
+              bottomLeft={
                 <span>
                   {edu.degree}
                   {edu.field ? ` in ${edu.field}` : ""}
                   {edu.gpa ? `, GPA: ${edu.gpa}` : ""}
                 </span>
-                <span>
-                  {edu.startDate}
-                  {edu.endDate ? ` -- ${edu.endDate}` : ""}
-                </span>
-              </div>
-              {edu.coursework.length > 0 && (
-                <div className="text-[9pt] mt-0.5">
-                  <span className="font-bold">Coursework: </span>
-                  {edu.coursework.join(", ")}
-                </div>
-              )}
-            </div>
+              }
+              bottomRight={dateRange(edu.startDate, edu.endDate)}
+            />
           ))}
         </Section>
       )}
 
-      {/* Experience */}
+      {/* ===== EXPERIENCE ===== */}
       {experience.length > 0 && (
         <Section title="Experience">
           {experience.map((exp) => (
-            <div key={exp.id} className="mb-2">
-              <div className="flex justify-between items-baseline">
-                <span className="font-bold">{exp.company}</span>
-                <span className="text-[9.5pt]">
-                  {exp.startDate}
-                  {exp.endDate ? ` -- ${exp.endDate}` : ""}
-                </span>
-              </div>
-              <div className="flex justify-between items-baseline italic text-[9.5pt]">
-                <span>{exp.title}</span>
-                <span>{exp.location}</span>
-              </div>
-              {exp.bullets.some((b) => b) && (
-                <ul className="mt-0.5 ml-4 list-none">
-                  {exp.bullets
-                    .filter((b) => b)
-                    .map((bullet, i) => (
-                      <li
-                        key={i}
-                        className="relative pl-3 text-[9.5pt] leading-[1.35] mb-0.5"
-                      >
-                        <span className="absolute left-0">--</span>
-                        {bullet}
-                      </li>
-                    ))}
-                </ul>
-              )}
+            <div key={exp.id} className="mb-1">
+              <SubHeading
+                topLeft={exp.company}
+                topRight={dateRange(exp.startDate, exp.endDate)}
+                bottomLeft={exp.title}
+                bottomRight={exp.location}
+              />
+              <BulletList bullets={exp.bullets} />
             </div>
           ))}
         </Section>
       )}
 
-      {/* Projects */}
+      {/* ===== PROJECTS ===== */}
       {projects.length > 0 && (
         <Section title="Projects">
           {projects.map((proj) => (
-            <div key={proj.id} className="mb-2">
+            <div key={proj.id} className="mb-1">
               <div className="flex justify-between items-baseline">
-                <div>
+                <div style={{ fontSize: "10pt" }}>
                   <span className="font-bold">{proj.name}</span>
                   {proj.techStack.length > 0 && (
-                    <span className="text-[9.5pt]">
-                      {" "}
-                      | <em>{proj.techStack.join(", ")}</em>
+                    <span>
+                      {" | "}
+                      <em>{proj.techStack.join(", ")}</em>
                     </span>
                   )}
                 </div>
-                <span className="text-[9.5pt]">
-                  {proj.startDate}
-                  {proj.endDate ? ` -- ${proj.endDate}` : ""}
+                <span className="text-right shrink-0 ml-4" style={{ fontSize: "10pt" }}>
+                  {dateRange(proj.startDate, proj.endDate)}
                 </span>
               </div>
-              {proj.bullets.some((b) => b) && (
-                <ul className="mt-0.5 ml-4 list-none">
-                  {proj.bullets
-                    .filter((b) => b)
-                    .map((bullet, i) => (
-                      <li
-                        key={i}
-                        className="relative pl-3 text-[9.5pt] leading-[1.35] mb-0.5"
-                      >
-                        <span className="absolute left-0">--</span>
-                        {bullet}
-                      </li>
-                    ))}
-                </ul>
-              )}
+              <BulletList bullets={proj.bullets} />
             </div>
           ))}
         </Section>
       )}
 
-      {/* Technical Skills */}
+      {/* ===== TECHNICAL SKILLS ===== */}
       {(skills.languages.length > 0 ||
         skills.frameworks.length > 0 ||
         skills.tools.length > 0 ||
         skills.databases.length > 0) && (
         <Section title="Technical Skills">
-          <div className="text-[9.5pt] space-y-0.5">
+          <div style={{ fontSize: "10pt", lineHeight: "1.4" }}>
             {skills.languages.length > 0 && (
               <div>
                 <span className="font-bold">Languages: </span>
@@ -210,26 +194,14 @@ const JakeTemplate = forwardRef<HTMLDivElement>(function JakeTemplate(_, ref) {
         </Section>
       )}
 
-      {/* Achievements */}
-      {resume.achievements.length > 0 && (
+      {/* ===== ACHIEVEMENTS ===== */}
+      {resume.achievements.length > 0 && resume.achievements.some((a) => a) && (
         <Section title="Achievements">
-          <ul className="ml-4 list-none">
-            {resume.achievements
-              .filter((a) => a)
-              .map((achievement, i) => (
-                <li
-                  key={i}
-                  className="relative pl-3 text-[9.5pt] leading-[1.35] mb-0.5"
-                >
-                  <span className="absolute left-0">--</span>
-                  {achievement}
-                </li>
-              ))}
-          </ul>
+          <BulletList bullets={resume.achievements} />
         </Section>
       )}
 
-      {/* Empty state */}
+      {/* ===== EMPTY STATE ===== */}
       {education.length === 0 &&
         experience.length === 0 &&
         projects.length === 0 &&
@@ -247,23 +219,78 @@ const JakeTemplate = forwardRef<HTMLDivElement>(function JakeTemplate(_, ref) {
   );
 });
 
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
+/* ------------------------------------------------------------------ */
+/*  Section – renders the title with a horizontal rule below it        */
+/* ------------------------------------------------------------------ */
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="mb-2">
+    <div className="mt-2 mb-1">
+      {/* Section heading – matches LaTeX \section formatting */}
       <div
-        className="font-bold uppercase tracking-wider border-b border-black pb-0.5 mb-1.5"
-        style={{ fontSize: "11pt", fontVariant: "small-caps" }}
+        className="font-bold uppercase pb-[1px] border-b border-black mb-[6px]"
+        style={{ fontSize: "11.5pt", letterSpacing: "0.04em" }}
       >
         {title}
       </div>
       {children}
     </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  SubHeading – 2-row layout matching \resumeSubheading               */
+/*  Row 1: topLeft (bold) ............. topRight                       */
+/*  Row 2: bottomLeft (italic) ....... bottomRight (italic)            */
+/* ------------------------------------------------------------------ */
+function SubHeading({
+  topLeft,
+  topRight,
+  bottomLeft,
+  bottomRight,
+}: {
+  topLeft: React.ReactNode;
+  topRight: React.ReactNode;
+  bottomLeft: React.ReactNode;
+  bottomRight: React.ReactNode;
+}) {
+  return (
+    <div className="mb-0.5">
+      <div className="flex justify-between items-baseline" style={{ fontSize: "10pt" }}>
+        <span className="font-bold">{topLeft}</span>
+        <span className="text-right shrink-0 ml-4">{topRight}</span>
+      </div>
+      <div className="flex justify-between items-baseline italic" style={{ fontSize: "9.5pt" }}>
+        <span>{bottomLeft}</span>
+        <span className="text-right shrink-0 ml-4">{bottomRight}</span>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  BulletList – en-dash prefixed bullet items                         */
+/* ------------------------------------------------------------------ */
+function BulletList({ bullets }: { bullets: string[] }) {
+  const filtered = bullets.filter((b) => b);
+  if (filtered.length === 0) return null;
+  return (
+    <ul className="ml-[14px] mt-[2px]" style={{ listStyle: "none", padding: 0 }}>
+      {filtered.map((bullet, i) => (
+        <li
+          key={i}
+          className="relative"
+          style={{
+            fontSize: "10pt",
+            lineHeight: "1.3",
+            paddingLeft: "12px",
+            marginBottom: "1px",
+          }}
+        >
+          <span className="absolute left-0">{"\u2013"}</span>
+          {bullet}
+        </li>
+      ))}
+    </ul>
   );
 }
 

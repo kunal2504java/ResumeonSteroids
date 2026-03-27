@@ -5,6 +5,7 @@ import { logger } from "hono/logger";
 import { aiRoutes } from "./routes/ai";
 import { resumeRoutes } from "./routes/resume";
 import { pdfExportRoute } from "./routes/export/pdf";
+import { latexExportRoute } from "./routes/export/latex";
 
 const app = new Hono();
 
@@ -20,6 +21,7 @@ app.use(
 app.route("/api/ai", aiRoutes);
 app.route("/api/resume", resumeRoutes);
 app.route("/api/export/pdf", pdfExportRoute);
+app.route("/api/export/latex", latexExportRoute);
 
 app.get("/health", (c) => c.json({ status: "ok" }));
 
