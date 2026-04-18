@@ -12,7 +12,7 @@ export function useGithubValidation(username: string) {
   const [isValidating, setIsValidating] = useState(false);
   const [isValid, setIsValid] = useState<boolean | null>(null);
   const [profile, setProfile] = useState<GithubProfile | null>(null);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mountedRef = useRef(true);
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export function useGithubValidation(username: string) {
     }
 
     setIsValidating(true);
-    clearTimeout(debounceRef.current);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
 
     debounceRef.current = setTimeout(async () => {
       try {
@@ -56,7 +56,9 @@ export function useGithubValidation(username: string) {
       }
     }, 600);
 
-    return () => clearTimeout(debounceRef.current);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
   }, [username]);
 
   return { isValidating, isValid, profile };

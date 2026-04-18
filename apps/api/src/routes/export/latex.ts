@@ -11,22 +11,11 @@
 import { Hono } from "hono";
 import { optionalAuthMiddleware } from "../../middleware/auth";
 import { fillTemplate, type ResumeData } from "../../lib/fillTemplate";
-import fs from "node:fs";
-import os from "node:os";
-import path from "node:path";
-import { execFile } from "node:child_process";
-import { promisify } from "node:util";
-
-const execFileAsync = promisify(execFile);
+import { compileLatexToPdf } from "../../lib/pdflatex";
 
 const route = new Hono();
 
 route.post("/", optionalAuthMiddleware, async (c) => {
-  // Unique temp directory for this compilation
-  const tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "resume-"));
-  const texFile = path.join(tmpDir, "resume.tex");
-  const pdfFile = path.join(tmpDir, "resume.pdf");
-
   try {
     // 1. Parse the incoming resume data
     const body = (await c.req.json()) as ResumeData;
@@ -37,59 +26,8 @@ route.post("/", optionalAuthMiddleware, async (c) => {
     // 2. Fill the LaTeX template with the resume data
     const texContent = fillTemplate(body);
 
-    // 3. Write the filled .tex to a temp file
-    fs.writeFileSync(texFile, texContent, "utf-8");
-
-    // 4. Run pdflatex TWICE (two passes resolve cross-references)
-    //    -interaction=nonstopmode prevents pdflatex from waiting for user input on errors
-    const pdflatexArgs = [
-      "-interaction=nonstopmode",
-      `-output-directory=${tmpDir}`,
-      texFile,
-    ];
-
-    try {
-      // First pass
-      await execFileAsync("pdflatex", pdflatexArgs, {
-        timeout: 30000, // 30s timeout per pass
-        cwd: tmpDir,
-      });
-      // Second pass (for cross-references, TOC, etc.)
-      await execFileAsync("pdflatex", pdflatexArgs, {
-        timeout: 30000,
-        cwd: tmpDir,
-      });
-    } catch (compileError: unknown) {
-      // pdflatex returns non-zero on warnings too, so check if PDF was still produced
-      if (!fs.existsSync(pdfFile)) {
-        // Read the .log file for diagnostics
-        const logFile = path.join(tmpDir, "resume.log");
-        const logContent = fs.existsSync(logFile)
-          ? fs.readFileSync(logFile, "utf-8").slice(-2000) // last 2000 chars
-          : "No log file found";
-        console.error("[LaTeX Compilation Failed]", logContent);
-
-        const errorMsg =
-          compileError instanceof Error ? compileError.message : "Unknown error";
-        return c.json(
-          {
-            error: "LaTeX compilation failed",
-            details: errorMsg,
-            log: logContent,
-          },
-          500
-        );
-      }
-      // PDF exists despite non-zero exit — warnings only, proceed
-    }
-
-    // 5. Verify the PDF was produced
-    if (!fs.existsSync(pdfFile)) {
-      return c.json({ error: "PDF file was not generated" }, 500);
-    }
-
-    // 6. Read the PDF and stream it back
-    const pdfBuffer = fs.readFileSync(pdfFile);
+    // 3. Compile LaTeX to PDF
+    const { pdfBuffer } = await compileLatexToPdf(texContent, "resume-");
 
     // Build a clean filename from the user's name
     const safeName = (body.personalInfo.name || "resume")
@@ -109,13 +47,6 @@ route.post("/", optionalAuthMiddleware, async (c) => {
     console.error("[LaTeX Export Error]", error);
     const message = error instanceof Error ? error.message : "Export failed";
     return c.json({ error: message }, 500);
-  } finally {
-    // 7. Clean up all temp files
-    try {
-      fs.rmSync(tmpDir, { recursive: true, force: true });
-    } catch {
-      // Best-effort cleanup
-    }
   }
 });
 

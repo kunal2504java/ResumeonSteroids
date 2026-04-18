@@ -5,8 +5,8 @@ import dynamic from "next/dynamic";
 import type { ConnectionStatus } from "@/hooks/useConnectionFlow";
 import { SourceIcon } from "./SourceIcon";
 
-const JakeTemplate = dynamic(
-  () => import("@/components/editor/RightPanel/JakeTemplate"),
+const ResumePreview = dynamic(
+  () => import("@/components/editor/RightPanel/ResumePreview"),
   { ssr: false }
 );
 
@@ -120,25 +120,14 @@ export default function Phase4_Results({
           ))}
         </motion.div>
 
-        {/* Right: live resume preview */}
+        {/* Right: compiled resume preview */}
         <motion.div
           initial={{ opacity: 0, x: 24 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ delay: 0.1 }}
-          className="rounded-2xl border border-white/10 bg-zinc-900 overflow-hidden"
+          className="rounded-2xl border border-white/10 bg-zinc-900 overflow-hidden h-[580px]"
         >
-          <div className="overflow-hidden" style={{ maxHeight: 580 }}>
-            <div
-              style={{
-                transform: "scale(0.52)",
-                transformOrigin: "top center",
-                width: "192%",
-                marginLeft: "-46%",
-              }}
-            >
-              <JakeTemplate />
-            </div>
-          </div>
+          <ResumePreview />
         </motion.div>
       </div>
 

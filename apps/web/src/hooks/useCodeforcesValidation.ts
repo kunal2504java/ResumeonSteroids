@@ -12,7 +12,7 @@ export function useCodeforcesValidation(handle: string) {
   const [isValidating, setIsValidating] = useState(false);
   const [isValid, setIsValid] = useState<boolean | null>(null);
   const [profile, setProfile] = useState<CodeforcesProfile | null>(null);
-  const debounceRef = useRef<ReturnType<typeof setTimeout>>();
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mountedRef = useRef(true);
 
   useEffect(() => {
@@ -31,7 +31,7 @@ export function useCodeforcesValidation(handle: string) {
     }
 
     setIsValidating(true);
-    clearTimeout(debounceRef.current);
+    if (debounceRef.current) clearTimeout(debounceRef.current);
 
     debounceRef.current = setTimeout(async () => {
       try {
@@ -69,7 +69,9 @@ export function useCodeforcesValidation(handle: string) {
       }
     }, 600);
 
-    return () => clearTimeout(debounceRef.current);
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
   }, [handle]);
 
   return { isValidating, isValid, profile };

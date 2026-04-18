@@ -80,20 +80,28 @@ function stripProto(url: string): string {
   return url.replace(/^https?:\/\/(www\.)?/, "");
 }
 
-const MONTHS: Record<string, string> = {
-  "01": "January",  "02": "February", "03": "March",     "04": "April",
-  "05": "May",      "06": "June",     "07": "July",      "08": "August",
-  "09": "September","10": "October",  "11": "November",  "12": "December",
-  "1": "January",   "2": "February",  "3": "March",      "4": "April",
-  "5": "May",       "6": "June",      "7": "July",       "8": "August",
-  "9": "September", "10": "October",  "11": "November",  "12": "December",
-};
+const MONTHS = [
+  "",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
 function fmtDate(date: string): string {
   if (!date) return "";
   if (date.includes("-")) {
     const [year, month] = date.split("-");
-    return month ? `${MONTHS[month] || month} ${year}` : year;
+    const monthName = month ? MONTHS[Number(month)] : "";
+    return month ? `${monthName || month} ${year}` : year;
   }
   return date;
 }
