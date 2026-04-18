@@ -1,0 +1,21 @@
+{
+  "role": "Senior Backend Engineer",
+  "title": "Senior Backend Engineer",
+  "company": "Acme Corp",
+  "required_skills": [
+    "Python",
+    "Go",
+    "PostgreSQL",
+    "Redis",
+    "Docker",
+    "Kubernetes",
+    "AWS",
+    "gRPC"
+  ],
+  "preferred_skills": [
+    "Kafka",
+    "Terraform",
+    "GraphQL"
+  ],
+  "raw_text": "Acme Corp is hiring a Senior Backend Engineer to design and ship resilient backend systems for global payments. You will build Python and Go services, own PostgreSQL and Redis data flows, and deploy containerized workloads with Docker and Kubernetes on AWS. Strong experience with gRPC APIs, service reliability, distributed systems, and production debugging is required. Preferred experience includes Kafka event streaming, Terraform-based infrastructure, and GraphQL integrations. This role partners closely with platform and product teams to improve scalability, observability, and low-latency service performance."
+}

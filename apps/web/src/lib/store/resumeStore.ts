@@ -3,6 +3,10 @@ import { immer } from "zustand/middleware/immer";
 import type { Resume, SectionKey, Experience, Education, Project } from "@resumeai/shared";
 import { v4 as uuid } from "uuid";
 
+function cleanImportedName(value: unknown): string {
+  return typeof value === "string" ? value.trim() : "";
+}
+
 interface ResumeStore {
   resume: Resume | null;
   isDirty: boolean;
@@ -330,9 +334,6 @@ export const useResumeStore = create<ResumeStore>()(
             }));
             state.resume.projects.push(...newProjects);
           }
-          if (ghData.profile?.name && !state.resume.personalInfo.name) {
-            state.resume.personalInfo.name = ghData.profile.name;
-          }
           if (ghData.profile?.url) {
             state.resume.personalInfo.github = ghData.profile.url;
           }
@@ -409,6 +410,10 @@ export const useResumeStore = create<ResumeStore>()(
 
         // Resume upload data
         const resumeImport = data.resume as any;
+        const importedResumeName = cleanImportedName(
+          resumeImport?.resumeData?.personalInfo?.name
+        );
+        const importedLinkedinName = cleanImportedName(liData?.profile?.name);
         if (resumeImport?.resumeData) {
           const rd = resumeImport.resumeData;
           if (rd.personalInfo) {
@@ -474,6 +479,12 @@ export const useResumeStore = create<ResumeStore>()(
               }
             );
           }
+        }
+
+        const preferredImportedName =
+          importedResumeName || importedLinkedinName;
+        if (preferredImportedName) {
+          state.resume.personalInfo.name = preferredImportedName;
         }
 
         state.isDirty = true;

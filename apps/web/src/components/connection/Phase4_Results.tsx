@@ -1,8 +1,10 @@
 "use client";
 
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
 import type { ConnectionStatus } from "@/hooks/useConnectionFlow";
+import { useResumeStore } from "@/lib/store/resumeStore";
 import { SourceIcon } from "./SourceIcon";
 
 const ResumePreview = dynamic(
@@ -21,8 +23,30 @@ export default function Phase4_Results({
   onConfirm,
   onBack,
 }: Phase4Props) {
+  const resume = useResumeStore((s) => s.resume);
+  const updatePersonalInfo = useResumeStore((s) => s.updatePersonalInfo);
   const completed = connections.filter((c) => c.status === "done");
   const failed = connections.filter((c) => c.status === "error");
+  const preferredNameSource = useMemo(() => {
+    if (completed.some((conn) => conn.id === "resume")) return "uploaded resume";
+    if (completed.some((conn) => conn.id === "linkedin")) return "LinkedIn";
+    return "manual entry";
+  }, [completed]);
+  const [draftName, setDraftName] = useState("");
+  const [isNameConfirmed, setIsNameConfirmed] = useState(false);
+
+  useEffect(() => {
+    if (!isNameConfirmed) {
+      setDraftName(resume?.personalInfo.name || "");
+    }
+  }, [resume?.personalInfo.name, isNameConfirmed]);
+
+  function handleConfirmName() {
+    const nextName = draftName.trim();
+    if (!nextName) return;
+    updatePersonalInfo("name", nextName);
+    setIsNameConfirmed(true);
+  }
 
   return (
     <div className="w-full max-w-5xl mx-auto">
@@ -127,7 +151,51 @@ export default function Phase4_Results({
           transition={{ delay: 0.1 }}
           className="rounded-2xl border border-white/10 bg-zinc-900 overflow-hidden h-[580px]"
         >
-          <ResumePreview />
+          {isNameConfirmed ? (
+            <ResumePreview />
+          ) : (
+            <div className="flex h-full items-center justify-center p-6">
+              <div className="w-full max-w-md rounded-2xl border border-white/10 bg-white/[0.03] p-6">
+                <div className="mb-4">
+                  <div className="text-xs uppercase tracking-[0.2em] text-indigo-300/80">
+                    Confirm Name
+                  </div>
+                  <h3 className="mt-2 text-xl font-semibold text-white">
+                    Confirm the name before preview
+                  </h3>
+                  <p className="mt-2 text-sm text-zinc-400">
+                    The preview stays hidden until you confirm the display name.
+                    Current source: {preferredNameSource}.
+                  </p>
+                </div>
+
+                <label className="mb-2 block text-xs font-medium uppercase tracking-[0.16em] text-zinc-500">
+                  Resume Name
+                </label>
+                <input
+                  type="text"
+                  value={draftName}
+                  onChange={(e) => setDraftName(e.target.value)}
+                  placeholder="Enter your full name"
+                  className="w-full rounded-xl border border-white/10 bg-zinc-800 px-4 py-3 text-sm text-white placeholder:text-zinc-500 focus:border-indigo-500/60 focus:outline-none"
+                />
+
+                <div className="mt-4 rounded-xl border border-amber-500/20 bg-amber-500/5 p-3 text-xs text-amber-100">
+                  GitHub usernames are no longer used as the resume name. This
+                  field should come from LinkedIn or your uploaded resume, and
+                  you can correct it here before the preview is rendered.
+                </div>
+
+                <button
+                  onClick={handleConfirmName}
+                  disabled={!draftName.trim()}
+                  className="mt-5 w-full rounded-xl bg-indigo-500 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  Confirm name and show preview
+                </button>
+              </div>
+            </div>
+          )}
         </motion.div>
       </div>
 
@@ -146,7 +214,8 @@ export default function Phase4_Results({
         </button>
         <button
           onClick={onConfirm}
-          className="px-8 py-3.5 rounded-xl text-sm font-semibold bg-indigo-500 hover:bg-indigo-400 text-white shadow-lg shadow-indigo-500/20 transition-all cursor-pointer"
+          disabled={!isNameConfirmed}
+          className="px-8 py-3.5 rounded-xl text-sm font-semibold bg-indigo-500 hover:bg-indigo-400 text-white shadow-lg shadow-indigo-500/20 transition-all cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
         >
           Open my resume &rarr;
         </button>

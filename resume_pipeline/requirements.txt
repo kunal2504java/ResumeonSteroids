@@ -1,0 +1,5 @@
+anthropic
+jsonschema
+mypy
+pytest
+ruff

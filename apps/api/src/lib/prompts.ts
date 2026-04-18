@@ -11,12 +11,12 @@ Rules: Start with a strong action verb. Include quantified impact if possible. M
 export const GITHUB_ANALYZE_PROMPT = (
   profile: string,
   repos: string
-) => `Given this GitHub profile and repositories, extract the most impressive projects for a software engineer resume. Focus on projects with the most impact, stars, and technical complexity.
+) => `Given this GitHub profile and repository evidence, extract the most impressive projects for a software engineer resume. Focus on impact, technical depth, architecture, shipped functionality, and proof from the inspected repo materials.
 
 GitHub Profile:
 ${profile}
 
-Repositories:
+Repository Evidence:
 ${repos}
 
 Return a JSON array of the top 6 projects in this exact format:
@@ -24,14 +24,75 @@ Return a JSON array of the top 6 projects in this exact format:
   "projects": [
     {
       "name": "repo-name",
-      "description": "2-3 sentence resume-worthy description focusing on technical impact",
+      "description": "2-3 sentence resume-worthy description focusing on what was built and why it matters",
       "techStack": ["React", "Node.js", "PostgreSQL"],
-      "highlights": ["Built X that achieved Y", "Implemented Z resulting in W"],
+      "highlights": [
+        "2-3 resume bullet points grounded in repository evidence",
+        "Start each bullet with a strong action verb",
+        "Mention architecture, features, scale, automation, or technical complexity when supported"
+      ],
       "url": "https://github.com/user/repo",
       "stars": 42
     }
   ]
 }
+
+Rules:
+- Use the README, top-level files, and package manifests to infer what each project actually does.
+- Do not invent production usage, user counts, or metrics that are not supported by the evidence.
+- Keep the highlights array to 2-3 bullets per project.
+- Prefer repositories with stronger technical depth over trivial demos.
+- If evidence is weak, say so in the description rather than hallucinating.
+
+Return ONLY valid JSON, no markdown code fences.`;
+
+export const LINKEDIN_ANALYZE_PROMPT = (
+  profile: string,
+  experience: string,
+  education: string,
+  skills: string
+) => `You are turning raw LinkedIn scrape data into resume-ready content.
+
+Candidate Profile:
+${profile}
+
+Experience:
+${experience}
+
+Education:
+${education}
+
+Skills:
+${skills}
+
+Return this exact JSON structure:
+{
+  "summary": "2-4 sentence summary grounded in the profile",
+  "experience": [
+    {
+      "company": "",
+      "title": "",
+      "location": "",
+      "startDate": "",
+      "endDate": "",
+      "bullets": ["2-4 concise resume bullets"]
+    }
+  ],
+  "skills": {
+    "languages": [],
+    "frameworks": [],
+    "tools": [],
+    "databases": []
+  }
+}
+
+Rules:
+- Rewrite responsibilities into stronger resume bullets when the evidence supports it.
+- Do not invent employers, dates, seniority, or results that are not present.
+- Preserve the original role order and factual content.
+- Keep bullets concise and professional.
+- If the scrape already contains bullet-like lines, consolidate and improve them.
+- Categorize only the skills clearly supported by the profile.
 
 Return ONLY valid JSON, no markdown code fences.`;
 

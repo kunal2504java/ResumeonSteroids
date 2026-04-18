@@ -1,5 +1,7 @@
 import { Hono } from "hono";
 import { LinkedInImportSchema } from "@resumeai/shared/schemas";
+import { anthropic } from "../../../lib/anthropic";
+import { LINKEDIN_ANALYZE_PROMPT } from "../../../lib/prompts";
 import { optionalAuthMiddleware } from "../../../middleware/auth";
 
 const APIFY_ACTOR_ID = "supreme_coder~linkedin-profile-scraper";
@@ -71,19 +73,34 @@ route.post("/", optionalAuthMiddleware, async (c) => {
       (profile.firstName
         ? `${profile.firstName ?? ""} ${profile.lastName ?? ""}`.trim()
         : undefined)
-    ) as string | undefined;
+      ) as string | undefined;
+
+    const profileSummary = {
+      name,
+      headline: profile.headline ?? profile.occupation ?? "",
+      summary: profile.summary ?? profile.about ?? "",
+      location: profile.geoLocationName ?? profile.geoCountryName ?? "",
+      profileUrl,
+    };
+
+    const enriched = await enrichLinkedInImport({
+      profile: profileSummary,
+      experience,
+      education,
+      skills,
+    });
 
     return c.json({
       profile: {
         name,
         headline: profile.headline ?? profile.occupation,
-        summary: profile.summary ?? profile.about,
+        summary: enriched.summary || profile.summary || profile.about,
         location: profile.geoLocationName ?? profile.geoCountryName,
         url: profileUrl,
       },
-      experience,
+      experience: enriched.experience.length ? enriched.experience : experience,
       education,
-      skills,
+      skills: mergeSkillBuckets(skills, enriched.skills),
       linkedinUrl: profileUrl,
     });
   } catch (error) {
@@ -199,6 +216,133 @@ function normalizeSkills(profile: Record<string, any>) {
     frameworks: [] as string[],
     tools: skillNames.slice(0, 20),
     databases: [] as string[],
+  };
+}
+
+async function enrichLinkedInImport(input: {
+  profile: {
+    name?: string;
+    headline?: unknown;
+    summary?: unknown;
+    location?: unknown;
+    profileUrl: string;
+  };
+  experience: Array<{
+    company: string;
+    title: string;
+    location: string;
+    startDate: string;
+    endDate: string;
+    bullets: string[];
+  }>;
+  education: Array<{
+    institution: string;
+    degree: string;
+    field: string;
+    location: string;
+    startDate: string;
+    endDate: string;
+    gpa: string;
+    coursework: string[];
+  }>;
+  skills: {
+    languages: string[];
+    frameworks: string[];
+    tools: string[];
+    databases: string[];
+  };
+}) {
+  try {
+    const aiResponse = await anthropic.messages.create({
+      model: "claude-sonnet-4-20250514",
+      max_tokens: 2500,
+      messages: [
+        {
+          role: "user",
+          content: LINKEDIN_ANALYZE_PROMPT(
+            JSON.stringify(input.profile, null, 2),
+            JSON.stringify(input.experience, null, 2),
+            JSON.stringify(input.education, null, 2),
+            JSON.stringify(input.skills, null, 2)
+          ),
+        },
+      ],
+    });
+
+    const text =
+      aiResponse.content[0].type === "text" ? aiResponse.content[0].text : "";
+
+    const parsed = JSON.parse(text) as {
+      summary?: string;
+      experience?: Array<{
+        company?: string;
+        title?: string;
+        location?: string;
+        startDate?: string;
+        endDate?: string;
+        bullets?: string[];
+      }>;
+      skills?: {
+        languages?: string[];
+        frameworks?: string[];
+        tools?: string[];
+        databases?: string[];
+      };
+    };
+
+    return {
+      summary: parsed.summary?.trim() || "",
+      experience: (parsed.experience ?? [])
+        .map((item, index) => ({
+          company: item.company || input.experience[index]?.company || "",
+          title: item.title || input.experience[index]?.title || "",
+          location: item.location || input.experience[index]?.location || "",
+          startDate: item.startDate || input.experience[index]?.startDate || "",
+          endDate: item.endDate || input.experience[index]?.endDate || "",
+          bullets: (item.bullets ?? []).filter(Boolean).slice(0, 4),
+        }))
+        .filter((item) => item.company || item.title),
+      skills: {
+        languages: parsed.skills?.languages ?? [],
+        frameworks: parsed.skills?.frameworks ?? [],
+        tools: parsed.skills?.tools ?? [],
+        databases: parsed.skills?.databases ?? [],
+      },
+    };
+  } catch (error) {
+    console.warn("[LinkedIn Import] AI enrichment failed, using normalized scrape only", error);
+    return {
+      summary: "",
+      experience: [],
+      skills: {
+        languages: [] as string[],
+        frameworks: [] as string[],
+        tools: [] as string[],
+        databases: [] as string[],
+      },
+    };
+  }
+}
+
+function mergeSkillBuckets(
+  base: {
+    languages: string[];
+    frameworks: string[];
+    tools: string[];
+    databases: string[];
+  },
+  enriched: {
+    languages: string[];
+    frameworks: string[];
+    tools: string[];
+    databases: string[];
+  }
+) {
+  return {
+    languages: Array.from(new Set([...(base.languages || []), ...(enriched.languages || [])])),
+    frameworks: Array.from(new Set([...(base.frameworks || []), ...(enriched.frameworks || [])])),
+    tools: Array.from(new Set([...(base.tools || []), ...(enriched.tools || [])])),
+    databases: Array.from(new Set([...(base.databases || []), ...(enriched.databases || [])])),
   };
 }
 

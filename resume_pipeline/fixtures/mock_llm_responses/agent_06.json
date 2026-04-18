@@ -1,0 +1,11 @@
+{
+  "order": [
+    "Summary",
+    "Experience",
+    "Projects",
+    "Skills",
+    "Education",
+    "Certifications"
+  ],
+  "rationale": "Experience should lead because the profile matches a senior backend role."
+}

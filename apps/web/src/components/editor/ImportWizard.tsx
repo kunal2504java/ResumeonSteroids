@@ -29,6 +29,10 @@ interface ProgressItem {
   message: string;
 }
 
+function cleanImportedName(value: unknown): string {
+  return typeof value === "string" ? value.trim() : "";
+}
+
 export default function ImportWizard({ onComplete }: { onComplete: () => void }) {
   const [step, setStep] = useState(1);
   const [selected, setSelected] = useState<Set<ImportSource>>(new Set());
@@ -134,6 +138,13 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
 
     // Apply resume import
     const resumeImport = importedData.resume as { resumeData?: Record<string, unknown> } | undefined;
+    const importedResumeName = cleanImportedName(
+      resumeImport?.resumeData &&
+        typeof resumeImport.resumeData === "object" &&
+        "personalInfo" in resumeImport.resumeData
+        ? (resumeImport.resumeData.personalInfo as Record<string, unknown> | undefined)?.name
+        : ""
+    );
     if (resumeImport?.resumeData) {
       const rd = resumeImport.resumeData as Record<string, unknown>;
       if (rd.personalInfo) updated.personalInfo = { ...updated.personalInfo, ...(rd.personalInfo as Record<string, string>) };
@@ -189,9 +200,6 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
         bullets: p.highlights || [p.description],
       }));
       updated.projects = [...updated.projects, ...ghProjects.slice(0, 4)];
-      if (ghData.profile?.name && !updated.personalInfo.name) {
-        updated.personalInfo.name = ghData.profile.name;
-      }
     }
 
     // Apply LeetCode
@@ -204,6 +212,13 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
     const cfData = importedData.codeforces as { achievement?: string } | undefined;
     if (cfData?.achievement) {
       updated.achievements = [...updated.achievements, cfData.achievement];
+    }
+
+    const liData = importedData.linkedin as { profile?: { name?: string } } | undefined;
+    const importedLinkedinName = cleanImportedName(liData?.profile?.name);
+    const preferredImportedName = importedResumeName || importedLinkedinName;
+    if (preferredImportedName) {
+      updated.personalInfo.name = preferredImportedName;
     }
 
     updated.updatedAt = new Date().toISOString();

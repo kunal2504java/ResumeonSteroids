@@ -1,0 +1,172 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "personalInfo",
+    "summary",
+    "education",
+    "experience",
+    "projects",
+    "skills",
+    "achievements",
+    "sectionOrder",
+    "maxPages"
+  ],
+  "properties": {
+    "personalInfo": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "email",
+        "phone",
+        "location",
+        "linkedin",
+        "github",
+        "website"
+      ],
+      "properties": {
+        "name": { "type": "string" },
+        "email": { "type": "string" },
+        "phone": { "type": "string" },
+        "location": { "type": "string" },
+        "linkedin": { "type": "string" },
+        "github": { "type": "string" },
+        "website": { "type": "string" }
+      }
+    },
+    "summary": { "type": "string" },
+    "education": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "institution",
+          "degree",
+          "field",
+          "location",
+          "startDate",
+          "endDate",
+          "gpa",
+          "coursework"
+        ],
+        "properties": {
+          "institution": { "type": "string" },
+          "degree": { "type": "string" },
+          "field": { "type": "string" },
+          "location": { "type": "string" },
+          "startDate": { "type": "string" },
+          "endDate": { "type": "string" },
+          "gpa": { "type": "string" },
+          "coursework": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "experience": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "company",
+          "title",
+          "location",
+          "startDate",
+          "endDate",
+          "bullets"
+        ],
+        "properties": {
+          "company": { "type": "string" },
+          "title": { "type": "string" },
+          "location": { "type": "string" },
+          "startDate": { "type": "string" },
+          "endDate": { "type": "string" },
+          "bullets": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "projects": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "name",
+          "techStack",
+          "startDate",
+          "endDate",
+          "bullets"
+        ],
+        "properties": {
+          "name": { "type": "string" },
+          "techStack": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "startDate": { "type": "string" },
+          "endDate": { "type": "string" },
+          "bullets": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    },
+    "skills": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "languages",
+        "frameworks",
+        "tools",
+        "databases"
+      ],
+      "properties": {
+        "languages": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "frameworks": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "tools": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "databases": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "achievements": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "sectionOrder": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["section", "position"],
+        "properties": {
+          "section": { "type": "string" },
+          "position": { "type": "integer", "minimum": 1 }
+        }
+      }
+    },
+    "maxPages": {
+      "type": "integer",
+      "minimum": 1
+    }
+  }
+}

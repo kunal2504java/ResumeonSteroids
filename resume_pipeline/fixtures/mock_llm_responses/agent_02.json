@@ -1,0 +1,85 @@
+{
+  "scored_evidence": [
+    {
+      "id": "exp_backend_01",
+      "type": "experience",
+      "source": "linkedin",
+      "title": "Senior Backend Engineer 2024",
+      "relevance": 10,
+      "impact": 9,
+      "recency": 10
+    },
+    {
+      "id": "exp_platform_02",
+      "type": "experience",
+      "source": "linkedin",
+      "title": "Backend Platform Engineer 2023",
+      "relevance": 9,
+      "impact": 8,
+      "recency": 8
+    },
+    {
+      "id": "exp_intern_03",
+      "type": "experience",
+      "source": "linkedin",
+      "title": "Software Engineer Intern 2022",
+      "relevance": 6,
+      "impact": 5,
+      "recency": 5
+    },
+    {
+      "id": "edu_bsc_01",
+      "type": "education",
+      "source": "linkedin",
+      "title": "BSc Computer Science",
+      "relevance": 5,
+      "impact": 4,
+      "recency": 6
+    },
+    {
+      "id": "proj_grpc_backend_01",
+      "type": "project",
+      "source": "github",
+      "title": "gRPC Order Service 2024",
+      "relevance": 10,
+      "impact": 9,
+      "recency": 9
+    },
+    {
+      "id": "proj_kafka_stream_02",
+      "type": "project",
+      "source": "github",
+      "title": "Kafka Stream Platform 12",
+      "relevance": 8,
+      "impact": 8,
+      "recency": 9
+    },
+    {
+      "id": "proj_old_graphql_03",
+      "type": "project",
+      "source": "github",
+      "title": "GraphQL Analytics App 5",
+      "relevance": 4,
+      "impact": 5,
+      "recency": 3
+    },
+    {
+      "id": "old_proj_inventory_01",
+      "type": "project",
+      "source": "old_resume",
+      "title": "Inventory Sync Service 24",
+      "relevance": 8,
+      "impact": 7,
+      "recency": 5
+    },
+    {
+      "id": "old_proj_gateway_02",
+      "type": "project",
+      "source": "old_resume",
+      "title": "API Gateway Redis 30",
+      "relevance": 9,
+      "impact": 7,
+      "recency": 5
+    }
+  ]
+}

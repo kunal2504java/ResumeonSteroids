@@ -43,3 +43,7 @@ next-env.d.ts
 
 # turbo
 .turbo
+
+# python pipeline runs
+resume_pipeline/runs/
+resume_pipeline/logs/

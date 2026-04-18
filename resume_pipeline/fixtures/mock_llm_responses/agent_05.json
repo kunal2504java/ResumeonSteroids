@@ -1,0 +1,14 @@
+{
+  "revised_sections": {
+    "experience": [],
+    "projects": [],
+    "competitive_programming": {
+      "include": false,
+      "bullets": []
+    },
+    "skills": {
+      "grouped": {}
+    },
+    "education": []
+  }
+}

@@ -76,24 +76,38 @@ const JakeTemplate = forwardRef<HTMLDivElement>(function JakeTemplate(_, ref) {
     <div
       ref={ref}
       data-resume-preview
-      className="bg-white text-black w-[816px] min-h-[1056px]"
+      className="bg-white text-black w-[816px] h-[1056px] overflow-hidden"
       style={{
-        fontFamily: '"Computer Modern Serif", "CMU Serif", Georgia, "Times New Roman", serif',
-        fontSize: "10pt",
-        lineHeight: "1.2",
-        padding: "36px 48px",
+        fontFamily:
+          '"Latin Modern Roman", "CMU Serif", "Computer Modern Serif", "STIX Two Text", "Times New Roman", serif',
+        fontSize: "11pt",
+        lineHeight: "1.15",
+        padding: "48px",
       }}
     >
       {/* ===== HEADING ===== */}
       <div className="text-center mb-1">
         <h1
           className="font-bold"
-          style={{ fontSize: "24pt", fontVariant: "small-caps", letterSpacing: "0.03em" }}
+          style={{
+            fontSize: "26pt",
+            fontVariant: "small-caps",
+            letterSpacing: "0.02em",
+            lineHeight: "1.05",
+          }}
         >
           {p.name || "Your Name"}
         </h1>
+        {p.location && (
+          <div className="mt-[1px]" style={{ fontSize: "10pt", lineHeight: "1.1" }}>
+            {p.location}
+          </div>
+        )}
         {contactParts.length > 0 && (
-          <div className="flex items-center justify-center flex-wrap mt-0.5" style={{ fontSize: "9pt" }}>
+          <div
+            className="flex items-center justify-center flex-wrap mt-[1px]"
+            style={{ fontSize: "9pt", lineHeight: "1.1" }}
+          >
             {contactParts.map((part, i) => (
               <span key={i} className="flex items-center">
                 {i > 0 && <span className="mx-1.5">|</span>}
@@ -129,7 +143,7 @@ const JakeTemplate = forwardRef<HTMLDivElement>(function JakeTemplate(_, ref) {
       {experience.length > 0 && (
         <Section title="Experience">
           {experience.map((exp) => (
-            <div key={exp.id} className="mb-1">
+            <div key={exp.id} className="mb-[2px]">
               <SubHeading
                 topLeft={exp.company}
                 topRight={dateRange(exp.startDate, exp.endDate)}
@@ -146,9 +160,9 @@ const JakeTemplate = forwardRef<HTMLDivElement>(function JakeTemplate(_, ref) {
       {projects.length > 0 && (
         <Section title="Projects">
           {projects.map((proj) => (
-            <div key={proj.id} className="mb-1">
+            <div key={proj.id} className="mb-[2px]">
               <div className="flex justify-between items-baseline">
-                <div style={{ fontSize: "10pt" }}>
+                <div style={{ fontSize: "9pt", lineHeight: "1.15" }}>
                   <span className="font-bold">{proj.name}</span>
                   {proj.techStack.length > 0 && (
                     <span>
@@ -157,7 +171,7 @@ const JakeTemplate = forwardRef<HTMLDivElement>(function JakeTemplate(_, ref) {
                     </span>
                   )}
                 </div>
-                <span className="text-right shrink-0 ml-4" style={{ fontSize: "10pt" }}>
+                <span className="text-right shrink-0 ml-4" style={{ fontSize: "9pt", lineHeight: "1.15" }}>
                   {dateRange(proj.startDate, proj.endDate)}
                 </span>
               </div>
@@ -173,7 +187,7 @@ const JakeTemplate = forwardRef<HTMLDivElement>(function JakeTemplate(_, ref) {
         skills.tools.length > 0 ||
         skills.databases.length > 0) && (
         <Section title="Technical Skills">
-          <div style={{ fontSize: "10pt", lineHeight: "1.4" }}>
+          <div style={{ fontSize: "9pt", lineHeight: "1.25" }}>
             {skills.languages.length > 0 && (
               <div>
                 <span className="font-bold">Languages: </span>
@@ -232,11 +246,17 @@ const JakeTemplate = forwardRef<HTMLDivElement>(function JakeTemplate(_, ref) {
 /* ------------------------------------------------------------------ */
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="mt-2 mb-1">
+    <div className="mt-[8px] mb-[4px]">
       {/* Section heading – matches LaTeX \section formatting */}
       <div
-        className="font-bold uppercase pb-[1px] border-b border-black mb-[6px]"
-        style={{ fontSize: "11.5pt", letterSpacing: "0.04em" }}
+        className="border-b border-black mb-[5px]"
+        style={{
+          fontSize: "14pt",
+          fontVariant: "small-caps",
+          letterSpacing: "0.02em",
+          lineHeight: "1.05",
+          paddingBottom: "1px",
+        }}
       >
         {title}
       </div>
@@ -262,12 +282,18 @@ function SubHeading({
   bottomRight: React.ReactNode;
 }) {
   return (
-    <div className="mb-0.5">
-      <div className="flex justify-between items-baseline" style={{ fontSize: "10pt" }}>
+    <div className="mb-[1px]">
+      <div
+        className="flex justify-between items-baseline gap-4"
+        style={{ fontSize: "10pt", lineHeight: "1.1" }}
+      >
         <span className="font-bold">{topLeft}</span>
         <span className="text-right shrink-0 ml-4">{topRight}</span>
       </div>
-      <div className="flex justify-between items-baseline italic" style={{ fontSize: "9.5pt" }}>
+      <div
+        className="flex justify-between items-baseline gap-4 italic"
+        style={{ fontSize: "9pt", lineHeight: "1.1" }}
+      >
         <span>{bottomLeft}</span>
         <span className="text-right shrink-0 ml-4">{bottomRight}</span>
       </div>
@@ -279,22 +305,27 @@ function SubHeading({
 /*  BulletList – en-dash prefixed bullet items                         */
 /* ------------------------------------------------------------------ */
 function BulletList({ bullets }: { bullets: string[] }) {
-  const filtered = bullets.filter((b) => b);
+  const filtered = bullets.filter((b) => b.trim());
   if (filtered.length === 0) return null;
   return (
-    <ul className="ml-[14px] mt-[2px]" style={{ listStyle: "none", padding: 0 }}>
+    <ul className="mt-[2px] ml-[11px]" style={{ listStyle: "none", padding: 0 }}>
       {filtered.map((bullet, i) => (
         <li
           key={i}
           className="relative"
           style={{
-            fontSize: "10pt",
-            lineHeight: "1.3",
-            paddingLeft: "12px",
-            marginBottom: "1px",
+            fontSize: "9pt",
+            lineHeight: "1.15",
+            paddingLeft: "11px",
+            marginBottom: "0px",
           }}
         >
-          <span className="absolute left-0">{"\u2013"}</span>
+          <span
+            className="absolute left-0"
+            style={{ top: "0.08em", fontSize: "10pt", lineHeight: 1 }}
+          >
+            {"\u2022"}
+          </span>
           {bullet}
         </li>
       ))}

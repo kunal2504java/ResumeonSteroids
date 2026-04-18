@@ -30,18 +30,37 @@ export default function ResumeCard({
             className="w-[816px] h-[1056px] pointer-events-none origin-top-left"
             style={{ transform: "scale(0.25)" }}
           >
-            <div className="bg-white text-black px-[48px] py-[36px]" style={{ fontFamily: '"CMU Serif", Georgia, "Times New Roman", serif', fontSize: "10.5pt", lineHeight: "1.25" }}>
+            <div
+              className="bg-white text-black px-[48px] py-[48px]"
+              style={{
+                fontFamily:
+                  '"Latin Modern Roman", "CMU Serif", "Computer Modern Serif", "STIX Two Text", "Times New Roman", serif',
+                fontSize: "10.5pt",
+                lineHeight: "1.15",
+              }}
+            >
               <div className="text-center mb-1">
-                <div className="font-bold tracking-wide" style={{ fontSize: "22pt", fontVariant: "small-caps" }}>
+                <div
+                  className="font-bold tracking-wide"
+                  style={{ fontSize: "24pt", fontVariant: "small-caps", lineHeight: "1.05" }}
+                >
                   {resume.personalInfo.name || "Your Name"}
                 </div>
-                <div className="text-[9pt] mt-0.5">
+                {resume.personalInfo.location && (
+                  <div className="text-[9.5pt] mt-[1px]">{resume.personalInfo.location}</div>
+                )}
+                <div className="text-[9pt] mt-[1px]">
                   {[resume.personalInfo.email, resume.personalInfo.phone, resume.personalInfo.linkedin?.replace(/https?:\/\/(www\.)?/, "")].filter(Boolean).join(" | ")}
                 </div>
               </div>
               {resume.experience.length > 0 && (
                 <div className="mb-2">
-                  <div className="font-bold uppercase tracking-wider border-b border-black pb-0.5 mb-1.5" style={{ fontSize: "11pt", fontVariant: "small-caps" }}>Experience</div>
+                  <div
+                    className="border-b border-black pb-0.5 mb-1.5"
+                    style={{ fontSize: "12pt", fontVariant: "small-caps", lineHeight: "1.05" }}
+                  >
+                    Experience
+                  </div>
                   {resume.experience.slice(0, 2).map((exp) => (
                     <div key={exp.id} className="mb-1.5">
                       <div className="flex justify-between items-baseline">
@@ -55,7 +74,12 @@ export default function ResumeCard({
               )}
               {resume.education.length > 0 && (
                 <div className="mb-2">
-                  <div className="font-bold uppercase tracking-wider border-b border-black pb-0.5 mb-1.5" style={{ fontSize: "11pt", fontVariant: "small-caps" }}>Education</div>
+                  <div
+                    className="border-b border-black pb-0.5 mb-1.5"
+                    style={{ fontSize: "12pt", fontVariant: "small-caps", lineHeight: "1.05" }}
+                  >
+                    Education
+                  </div>
                   {resume.education.slice(0, 1).map((edu) => (
                     <div key={edu.id}>
                       <div className="flex justify-between items-baseline">

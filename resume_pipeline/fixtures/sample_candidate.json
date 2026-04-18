@@ -1,0 +1,113 @@
+{
+  "personal_info": {
+    "name": "Kunal Singh",
+    "email": "kunal@example.com",
+    "phone": "+91-9876543210",
+    "location": "Noida, India",
+    "linkedin": "https://www.linkedin.com/in/kunaalpratapsingh/",
+    "github": "https://github.com/kunaalps",
+    "website": "https://kunal.dev"
+  },
+  "github": {
+    "profile_url": "https://github.com/kunaalps",
+    "projects": [
+      {
+        "id": "proj_grpc_backend_01",
+        "name": "gRPC Order Service 2024",
+        "description": "Built a Python and Go backend with PostgreSQL, Redis, Docker, Kubernetes, AWS, and gRPC for order processing.",
+        "stars": 128,
+        "updated_at": "2026-03-02"
+      },
+      {
+        "id": "proj_kafka_stream_02",
+        "name": "Kafka Stream Platform 12",
+        "description": "Created a Kafka and Terraform platform for high-volume event ingestion on AWS with Docker and Kubernetes.",
+        "stars": 34,
+        "updated_at": "2026-02-11"
+      },
+      {
+        "id": "proj_old_graphql_03",
+        "name": "GraphQL Analytics App 5",
+        "description": "Older analytics project using GraphQL, Redis, and PostgreSQL for dashboard queries.",
+        "stars": 6,
+        "updated_at": "2023-01-18"
+      }
+    ]
+  },
+  "leetcode": {
+    "username": "kunaalps",
+    "rating": 1650,
+    "solved": {
+      "easy": 80,
+      "medium": 45,
+      "hard": 12
+    }
+  },
+  "codeforces": {
+    "handle": "kunaalps",
+    "rating": 1523,
+    "rank": "Specialist"
+  },
+  "linkedin": {
+    "profile_url": "https://www.linkedin.com/in/kunaalpratapsingh/",
+    "experience": [
+      {
+        "id": "exp_backend_01",
+        "company": "Acme Payments",
+        "title": "Senior Backend Engineer 2024",
+        "duration": "Jan 2024 - Present",
+        "description": "Led backend delivery for payment APIs using Python, PostgreSQL, Redis, Docker, Kubernetes, AWS, and gRPC.",
+        "bullets": [
+          "Built Python microservices for checkout and settlement flows.",
+          "Scaled Redis-backed caching and PostgreSQL query paths."
+        ]
+      },
+      {
+        "id": "exp_platform_02",
+        "company": "CloudScale Labs",
+        "title": "Backend Platform Engineer 2023",
+        "duration": "Jul 2022 - Dec 2023",
+        "description": "Worked on Go services, Docker builds, Kubernetes rollouts, AWS infrastructure, and observability improvements.",
+        "bullets": [
+          "Implemented Go backend services for internal platform APIs.",
+          "Automated container delivery pipelines with Docker and AWS."
+        ]
+      },
+      {
+        "id": "exp_intern_03",
+        "company": "DevForge",
+        "title": "Software Engineer Intern 2022",
+        "duration": "Jan 2022 - Jun 2022",
+        "description": "Internship focused on backend tooling, PostgreSQL migrations, and Redis-backed task processing.",
+        "bullets": [
+          "Wrote backend scripts for data migration.",
+          "Supported PostgreSQL and Redis maintenance tasks."
+        ]
+      }
+    ],
+    "education": [
+      {
+        "id": "edu_bsc_01",
+        "institution": "Delhi University",
+        "degree": "BSc Computer Science",
+        "year": "2022"
+      }
+    ],
+    "certifications": []
+  },
+  "old_resume": {
+    "raw_text": "Built a distributed inventory sync service in Go with Docker and PostgreSQL. Created a low-latency API gateway in Python using Redis caching and AWS deployment.",
+    "projects": [
+      {
+        "id": "old_proj_inventory_01",
+        "name": "Inventory Sync Service 24",
+        "description": "Go service for distributed inventory synchronization using PostgreSQL, Docker, and Kubernetes."
+      },
+      {
+        "id": "old_proj_gateway_02",
+        "name": "API Gateway Redis 30",
+        "description": "Python API gateway with Redis caching, AWS deployment, and gRPC service-to-service communication."
+      }
+    ]
+  }
+}

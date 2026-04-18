@@ -1,0 +1,21 @@
+{
+  "hard_gaps": [],
+  "soft_gaps": [
+    {
+      "skill": "Terraform",
+      "reframe_hint": "Emphasize infrastructure-as-code ownership in the Kafka platform project.",
+      "evidence_id": "proj_kafka_stream_02"
+    }
+  ],
+  "covered_skills": [
+    "Python",
+    "Go",
+    "PostgreSQL",
+    "Redis",
+    "Docker",
+    "Kubernetes",
+    "AWS",
+    "gRPC"
+  ],
+  "coverage_summary": "The candidate covers the core backend stack strongly through recent backend experience and relevant projects. Preferred infrastructure tooling can be strengthened by reframing the stream platform work."
+}

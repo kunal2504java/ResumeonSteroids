@@ -1,7 +1,11 @@
 import { Hono } from "hono";
 import { GitHubImportSchema } from "@resumeai/shared/schemas";
 import { anthropic } from "../../../lib/anthropic";
-import { fetchGitHubUser, fetchGitHubRepos } from "../../../lib/github";
+import {
+  fetchGitHubUser,
+  fetchGitHubRepos,
+  inspectGitHubRepo,
+} from "../../../lib/github";
 import { GITHUB_ANALYZE_PROMPT } from "../../../lib/prompts";
 import { optionalAuthMiddleware } from "../../../middleware/auth";
 
@@ -23,18 +27,41 @@ route.post("/", optionalAuthMiddleware, async (c) => {
       fetchGitHubRepos(username),
     ]);
 
-    const profileText = `Name: ${user.name || user.login}\nBio: ${user.bio || "N/A"}\nPublic repos: ${user.public_repos}\nFollowers: ${user.followers}`;
+    const inspectedRepos = await Promise.all(
+      repos.slice(0, 5).map((repo) => inspectGitHubRepo(username, repo))
+    );
 
-    const reposText = repos
+    const profileText = `Display name: ${user.name || "N/A"}\nUsername: ${user.login}\nBio: ${user.bio || "N/A"}\nPublic repos: ${user.public_repos}\nFollowers: ${user.followers}`;
+
+    const reposText = inspectedRepos
       .map(
         (r) =>
-          `- ${r.name}: ${r.description || "No description"} | Stars: ${r.stargazers_count} | Language: ${r.language || "N/A"} | Topics: ${r.topics?.join(", ") || "none"}`
+          [
+            `Repository: ${r.name}`,
+            `URL: ${r.html_url}`,
+            `Description: ${r.description || "No description"}`,
+            `Stars: ${r.stars}`,
+            `Primary language: ${r.language || "N/A"}`,
+            `Detected languages: ${r.languages.join(", ") || "unknown"}`,
+            `Topics: ${r.topics.join(", ") || "none"}`,
+            `Updated: ${r.updated_at}`,
+            `Top-level files: ${r.topLevelFiles.join(", ") || "none"}`,
+            r.packageFiles.length
+              ? `Key files:\n${r.packageFiles
+                  .map(
+                    (file) =>
+                      `--- ${file.path} ---\n${file.content}`
+                  )
+                  .join("\n")}`
+              : "Key files: none",
+            `README:\n${r.readme || "No README available"}`,
+          ].join("\n")
       )
-      .join("\n");
+      .join("\n\n====================\n\n");
 
     const aiResponse = await anthropic.messages.create({
       model: "claude-sonnet-4-20250514",
-      max_tokens: 2000,
+      max_tokens: 3000,
       messages: [
         {
           role: "user",
@@ -55,11 +82,16 @@ route.post("/", optionalAuthMiddleware, async (c) => {
 
     return c.json({
       profile: {
-        name: user.name || user.login,
+        name: user.name || "",
+        username: user.login,
         bio: user.bio,
         url: user.html_url,
         repos: user.public_repos,
         followers: user.followers,
+      },
+      analysis: {
+        inspectedRepoCount: inspectedRepos.length,
+        totalCandidateRepoCount: repos.length,
       },
       ...projects,
     });

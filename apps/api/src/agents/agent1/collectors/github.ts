@@ -78,7 +78,7 @@ export async function collectGitHub(username: string): Promise<GitHubRawData> {
 
   return {
     source: "github",
-    name: (profile.name as string) || (profile.login as string),
+    name: (profile.name as string) || "",
     bio: (profile.bio as string | null) ?? null,
     location: (profile.location as string | null) ?? null,
     email: (profile.email as string | null) ?? null,

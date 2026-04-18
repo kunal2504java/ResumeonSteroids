@@ -1,0 +1,77 @@
+{
+  "role_level": "senior",
+  "must_have_themes": [
+    "backend systems",
+    "cloud infrastructure",
+    "service reliability"
+  ],
+  "required_skills": [
+    {
+      "skill": "Python",
+      "importance": "high"
+    },
+    {
+      "skill": "Go",
+      "importance": "high"
+    },
+    {
+      "skill": "PostgreSQL",
+      "importance": "high"
+    },
+    {
+      "skill": "Redis",
+      "importance": "high"
+    },
+    {
+      "skill": "Docker",
+      "importance": "high"
+    },
+    {
+      "skill": "Kubernetes",
+      "importance": "high"
+    },
+    {
+      "skill": "AWS",
+      "importance": "high"
+    },
+    {
+      "skill": "gRPC",
+      "importance": "high"
+    }
+  ],
+  "preferred_skills": [
+    {
+      "skill": "Kafka",
+      "importance": "medium"
+    },
+    {
+      "skill": "Terraform",
+      "importance": "medium"
+    },
+    {
+      "skill": "GraphQL",
+      "importance": "low"
+    }
+  ],
+  "implicit_signals": {
+    "team_size": "medium",
+    "work_style": "infra",
+    "tech_focus": "backend platforms"
+  },
+  "ats_keywords": [
+    "Python",
+    "Go",
+    "PostgreSQL",
+    "Redis",
+    "Docker",
+    "Kubernetes",
+    "AWS",
+    "gRPC",
+    "Kafka",
+    "Terraform",
+    "GraphQL",
+    "distributed systems",
+    "service reliability",
+    "observability"
+  ]
+}

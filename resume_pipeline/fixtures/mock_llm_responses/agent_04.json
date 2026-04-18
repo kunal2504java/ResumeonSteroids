@@ -1,0 +1,109 @@
+{
+  "summary": "Backend engineer with 4 years building Python and Go services. Delivered 128-star infrastructure and 35% latency improvements in production systems. Brings cloud-native backend depth to Acme Corp.",
+  "sections": {
+    "experience": [
+      {
+        "evidence_id": "exp_backend_01",
+        "title": "Senior Backend Engineer",
+        "org": "Acme Payments",
+        "duration": "Jan 2024 - Present",
+        "bullets": [
+          {
+            "text": "Built Python payment APIs by redesigning gRPC handlers, resulting in 35% lower latency on AWS.",
+            "keywords_used": [
+              "Python",
+              "gRPC",
+              "AWS"
+            ],
+            "inferred": false
+          }
+        ]
+      },
+      {
+        "evidence_id": "exp_platform_02",
+        "title": "Backend Platform Engineer",
+        "org": "CloudScale Labs",
+        "duration": "Jul 2022 - Dec 2023",
+        "bullets": [
+          {
+            "text": "Implemented Go services by automating Docker releases, resulting in 4 faster weekly Kubernetes deployments.",
+            "keywords_used": [
+              "Go",
+              "Docker",
+              "Kubernetes"
+            ],
+            "inferred": false
+          }
+        ]
+      }
+    ],
+    "projects": [
+      {
+        "evidence_id": "proj_grpc_backend_01",
+        "title": "gRPC Order Service",
+        "org": "GitHub",
+        "duration": "Jan 2025 - Mar 2026",
+        "bullets": [
+          {
+            "text": "Engineered PostgreSQL and Redis services by scaling order workflows, resulting in 128 GitHub stars for the project.",
+            "keywords_used": [
+              "PostgreSQL",
+              "Redis"
+            ],
+            "inferred": false
+          }
+        ]
+      },
+      {
+        "evidence_id": "proj_kafka_stream_02",
+        "title": "Kafka Stream Platform",
+        "org": "GitHub",
+        "duration": "May 2025 - Feb 2026",
+        "bullets": [
+          {
+            "text": "Created Kafka infrastructure by codifying Terraform modules, resulting in 12 reusable streaming environments.",
+            "keywords_used": [
+              "Kafka",
+              "Terraform"
+            ],
+            "inferred": false
+          }
+        ]
+      }
+    ],
+    "competitive_programming": {
+      "include": false,
+      "bullets": []
+    },
+    "skills": {
+      "grouped": {
+        "Languages": [
+          "Python",
+          "Go"
+        ],
+        "Frameworks": [
+          "gRPC",
+          "GraphQL"
+        ],
+        "Databases": [
+          "PostgreSQL",
+          "Redis"
+        ],
+        "Tools": [
+          "Docker",
+          "Kubernetes",
+          "AWS",
+          "Kafka",
+          "Terraform"
+        ]
+      }
+    },
+    "education": [
+      {
+        "degree": "BSc Computer Science",
+        "institution": "Delhi University",
+        "year": "2022"
+      }
+    ]
+  }
+}
