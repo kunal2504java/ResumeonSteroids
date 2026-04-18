@@ -4,7 +4,11 @@ import { useEffect, useRef, useState } from "react";
 import { useResumeStore } from "@/lib/store/resumeStore";
 import JakeTemplate from "./JakeTemplate";
 
-export default function ResumePreview() {
+interface ResumePreviewProps {
+  highlightedSection?: string;
+}
+
+export default function ResumePreview({ highlightedSection }: ResumePreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const requestIdRef = useRef(0);
   const resume = useResumeStore((s) => s.resume);
@@ -91,7 +95,8 @@ export default function ResumePreview() {
     );
   }
 
-  const showFallback = status === "error" || !pdfUrl;
+  const forceHtmlPreview = Boolean(highlightedSection);
+  const showFallback = status === "error" || !pdfUrl || forceHtmlPreview;
 
   return (
     <div ref={containerRef} className="relative h-full overflow-hidden bg-zinc-900">
@@ -110,7 +115,7 @@ export default function ResumePreview() {
         {showFallback && (
           <div className="flex min-h-full items-start justify-center">
             <div className="shadow-2xl shadow-black/50">
-              <JakeTemplate />
+              <JakeTemplate highlightedSection={highlightedSection} />
             </div>
           </div>
         )}
@@ -129,8 +134,14 @@ export default function ResumePreview() {
         </div>
       )}
 
+      {forceHtmlPreview && status !== "error" && (
+        <div className="absolute bottom-6 left-6 right-6 rounded-xl border border-indigo-500/20 bg-[#161B27]/95 p-3 text-xs text-indigo-100 shadow-lg shadow-black/30">
+          HTML preview enabled to highlight the affected ATS section.
+        </div>
+      )}
+
       <div className="pointer-events-none fixed -left-[10000px] top-0">
-        <JakeTemplate />
+        <JakeTemplate highlightedSection={highlightedSection} />
       </div>
     </div>
   );

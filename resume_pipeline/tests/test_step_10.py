@@ -340,4 +340,5 @@ def test_pass_true_when_all_checks_clean(tmp_path: Path) -> None:
     result = run(ctx.assembled_resume, ctx.candidate, ctx.jd_analysis, client, ctx)
 
     assert result["pass"] is True
-    assert result["ats_score"] == 78.5
+    assert result["ats_score"] == result["ats_report"]["total_score"]
+    assert ctx.ats_report == result["ats_report"]

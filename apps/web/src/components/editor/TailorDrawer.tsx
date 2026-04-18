@@ -8,17 +8,23 @@ import type { TailorResponse } from "@resumeai/shared";
 interface TailorDrawerProps {
   isOpen: boolean;
   onClose: () => void;
+  jobDescription: string;
+  onJobDescriptionChange: (value: string) => void;
 }
 
-export default function TailorDrawer({ isOpen, onClose }: TailorDrawerProps) {
+export default function TailorDrawer({
+  isOpen,
+  onClose,
+  jobDescription,
+  onJobDescriptionChange,
+}: TailorDrawerProps) {
   const resume = useResumeStore((s) => s.resume);
   const addToast = useResumeStore((s) => s.addToast);
-  const [jd, setJd] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<TailorResponse | null>(null);
 
   async function analyze() {
-    if (!jd.trim() || !resume) return;
+    if (!jobDescription.trim() || !resume) return;
     setLoading(true);
     setResult(null);
 
@@ -28,7 +34,7 @@ export default function TailorDrawer({ isOpen, onClose }: TailorDrawerProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           resumeId: resume.id,
-          jobDescription: jd,
+          jobDescription,
           resume,
         }),
       });
@@ -83,17 +89,21 @@ export default function TailorDrawer({ isOpen, onClose }: TailorDrawerProps) {
                   Paste the job description
                 </label>
                 <textarea
-                  value={jd}
-                  onChange={(e) => setJd(e.target.value)}
+                  value={jobDescription}
+                  onChange={(e) => onJobDescriptionChange(e.target.value)}
                   placeholder="We are looking for a senior software engineer..."
                   rows={8}
                   className="w-full bg-[#0D1117] border border-[#1E2535] px-3 py-2 text-sm text-white placeholder:text-[#71717A]/40 outline-none focus:border-[#6366f1]/50 transition-colors font-mono resize-none"
                 />
+                <p className="mt-2 text-[11px] leading-5 text-[#71717A]">
+                  Paste the full job description. We extract keywords and run
+                  ATS rules against the resume preview to maximize parser compatibility.
+                </p>
               </div>
 
               <button
                 onClick={analyze}
-                disabled={loading || !jd.trim()}
+                disabled={loading || !jobDescription.trim()}
                 className="w-full py-2.5 bg-[#6366f1] text-white text-sm font-medium hover:bg-[#818cf8] disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
               >
                 {loading ? "Analyzing..." : "Analyze Match"}

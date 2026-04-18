@@ -353,6 +353,7 @@ def _build_user_content(scored_evidence: dict, jd_analysis: dict, gap_analysis: 
         "gap_analysis": {
             "hard_gaps": gap_analysis.get("hard_gaps", []),
             "soft_gaps": gap_analysis.get("soft_gaps", []),
+            "skill_match_details": gap_analysis.get("skill_match_details", []),
             "coverage_summary": gap_analysis.get("coverage_summary", ""),
             "match_score": gap_analysis.get("match_score", 0),
         },

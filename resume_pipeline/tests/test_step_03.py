@@ -85,6 +85,12 @@ def test_output_matches_schema_exactly(tmp_path: Path) -> None:
     assert isinstance(result["preferred_skills"], list)
     assert isinstance(result["implicit_signals"], dict)
     assert isinstance(result["ats_keywords"], list)
+    assert all("canonical" in skill for skill in result["required_skills"])
+    assert all("canonical" in skill for skill in result["preferred_skills"])
+    assert all(
+        isinstance(keyword, dict) and {"original", "canonical"} <= set(keyword.keys())
+        for keyword in result["ats_keywords"]
+    )
 
 
 def test_role_level_is_valid_enum_value(tmp_path: Path) -> None:
@@ -114,6 +120,7 @@ def test_importance_values_are_valid_enum(tmp_path: Path) -> None:
 
     all_skills = result["required_skills"] + result["preferred_skills"]
     assert all(skill["importance"] in {"high", "medium", "low"} for skill in all_skills)
+    assert all(isinstance(skill["canonical"], str) and skill["canonical"] for skill in all_skills)
 
 
 def test_no_skills_invented_not_in_jd(tmp_path: Path) -> None:
@@ -154,6 +161,8 @@ def test_ats_keywords_non_empty_for_technical_jd(tmp_path: Path) -> None:
     result = run("Need Python, React, and AWS experience", client, ctx)
 
     assert result["ats_keywords"]
+    assert any(keyword["canonical"] == "python" for keyword in result["ats_keywords"])
+    assert any(keyword["canonical"] == "aws" for keyword in result["ats_keywords"])
 
 
 def test_runs_with_empty_jd_returns_unknown_role_level(tmp_path: Path) -> None:

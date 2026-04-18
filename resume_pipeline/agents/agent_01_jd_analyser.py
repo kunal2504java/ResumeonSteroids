@@ -5,6 +5,7 @@ from typing import Dict, List, TypedDict
 
 from context_manager import save_context
 from pipeline_context import PipelineContext
+from skill_matcher import normalise
 
 
 VALID_ROLE_LEVELS = {"junior", "mid", "senior", "staff", "unknown"}
@@ -17,7 +18,7 @@ class JDAnalysis(TypedDict):
     required_skills: List[Dict[str, str]]
     preferred_skills: List[Dict[str, str]]
     implicit_signals: Dict[str, str]
-    ats_keywords: List[str]
+    ats_keywords: List[Dict[str, str]]
 
 
 def _base_dir() -> Path:
@@ -80,7 +81,14 @@ def _validate_skill_list(name: str, value: object) -> List[Dict[str, str]]:
                 f"{name} importance must be one of {sorted(VALID_IMPORTANCE_LEVELS)}"
             )
 
-        validated.append({"skill": skill.strip(), "importance": str(importance)})
+        skill_value = skill.strip()
+        validated.append(
+            {
+                "skill": skill_value,
+                "importance": str(importance),
+                "canonical": normalise(skill_value),
+            }
+        )
 
     return validated
 
@@ -130,7 +138,11 @@ def _validate_analysis(raw: dict) -> JDAnalysis:
         "implicit_signals": {
             str(key): str(value) for key, value in implicit_signals.items()
         },
-        "ats_keywords": [item.strip() for item in ats_keywords if isinstance(item, str)],
+        "ats_keywords": [
+            {"original": item.strip(), "canonical": normalise(item.strip())}
+            for item in ats_keywords
+            if isinstance(item, str) and item.strip()
+        ],
     }
 
 

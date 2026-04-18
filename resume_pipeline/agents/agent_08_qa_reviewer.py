@@ -5,6 +5,7 @@ import re
 from pathlib import Path
 from typing import Any
 
+from ats_simulator import ats_report_to_dict, simulate_ats
 from context_manager import save_context
 from pipeline_context import PipelineContext
 
@@ -372,6 +373,20 @@ def run(
     llm_client,
     ctx: PipelineContext,
 ) -> dict:
+    ats_report = ats_report_to_dict(
+        simulate_ats(
+            assembled_resume,
+            str(ctx.metadata.get("latex_source", "")),
+            jd_analysis.get("ats_keywords", []),
+            int(
+                assembled_resume.get(
+                    "maxPages",
+                    ctx.section_order.get("max_pages", 1) or 1,
+                )
+            ),
+        )
+    )
+    ctx.ats_report = ats_report
     forbidden_phrase_flags = _collect_forbidden_phrase_flags(assembled_resume, ctx)
     tense_flags = _collect_tense_flags(assembled_resume, ctx)
     inferred_rate, inferred_flags = _inferred_rate_and_flags(assembled_resume, ctx)
@@ -379,7 +394,8 @@ def run(
     if forbidden_phrase_flags or tense_flags or inferred_flags:
         result = {
             "pass": False,
-            "ats_score": float(ctx.ats_optimised.get("ats_score", 0.0)),
+            "ats_score": float(ats_report.get("total_score", 0.0)),
+            "ats_report": ats_report,
             "fact_check_flags": [],
             "tone_flags": tense_flags,
             "forbidden_phrase_flags": forbidden_phrase_flags,
@@ -417,7 +433,8 @@ def run(
     fact_check_flags, tone_flags = _validate_llm_flags(raw)
     result = {
         "pass": not fact_check_flags and not tone_flags,
-        "ats_score": float(ctx.ats_optimised.get("ats_score", 0.0)),
+        "ats_score": float(ats_report.get("total_score", 0.0)),
+        "ats_report": ats_report,
         "fact_check_flags": fact_check_flags,
         "tone_flags": tone_flags,
         "forbidden_phrase_flags": [],

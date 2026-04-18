@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": [
+    "total_score",
+    "grade",
+    "rule_results",
+    "critical_failures",
+    "keyword_coverage",
+    "parser_compatibility"
+  ],
+  "properties": {
+    "total_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 100
+    },
+    "grade": {
+      "type": "string",
+      "enum": ["A", "B", "C", "D", "F"]
+    },
+    "rule_results": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "rule_id",
+          "rule_name",
+          "category",
+          "status",
+          "score_impact",
+          "message",
+          "fix",
+          "affected_section",
+          "severity"
+        ],
+        "properties": {
+          "rule_id": { "type": "string" },
+          "rule_name": { "type": "string" },
+          "category": {
+            "type": "string",
+            "enum": ["parsing", "keywords", "formatting", "content"]
+          },
+          "status": {
+            "type": "string",
+            "enum": ["pass", "warn", "fail"]
+          },
+          "score_impact": { "type": "number" },
+          "message": { "type": "string" },
+          "fix": { "type": "string" },
+          "affected_section": { "type": "string" },
+          "severity": {
+            "type": "string",
+            "enum": ["critical", "major", "minor"]
+          }
+        }
+      }
+    },
+    "critical_failures": {
+      "type": "array"
+    },
+    "keyword_coverage": {
+      "type": "object"
+    },
+    "parser_compatibility": {
+      "type": "object"
+    },
+    "summary": {
+      "type": "string"
+    }
+  }
+}

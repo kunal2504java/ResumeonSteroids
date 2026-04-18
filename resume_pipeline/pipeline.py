@@ -80,6 +80,8 @@ def initialise_context(candidate: dict, jd: dict, run_id: str | None = None) -> 
         section_order={},
         assembled_resume={},
         qa_report={},
+        skill_match_details=[],
+        ats_report={},
         metadata={
             "run_id": resolved_run_id,
             "timestamp": datetime.now(timezone.utc).isoformat(),
@@ -193,6 +195,7 @@ def _save_result_for_agent(ctx: PipelineContext, name: str, result: Any, elapsed
     if result is not None:
         if name == "agent_03":
             ctx.gap_analysis = result
+            ctx.skill_match_details = result.get("skill_match_details", [])
         elif name == "agent_06":
             ctx.section_order = result
         elif name == "agent_01":
@@ -349,7 +352,7 @@ def run_pipeline(
                         _run_parallel_agent,
                         "agent_03",
                         agents["agent_03"].run,
-                        (ctx.jd_analysis, ctx.scored_evidence),
+                        (ctx.jd_analysis, ctx.scored_evidence, ctx.candidate),
                         llm_client,
                         _parallel_ctx(ctx, "agent_03"),
                     )

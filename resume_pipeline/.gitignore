@@ -2,3 +2,5 @@ runs/
 logs/
 __pycache__/
 .pytest_cache/
+!data/transferable_skills.json
+!data/stem_variants.json

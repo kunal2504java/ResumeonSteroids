@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 
 @dataclass
@@ -21,3 +21,5 @@ class PipelineContext:
 
     # run metadata
     metadata: dict
+    skill_match_details: list = field(default_factory=list)
+    ats_report: dict = field(default_factory=dict)

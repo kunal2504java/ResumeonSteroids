@@ -1,0 +1,106 @@
+{
+  "Kubernetes": {
+    "substitutes": ["Docker Swarm", "Amazon ECS", "Nomad", "OpenShift", "Mesos"],
+    "match_strength": [0.85, 0.75, 0.8, 0.85, 0.6],
+    "category": "container_orchestration",
+    "notes": "All are production-grade container orchestrators. ECS and OpenShift score higher due to broader adoption overlap."
+  },
+  "Kafka": {
+    "substitutes": ["RabbitMQ", "AWS SQS", "Google Pub/Sub", "NATS", "Redis Streams", "Pulsar"],
+    "match_strength": [0.7, 0.65, 0.65, 0.6, 0.55, 0.75],
+    "category": "message_queue",
+    "notes": "Pulsar scores high due to architectural similarity. Redis Streams scores low because the operational model differs."
+  },
+  "PostgreSQL": {
+    "substitutes": ["MySQL", "MariaDB", "CockroachDB", "Aurora", "SQLite"],
+    "match_strength": [0.8, 0.8, 0.85, 0.85, 0.4],
+    "category": "relational_database",
+    "notes": "SQLite scores low because it is not production-equivalent at scale."
+  },
+  "Redis": {
+    "substitutes": ["Memcached", "Hazelcast", "DragonflyDB", "KeyDB"],
+    "match_strength": [0.7, 0.55, 0.9, 0.85],
+    "category": "cache",
+    "notes": "DragonflyDB and KeyDB are Redis-protocol-compatible."
+  },
+  "Terraform": {
+    "substitutes": ["Pulumi", "AWS CDK", "Ansible", "CloudFormation", "Crossplane"],
+    "match_strength": [0.85, 0.75, 0.6, 0.65, 0.7],
+    "category": "infrastructure_as_code",
+    "notes": "Pulumi is near-equivalent. Ansible is lower because it overlaps more with configuration management."
+  },
+  "React": {
+    "substitutes": ["Vue", "Angular", "Svelte", "SolidJS", "Next.js"],
+    "match_strength": [0.75, 0.7, 0.7, 0.65, 0.9],
+    "category": "frontend_framework",
+    "notes": "Next.js is React plus conventions, so it scores highest."
+  },
+  "FastAPI": {
+    "substitutes": ["Flask", "Django REST Framework", "Express", "Gin", "Fiber"],
+    "match_strength": [0.75, 0.7, 0.55, 0.6, 0.6],
+    "category": "web_framework",
+    "notes": "Flask is the closest Python equivalent."
+  },
+  "PyTorch": {
+    "substitutes": ["TensorFlow", "JAX", "MXNet", "PaddlePaddle"],
+    "match_strength": [0.8, 0.85, 0.55, 0.45],
+    "category": "ml_framework",
+    "notes": "JAX scores high because it is similarly research-oriented."
+  },
+  "AWS": {
+    "substitutes": ["GCP", "Azure", "DigitalOcean", "Hetzner"],
+    "match_strength": [0.75, 0.75, 0.4, 0.3],
+    "category": "cloud_platform",
+    "notes": "GCP and Azure are strong enterprise equivalents."
+  },
+  "Go": {
+    "substitutes": ["Rust", "C++", "Java", "Kotlin", "C#"],
+    "match_strength": [0.65, 0.5, 0.6, 0.6, 0.55],
+    "category": "systems_language",
+    "notes": "Rust is the closest systems-language analogue."
+  },
+  "gRPC": {
+    "substitutes": ["Thrift", "Cap'n Proto", "REST with OpenAPI", "GraphQL"],
+    "match_strength": [0.75, 0.7, 0.55, 0.5],
+    "category": "rpc_protocol",
+    "notes": "REST overlaps functionally but uses a different paradigm."
+  },
+  "GraphQL": {
+    "substitutes": ["REST", "tRPC", "Falcor"],
+    "match_strength": [0.6, 0.8, 0.55],
+    "category": "api_paradigm"
+  },
+  "Elasticsearch": {
+    "substitutes": ["OpenSearch", "Solr", "Typesense", "Meilisearch"],
+    "match_strength": [0.95, 0.65, 0.55, 0.5],
+    "category": "search_engine",
+    "notes": "OpenSearch is a direct fork."
+  },
+  "Docker": {
+    "substitutes": ["Podman", "containerd", "LXC"],
+    "match_strength": [0.9, 0.8, 0.5],
+    "category": "containerisation"
+  },
+  "Jenkins": {
+    "substitutes": ["GitHub Actions", "GitLab CI", "CircleCI", "Buildkite", "ArgoCD"],
+    "match_strength": [0.75, 0.75, 0.7, 0.7, 0.6],
+    "category": "ci_cd"
+  },
+  "Spark": {
+    "substitutes": ["Flink", "Dask", "Ray", "Databricks"],
+    "match_strength": [0.75, 0.65, 0.6, 0.85],
+    "category": "distributed_compute",
+    "notes": "Databricks is Spark-native."
+  },
+  "dbt": {
+    "substitutes": ["SQLMesh", "Dataform", "LookML"],
+    "match_strength": [0.8, 0.75, 0.55],
+    "category": "data_transformation"
+  },
+  "Prometheus": {
+    "substitutes": ["Datadog", "New Relic", "Grafana Cloud", "VictoriaMetrics"],
+    "match_strength": [0.65, 0.65, 0.75, 0.9],
+    "category": "observability",
+    "notes": "VictoriaMetrics is Prometheus-compatible."
+  }
+}

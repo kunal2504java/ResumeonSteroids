@@ -9,11 +9,13 @@ import ExperienceEditor from "./LeftPanel/ExperienceEditor";
 import EducationEditor from "./LeftPanel/EducationEditor";
 import ProjectEditor from "./LeftPanel/ProjectEditor";
 import SkillsEditor from "./LeftPanel/SkillsEditor";
-import ResumePreview from "./RightPanel/ResumePreview";
 import Toolbar from "./Toolbar";
 import TailorDrawer from "./TailorDrawer";
 import CommandPalette from "@/components/ui/CommandPalette";
 import ToastContainer from "@/components/ui/Toast";
+import { ATSReportPanel } from "@/components/ats/ATSReportPanel";
+import { ResumePreviewPanel } from "@/components/resume/ResumePreviewPanel";
+import { useATSReport } from "@/hooks/useATSReport";
 
 export default function EditorLayout() {
   const activeSection = useResumeStore((s) => s.activeSection);
@@ -28,7 +30,16 @@ export default function EditorLayout() {
   const [tailorOpen, setTailorOpen] = useState(false);
   const [cmdOpen, setCmdOpen] = useState(false);
   const [dividerX, setDividerX] = useState(480);
+  const [jobDescription, setJobDescription] = useState("");
+  const [highlightedSection, setHighlightedSection] = useState<string | undefined>();
+  const [mobileTab, setMobileTab] = useState<"resume" | "ats">("resume");
   const dragging = useRef(false);
+  const atsRunId = resume ? `ats-${resume.id}` : null;
+  const { report, loading: atsLoading, error: atsError, triggerFix } = useATSReport(
+    atsRunId,
+    resume,
+    jobDescription
+  );
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -210,11 +221,70 @@ export default function EditorLayout() {
 
         {/* Right Panel */}
         <div className="flex-1 overflow-hidden" data-resume-preview-container>
-          <ResumePreview />
+          <div className="flex h-full flex-col gap-4 p-4">
+            <div className="flex items-center justify-between rounded-2xl border border-[#1E2535] bg-[#111827] p-2 lg:hidden">
+              <button
+                type="button"
+                onClick={() => setMobileTab("resume")}
+                className={`flex-1 rounded-xl px-3 py-2 text-sm transition ${
+                  mobileTab === "resume"
+                    ? "bg-white text-[#0D1117]"
+                    : "text-white/60 hover:text-white"
+                }`}
+              >
+                Resume
+              </button>
+              <button
+                type="button"
+                onClick={() => setMobileTab("ats")}
+                className={`flex-1 rounded-xl px-3 py-2 text-sm transition ${
+                  mobileTab === "ats"
+                    ? "bg-white text-[#0D1117]"
+                    : "text-white/60 hover:text-white"
+                }`}
+              >
+                ATS Report
+              </button>
+            </div>
+
+            <div className="hidden h-full gap-4 lg:flex">
+              <div className="min-w-0 flex-[3]">
+                <ResumePreviewPanel highlightedSection={highlightedSection} />
+              </div>
+              <div className="min-w-0 flex-[2]">
+                <ATSReportPanel
+                  report={report}
+                  loading={atsLoading}
+                  error={atsError}
+                  onFix={triggerFix}
+                  onHighlightSection={setHighlightedSection}
+                />
+              </div>
+            </div>
+
+            <div className="min-h-0 flex-1 lg:hidden">
+              {mobileTab === "resume" ? (
+                <ResumePreviewPanel highlightedSection={highlightedSection} />
+              ) : (
+                <ATSReportPanel
+                  report={report}
+                  loading={atsLoading}
+                  error={atsError}
+                  onFix={triggerFix}
+                  onHighlightSection={setHighlightedSection}
+                />
+              )}
+            </div>
+          </div>
         </div>
       </div>
 
-      <TailorDrawer isOpen={tailorOpen} onClose={() => setTailorOpen(false)} />
+      <TailorDrawer
+        isOpen={tailorOpen}
+        onClose={() => setTailorOpen(false)}
+        jobDescription={jobDescription}
+        onJobDescriptionChange={setJobDescription}
+      />
       <CommandPalette
         commands={commands}
         isOpen={cmdOpen}

@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["match_score", "hard_gaps", "soft_gaps", "covered_skills", "skill_match_details"],
+  "properties": {
+    "match_score": { "type": "number", "minimum": 0, "maximum": 100 },
+    "hard_gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["skill", "suggestion"],
+        "properties": {
+          "skill": { "type": "string" },
+          "suggestion": { "type": "string" }
+        }
+      }
+    },
+    "soft_gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["skill", "reframe_hint", "evidence_id"],
+        "properties": {
+          "skill": { "type": "string" },
+          "reframe_hint": { "type": "string" },
+          "evidence_id": { "type": "string" }
+        }
+      }
+    },
+    "covered_skills": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["skill", "matched_via", "candidate_skill", "strength"],
+        "properties": {
+          "skill": { "type": "string" },
+          "matched_via": {
+            "type": "string",
+            "enum": ["exact", "stem", "transferable"]
+          },
+          "candidate_skill": { "type": "string" },
+          "strength": { "type": "number", "minimum": 0, "maximum": 1 }
+        }
+      }
+    },
+    "skill_match_details": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["required", "candidate_has", "match_type", "strength", "classification"],
+        "properties": {
+          "required": { "type": "string" },
+          "candidate_has": { "type": "string" },
+          "match_type": {
+            "type": "string",
+            "enum": ["exact", "stem", "transferable", "none"]
+          },
+          "strength": { "type": "number", "minimum": 0, "maximum": 1 },
+          "classification": {
+            "type": "string",
+            "enum": ["covered", "soft_gap_strong", "soft_gap_weak", "hard_gap"]
+          }
+        }
+      }
+    },
+    "coverage_summary": { "type": "string" }
+  }
+}

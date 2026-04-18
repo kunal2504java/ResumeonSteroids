@@ -241,7 +241,7 @@ def test_xyz_structure_preserved_after_rewrite(tmp_path: Path) -> None:
     }
 
 
-def test_ats_score_equals_final_hit_rate(tmp_path: Path) -> None:
+def test_ats_score_equals_location_weighted_score(tmp_path: Path) -> None:
     ctx = make_context(tmp_path)
     content = base_content()
     jd_analysis = {
@@ -255,4 +255,4 @@ def test_ats_score_equals_final_hit_rate(tmp_path: Path) -> None:
 
     result = run(content, jd_analysis, client, ctx)
 
-    assert result["ats_score"] == result["keyword_hit_rate"]
+    assert result["ats_score"] == result["location_weighted_score"]

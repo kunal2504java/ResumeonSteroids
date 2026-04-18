@@ -3,6 +3,10 @@
 import { useResumeStore } from "@/lib/store/resumeStore";
 import { forwardRef } from "react";
 
+interface JakeTemplateProps {
+  highlightedSection?: string;
+}
+
 /**
  * Format "YYYY-MM" or "YYYY" into "November 2025" style.
  * Pass-through if already human-readable (e.g. "Present").
@@ -40,7 +44,14 @@ function dateRange(start: string, end: string): string {
   return `${s} \u2013 ${e}`;
 }
 
-const JakeTemplate = forwardRef<HTMLDivElement>(function JakeTemplate(_, ref) {
+function isHighlighted(currentSection: string, highlightedSection?: string): boolean {
+  return currentSection === highlightedSection;
+}
+
+const JakeTemplate = forwardRef<HTMLDivElement, JakeTemplateProps>(function JakeTemplate(
+  { highlightedSection },
+  ref,
+) {
   const resume = useResumeStore((s) => s.resume);
 
   if (!resume) return null;
@@ -120,7 +131,10 @@ const JakeTemplate = forwardRef<HTMLDivElement>(function JakeTemplate(_, ref) {
 
       {/* ===== EDUCATION ===== */}
       {education.length > 0 && (
-        <Section title="Education">
+        <Section
+          title="Education"
+          highlighted={isHighlighted("education", highlightedSection)}
+        >
           {education.map((edu) => (
             <SubHeading
               key={edu.id}
@@ -139,9 +153,22 @@ const JakeTemplate = forwardRef<HTMLDivElement>(function JakeTemplate(_, ref) {
         </Section>
       )}
 
+      {/* ===== SUMMARY ===== */}
+      {resume.summary && (
+        <Section
+          title="Summary"
+          highlighted={isHighlighted("summary", highlightedSection)}
+        >
+          <p style={{ fontSize: "9pt", lineHeight: "1.25" }}>{resume.summary}</p>
+        </Section>
+      )}
+
       {/* ===== EXPERIENCE ===== */}
       {experience.length > 0 && (
-        <Section title="Experience">
+        <Section
+          title="Experience"
+          highlighted={isHighlighted("experience", highlightedSection)}
+        >
           {experience.map((exp) => (
             <div key={exp.id} className="mb-[2px]">
               <SubHeading
@@ -158,7 +185,10 @@ const JakeTemplate = forwardRef<HTMLDivElement>(function JakeTemplate(_, ref) {
 
       {/* ===== PROJECTS ===== */}
       {projects.length > 0 && (
-        <Section title="Projects">
+        <Section
+          title="Projects"
+          highlighted={isHighlighted("projects", highlightedSection)}
+        >
           {projects.map((proj) => (
             <div key={proj.id} className="mb-[2px]">
               <div className="flex justify-between items-baseline">
@@ -186,7 +216,10 @@ const JakeTemplate = forwardRef<HTMLDivElement>(function JakeTemplate(_, ref) {
         skills.frameworks.length > 0 ||
         skills.tools.length > 0 ||
         skills.databases.length > 0) && (
-        <Section title="Technical Skills">
+        <Section
+          title="Technical Skills"
+          highlighted={isHighlighted("skills", highlightedSection)}
+        >
           <div style={{ fontSize: "9pt", lineHeight: "1.25" }}>
             {skills.languages.length > 0 && (
               <div>
@@ -218,7 +251,10 @@ const JakeTemplate = forwardRef<HTMLDivElement>(function JakeTemplate(_, ref) {
 
       {/* ===== ACHIEVEMENTS ===== */}
       {resume.achievements.length > 0 && resume.achievements.some((a) => a) && (
-        <Section title="Achievements">
+        <Section
+          title="Achievements"
+          highlighted={isHighlighted("achievements", highlightedSection)}
+        >
           <BulletList bullets={resume.achievements} />
         </Section>
       )}
@@ -244,9 +280,21 @@ const JakeTemplate = forwardRef<HTMLDivElement>(function JakeTemplate(_, ref) {
 /* ------------------------------------------------------------------ */
 /*  Section – renders the title with a horizontal rule below it        */
 /* ------------------------------------------------------------------ */
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({
+  title,
+  highlighted = false,
+  children,
+}: {
+  title: string;
+  highlighted?: boolean;
+  children: React.ReactNode;
+}) {
   return (
-    <div className="mt-[8px] mb-[4px]">
+    <div
+      className={`mt-[8px] mb-[4px] rounded-md px-2 py-1 transition ${
+        highlighted ? "bg-amber-100/60 ring-2 ring-amber-300" : ""
+      }`}
+    >
       {/* Section heading – matches LaTeX \section formatting */}
       <div
         className="border-b border-black mb-[5px]"

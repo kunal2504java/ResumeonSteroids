@@ -5,6 +5,7 @@ import re
 from pathlib import Path
 from typing import Any
 
+from ats_simulator import rule_keyword_location_score
 from context_manager import save_context
 from pipeline_context import PipelineContext
 
@@ -123,9 +124,30 @@ def _iter_keyword_scan_texts(sections: dict) -> list[str]:
     return texts
 
 
+def _normalize_ats_keywords(ats_keywords: list) -> list[dict[str, str]]:
+    normalized: list[dict[str, str]] = []
+    for keyword in ats_keywords:
+        if isinstance(keyword, dict):
+            original = str(keyword.get("original", "")).strip()
+            canonical = str(keyword.get("canonical", "")).strip()
+            display = original or canonical
+            if display:
+                normalized.append(
+                    {
+                        "display": display,
+                        "canonical": canonical or display,
+                    }
+                )
+        else:
+            value = str(keyword).strip()
+            if value:
+                normalized.append({"display": value, "canonical": value})
+    return normalized
+
+
 def scan_keywords(sections: dict, ats_keywords: list) -> dict:
     bullet_blob = " ".join(_iter_keyword_scan_texts(sections)).lower()
-    normalized_keywords = [str(keyword).strip() for keyword in ats_keywords if str(keyword).strip()]
+    normalized_keywords = _normalize_ats_keywords(ats_keywords)
 
     if not normalized_keywords:
         return {
@@ -136,12 +158,17 @@ def scan_keywords(sections: dict, ats_keywords: list) -> dict:
             "keywords_missing": [],
         }
 
-    keywords_present = [
-        keyword for keyword in normalized_keywords if keyword.lower() in bullet_blob
-    ]
-    keywords_missing = [
-        keyword for keyword in normalized_keywords if keyword.lower() not in bullet_blob
-    ]
+    keywords_present = []
+    keywords_missing = []
+    for keyword in normalized_keywords:
+        variants = {
+            keyword["display"].lower(),
+            keyword["canonical"].lower(),
+        }
+        if any(variant and variant in bullet_blob for variant in variants):
+            keywords_present.append(keyword["display"])
+        else:
+            keywords_missing.append(keyword["display"])
     hits = len(keywords_present)
     misses = len(keywords_missing)
     hit_rate = round((hits / len(normalized_keywords)) * 100, 1)
@@ -259,7 +286,7 @@ def run(
     ctx: PipelineContext,
 ) -> dict:
     original_sections = content.get("sections", {})
-    ats_keywords = [str(keyword) for keyword in jd_analysis.get("ats_keywords", [])]
+    ats_keywords = list(jd_analysis.get("ats_keywords", []))
 
     initial_scan = scan_keywords(original_sections, ats_keywords)
 
@@ -277,16 +304,97 @@ def run(
 
     final_scan = scan_keywords(revised_sections, ats_keywords)
     formatting_flags = check_formatting(revised_sections)
+    keyword_rule, keyword_coverage = rule_keyword_location_score(
+        _sections_to_assembled_resume(content.get("summary", ""), revised_sections),
+        ats_keywords,
+    )
 
     result = {
         "keyword_hit_rate": final_scan["hit_rate"],
         "keywords_present": final_scan["keywords_present"],
         "keywords_missing": final_scan["keywords_missing"],
+        "keyword_coverage": keyword_coverage,
+        "location_weighted_score": keyword_coverage["location_weighted_score"],
+        "keyword_rule_status": keyword_rule.status,
         "llm_triggered": llm_triggered,
         "revised_sections": revised_sections,
         "formatting_flags": formatting_flags,
-        "ats_score": final_scan["hit_rate"],
+        "ats_score": keyword_coverage["location_weighted_score"],
     }
     ctx.ats_optimised = result
     save_context(ctx, str(_context_path(ctx)))
+    return result
+
+
+def _sections_to_assembled_resume(summary: str, sections: dict) -> dict:
+    return {
+        "summary": summary,
+        "experience": [
+            {
+                "company": str(entry.get("org", "")),
+                "title": str(entry.get("title", "")),
+                "location": "",
+                "startDate": "",
+                "endDate": "",
+                "bullets": [
+                    bullet.get("text", "")
+                    for bullet in entry.get("bullets", [])
+                    if isinstance(bullet, dict) and str(bullet.get("text", "")).strip()
+                ],
+            }
+            for entry in sections.get("experience", [])
+            if isinstance(entry, dict)
+        ],
+        "projects": [
+            {
+                "name": str(entry.get("title", "")),
+                "techStack": [],
+                "startDate": "",
+                "endDate": "",
+                "bullets": [
+                    bullet.get("text", "")
+                    for bullet in entry.get("bullets", [])
+                    if isinstance(bullet, dict) and str(bullet.get("text", "")).strip()
+                ],
+            }
+            for entry in sections.get("projects", [])
+            if isinstance(entry, dict)
+        ],
+        "skills": _skills_grouped_to_resume_skills(sections.get("skills", {})),
+        "education": sections.get("education", []),
+        "achievements": [
+            bullet.get("text", "")
+            for bullet in sections.get("competitive_programming", {}).get("bullets", [])
+            if isinstance(bullet, dict) and str(bullet.get("text", "")).strip()
+        ],
+    }
+
+
+def _skills_grouped_to_resume_skills(skills_section: Any) -> dict:
+    grouped = {}
+    if isinstance(skills_section, dict):
+        grouped = skills_section.get("grouped", {})
+
+    result = {
+        "languages": [],
+        "frameworks": [],
+        "tools": [],
+        "databases": [],
+    }
+    if not isinstance(grouped, dict):
+        return result
+
+    for label, values in grouped.items():
+        if not isinstance(values, list):
+            continue
+        normalized_label = str(label).strip().lower()
+        if normalized_label == "languages":
+            result["languages"] = [str(value) for value in values]
+        elif normalized_label == "frameworks":
+            result["frameworks"] = [str(value) for value in values]
+        elif normalized_label == "databases":
+            result["databases"] = [str(value) for value in values]
+        else:
+            result["tools"].extend(str(value) for value in values)
+
     return result

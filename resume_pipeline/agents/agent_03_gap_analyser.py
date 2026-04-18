@@ -7,19 +7,22 @@ from typing import TypedDict
 
 from context_manager import save_context
 from pipeline_context import PipelineContext
+from skill_matcher import classify_gap, extract_candidate_skills, match_skill
+
+
+IMPORTANCE_WEIGHTS = {"high": 1.0, "medium": 0.6, "low": 0.3}
+TERM_ALIASES = {
+    "cloud": {"aws", "gcp", "azure", "cloud"},
+}
 
 
 class GapAnalysis(TypedDict):
     hard_gaps: list[dict]
     soft_gaps: list[dict]
-    covered_skills: list[str]
+    covered_skills: list[dict]
+    skill_match_details: list[dict]
     coverage_summary: str
     match_score: float
-
-
-TERM_ALIASES = {
-    "cloud": {"aws", "gcp", "azure", "cloud"},
-}
 
 
 def _base_dir() -> Path:
@@ -82,62 +85,37 @@ def _text_matches(term: str, evidence: dict) -> bool:
     return len(overlap) == len(term_tokens)
 
 
-def _compute_match_score(jd_analysis: dict, included_evidence: list[dict]) -> float:
-    required_skills = jd_analysis.get("required_skills", [])
+def _compute_themes_score(jd_analysis: dict, included_evidence: list[dict]) -> float:
     must_have_themes = jd_analysis.get("must_have_themes", [])
-
-    relevant_evidence = []
-    for evidence in included_evidence:
-        if any(
-            isinstance(skill_entry, dict)
-            and _text_matches(str(skill_entry.get("skill", "")), evidence)
-            for skill_entry in required_skills
-        ):
-            relevant_evidence.append(evidence)
-
-    total_required = len(required_skills)
-    if total_required == 0:
-        required_component = 0.0
-    else:
-        covered_required = sum(
-            1
-            for skill_entry in required_skills
-            if isinstance(skill_entry, dict)
-            and any(
-                _text_matches(str(skill_entry.get("skill", "")), evidence)
-                for evidence in included_evidence
-            )
-        )
-        required_component = (covered_required / total_required) * 70
+    if not must_have_themes:
+        return 0.0
 
     themes_covered = sum(
         1
         for theme in must_have_themes
         if isinstance(theme, str)
-        and any(_text_matches(theme, evidence) for evidence in relevant_evidence)
+        and any(_text_matches(theme, evidence) for evidence in included_evidence)
     )
-    theme_component = (themes_covered / 3) * 30 if must_have_themes else 0.0
-
-    return round(required_component + theme_component, 1)
+    return (themes_covered / 3) * 30
 
 
-def _validate_gap_output(raw: dict, valid_evidence_ids: set[str]) -> dict:
-    required_keys = {"hard_gaps", "soft_gaps", "covered_skills", "coverage_summary"}
-    missing = required_keys.difference(raw.keys())
-    if missing:
-        raise ValueError(f"Gap analysis missing keys: {sorted(missing)}")
+def _importance_weight(skill_entry: dict) -> float:
+    importance = str(skill_entry.get("importance", "low")).lower()
+    return IMPORTANCE_WEIGHTS.get(importance, 0.3)
 
-    hard_gaps = raw["hard_gaps"]
-    soft_gaps = raw["soft_gaps"]
-    covered_skills = raw["covered_skills"]
-    coverage_summary = raw["coverage_summary"]
+
+def _validate_llm_gap_output(raw: dict, valid_evidence_ids: set[str]) -> dict:
+    if not isinstance(raw, dict):
+        raise ValueError("gap analysis response must be an object")
+
+    hard_gaps = raw.get("hard_gaps", [])
+    soft_gaps = raw.get("soft_gaps", [])
+    coverage_summary = raw.get("coverage_summary", "")
 
     if not isinstance(hard_gaps, list):
         raise ValueError("hard_gaps must be a list")
     if not isinstance(soft_gaps, list):
         raise ValueError("soft_gaps must be a list")
-    if not isinstance(covered_skills, list):
-        raise ValueError("covered_skills must be a list")
     if not isinstance(coverage_summary, str):
         raise ValueError("coverage_summary must be a string")
 
@@ -174,58 +152,181 @@ def _validate_gap_output(raw: dict, valid_evidence_ids: set[str]) -> dict:
             }
         )
 
-    if not all(isinstance(item, str) for item in covered_skills):
-        raise ValueError("covered_skills entries must be strings")
-
     return {
         "hard_gaps": validated_hard,
         "soft_gaps": validated_soft,
-        "covered_skills": [item.strip() for item in covered_skills if isinstance(item, str)],
         "coverage_summary": coverage_summary.strip(),
     }
+
+
+def _build_soft_gap_fallback(skill: str, candidate_skill: str, evidence_id: str) -> dict:
+    return {
+        "skill": skill,
+        "reframe_hint": f"Position {candidate_skill} experience as adjacent evidence for {skill} and emphasize the overlapping production use cases.",
+        "evidence_id": evidence_id,
+    }
+
+
+def _build_hard_gap_fallback(skill: str) -> dict:
+    return {
+        "skill": skill,
+        "suggestion": f"Add a project or experience entry that demonstrates {skill} in a production-relevant use case.",
+    }
+
+
+def _default_coverage_summary(match_results: list[dict]) -> str:
+    if not match_results:
+        return ""
+
+    covered_count = sum(1 for item in match_results if item["classification"] == "covered")
+    soft_count = sum(
+        1
+        for item in match_results
+        if item["classification"] in {"soft_gap_strong", "soft_gap_weak"}
+    )
+    hard_count = sum(1 for item in match_results if item["classification"] == "hard_gap")
+    return (
+        f"The candidate fully covers {covered_count} required skills, has adjacent evidence for {soft_count}, "
+        f"and still shows {hard_count} hard gaps."
+    )
 
 
 def run(
     jd_analysis: dict,
     scored_evidence: dict,
-    llm_client,
-    ctx: PipelineContext,
+    candidate,
+    llm_client=None,
+    ctx: PipelineContext | None = None,
 ) -> dict:
+    if ctx is None:
+        ctx = llm_client
+        llm_client = candidate
+        candidate = getattr(ctx, "candidate", {})
+
+    required_skills = jd_analysis.get("required_skills", [])
+    included_evidence = [
+        item
+        for item in scored_evidence.get("scored_evidence", [])
+        if isinstance(item, dict) and item.get("include") is True
+    ]
     include_true_items = [
         {
-            "id": item["id"],
-            "title": item["title"],
-            "type": item["type"],
-            "source": item["source"],
+            "id": str(item.get("id", "")),
+            "title": str(item.get("title", "")),
+            "type": str(item.get("type", "")),
+            "source": str(item.get("source", "")),
         }
-        for item in scored_evidence.get("scored_evidence", [])
-        if item.get("include") is True
+        for item in included_evidence
     ]
+    valid_evidence_ids = {item["id"] for item in include_true_items if item["id"]}
+    candidate_skills = extract_candidate_skills(candidate)
 
-    user_content = json.dumps(
-        {
-            "required_skills": jd_analysis.get("required_skills", []),
-            "must_have_themes": jd_analysis.get("must_have_themes", []),
-            "candidate_evidence": include_true_items,
-        },
-        indent=2,
-        sort_keys=True,
-    )
+    match_results: list[dict] = []
+    for skill_entry in required_skills:
+        if not isinstance(skill_entry, dict):
+            continue
+        skill_name = str(skill_entry.get("skill", "")).strip()
+        if not skill_name:
+            continue
+        result = match_skill(skill_name, candidate_skills)
+        classification = classify_gap(result)
+        match_results.append(
+            {
+                "skill": skill_name,
+                "importance": str(skill_entry.get("importance", "low")).lower(),
+                "match_result": result,
+                "classification": classification,
+            }
+        )
 
-    valid_evidence_ids = {item["id"] for item in include_true_items}
-    validated = _validate_gap_output(
-        llm_client.call_llm(
+    covered = [item for item in match_results if item["classification"] == "covered"]
+    soft_strong = [item for item in match_results if item["classification"] == "soft_gap_strong"]
+    soft_weak = [item for item in match_results if item["classification"] == "soft_gap_weak"]
+    hard = [item for item in match_results if item["classification"] == "hard_gap"]
+
+    llm_output = {"hard_gaps": [], "soft_gaps": [], "coverage_summary": ""}
+    if (hard or soft_strong or soft_weak) and llm_client is not None:
+        raw_output = llm_client.call_llm(
             system_prompt=_load_prompt(),
-            user_content=user_content,
+            user_content=json.dumps(
+                {
+                    "hard_gaps": [item["skill"] for item in hard],
+                    "soft_gaps": [
+                        {
+                            "skill": item["skill"],
+                            "candidate_has": item["match_result"].candidate_skill,
+                            "match_strength": item["match_result"].match_strength,
+                        }
+                        for item in (soft_strong + soft_weak)
+                    ],
+                    "candidate_evidence": include_true_items,
+                },
+                indent=2,
+                sort_keys=True,
+            ),
             temperature=0.3,
             agent_name="agent_03_gap_analyser",
             run_id=str(ctx.metadata.get("run_id", "")),
-        ),
-        valid_evidence_ids=valid_evidence_ids,
-    )
+        )
+        llm_output = _validate_llm_gap_output(raw_output, valid_evidence_ids)
 
-    match_score = _compute_match_score(jd_analysis, include_true_items)
-    result = {**validated, "match_score": match_score}
+    llm_hard_by_skill = {item["skill"]: item for item in llm_output.get("hard_gaps", [])}
+    llm_soft_by_skill = {item["skill"]: item for item in llm_output.get("soft_gaps", [])}
+    fallback_evidence_id = next(iter(sorted(valid_evidence_ids)), "")
+
+    hard_gaps = [
+        llm_hard_by_skill.get(item["skill"], _build_hard_gap_fallback(item["skill"]))
+        for item in hard
+    ]
+
+    soft_gaps = []
+    for item in soft_strong + soft_weak:
+        llm_soft = llm_soft_by_skill.get(item["skill"])
+        if llm_soft is not None:
+            soft_gaps.append(llm_soft)
+        elif fallback_evidence_id:
+            soft_gaps.append(
+                _build_soft_gap_fallback(
+                    item["skill"],
+                    item["match_result"].candidate_skill or item["skill"],
+                    fallback_evidence_id,
+                )
+            )
+
+    max_possible = sum(_importance_weight(item) for item in match_results)
+    weighted_score = sum(
+        item["match_result"].match_strength * _importance_weight(item) for item in match_results
+    )
+    skill_score = (weighted_score / max_possible) * 70 if max_possible else 0.0
+    themes_score = _compute_themes_score(jd_analysis, included_evidence)
+    match_score = round(min(100.0, skill_score + themes_score), 1)
+
+    result = {
+        "match_score": match_score,
+        "hard_gaps": hard_gaps,
+        "soft_gaps": soft_gaps,
+        "covered_skills": [
+            {
+                "skill": item["skill"],
+                "matched_via": item["match_result"].match_type,
+                "candidate_skill": item["match_result"].candidate_skill,
+                "strength": item["match_result"].match_strength,
+            }
+            for item in covered + soft_strong
+        ],
+        "skill_match_details": [
+            {
+                "required": item["skill"],
+                "candidate_has": item["match_result"].candidate_skill,
+                "match_type": item["match_result"].match_type,
+                "strength": item["match_result"].match_strength,
+                "classification": item["classification"],
+            }
+            for item in match_results
+        ],
+        "coverage_summary": llm_output.get("coverage_summary") or _default_coverage_summary(match_results),
+    }
     ctx.gap_analysis = result
+    ctx.skill_match_details = result["skill_match_details"]
     save_context(ctx, str(_context_path(ctx)))
     return result
