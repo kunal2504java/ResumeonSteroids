@@ -3,13 +3,25 @@ import { TailorRequestSchema } from "@resumeai/shared/schemas";
 import { anthropic } from "../../lib/anthropic";
 import { TAILOR_PROMPT } from "../../lib/prompts";
 import { resumeToPlainText } from "../../lib/resumeHelpers";
-import { authMiddleware } from "../../middleware/auth";
+import { optionalAuthMiddleware } from "../../middleware/auth";
 import { rateLimitMiddleware } from "../../middleware/rateLimit";
 
 const route = new Hono();
 
-route.post("/", authMiddleware, rateLimitMiddleware("tailor"), async (c) => {
+route.post("/", optionalAuthMiddleware, async (c) => {
   try {
+    const userId = c.get("userId");
+    if (userId) {
+      const limiter = rateLimitMiddleware("tailor");
+      let allowed = false;
+      await limiter(c, async () => {
+        allowed = true;
+      });
+      if (!allowed) {
+        return c.res;
+      }
+    }
+
     const body = await c.req.json();
     const parsed = TailorRequestSchema.safeParse(body);
 

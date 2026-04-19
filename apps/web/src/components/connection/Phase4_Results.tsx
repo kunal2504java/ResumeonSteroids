@@ -14,12 +14,14 @@ const ResumePreview = dynamic(
 
 interface Phase4Props {
   connections: ConnectionStatus[];
+  results: Record<string, unknown>;
   onConfirm: () => void;
   onBack: () => void;
 }
 
 export default function Phase4_Results({
   connections,
+  results,
   onConfirm,
   onBack,
 }: Phase4Props) {
@@ -34,6 +36,14 @@ export default function Phase4_Results({
   }, [completed]);
   const [draftName, setDraftName] = useState("");
   const [isNameConfirmed, setIsNameConfirmed] = useState(false);
+  const experienceEnrichment = results.experience_enrichment as
+    | {
+        rolesNeedingInput?: string[];
+        questionsBlock?: string;
+      }
+    | undefined;
+  const rolesNeedingInput = experienceEnrichment?.rolesNeedingInput ?? [];
+  const questionsBlock = experienceEnrichment?.questionsBlock?.trim() ?? "";
 
   useEffect(() => {
     if (!isNameConfirmed) {
@@ -72,6 +82,27 @@ export default function Phase4_Results({
           animate={{ opacity: 1, x: 0 }}
           className="space-y-3"
         >
+          {rolesNeedingInput.length > 0 && (
+            <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5">
+              <div className="flex items-center justify-between gap-4">
+                <div>
+                  <div className="text-sm font-semibold text-amber-100">
+                    More detail needed for {rolesNeedingInput.length} role{rolesNeedingInput.length > 1 ? "s" : ""}
+                  </div>
+                  <p className="mt-1 text-xs leading-5 text-amber-100/75">
+                    We improved the experience section where evidence was strong.
+                    The roles below still need specifics before they can be written properly.
+                  </p>
+                </div>
+              </div>
+              {questionsBlock && (
+                <pre className="mt-4 whitespace-pre-wrap rounded-xl border border-amber-500/15 bg-black/10 p-4 text-xs leading-6 text-amber-50/95">
+                  {questionsBlock}
+                </pre>
+              )}
+            </div>
+          )}
+
           {completed.map((conn) => (
             <div
               key={conn.id}

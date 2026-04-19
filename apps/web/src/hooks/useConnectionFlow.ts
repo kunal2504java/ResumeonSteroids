@@ -19,6 +19,25 @@ export interface GlobalStageInfo {
   subtitle: string;
 }
 
+export interface ExperienceEnrichmentResult {
+  experience: Array<{
+    company: string;
+    title: string;
+    duration: string;
+    location: string;
+    bullets: Array<{
+      text: string;
+      ats_keywords_used: string[];
+      action_verb: string;
+      has_metric: boolean;
+      metric_source: "linkedin" | "github" | "old_resume" | "inferred";
+    }>;
+    status: "complete" | "awaiting_user_input";
+  }>;
+  rolesNeedingInput: string[];
+  questionsBlock: string;
+}
+
 const API_URL =
   typeof window !== "undefined"
     ? process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000"
@@ -88,6 +107,26 @@ export function useConnectionFlow(
     );
 
     await Promise.allSettled(promises);
+
+    const hasExperienceSignals =
+      Boolean(resultsRef.current.linkedin) ||
+      Boolean(resultsRef.current.resume) ||
+      Boolean(resultsRef.current.github);
+
+    if (hasExperienceSignals) {
+      setCurrentStage({
+        headline: "Deepening your experience section...",
+        subtitle:
+          "We’re auditing LinkedIn, GitHub, and resume evidence together to write sharper bullets.",
+      });
+
+      try {
+        const enrichment = await callExperienceEnrichmentApi(resultsRef.current);
+        resultsRef.current.experience_enrichment = enrichment;
+      } catch {
+        // Non-blocking; imported data is still usable without the enhancement pass.
+      }
+    }
 
     setCurrentStage({
       headline: "All done. Building your resume now.",
@@ -277,4 +316,27 @@ async function callImportApi(
     default:
       throw new Error(`Unknown source: ${sourceId}`);
   }
+}
+
+async function callExperienceEnrichmentApi(
+  importedResults: Record<string, unknown>
+): Promise<ExperienceEnrichmentResult> {
+  const res = await fetch(`${API_URL}/api/ai/enrich-experience`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      linkedin: importedResults.linkedin ?? null,
+      github: importedResults.github ?? null,
+      resume: importedResults.resume ?? null,
+    }),
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(
+      (err as { error?: string }).error ?? "Experience enrichment failed"
+    );
+  }
+
+  return (await res.json()) as ExperienceEnrichmentResult;
 }

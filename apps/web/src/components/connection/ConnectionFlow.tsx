@@ -167,6 +167,7 @@ export default function ConnectionFlow({
             >
               <Phase4_Results
                 connections={connections}
+                results={results}
                 onConfirm={handleConfirm}
                 onBack={handleBackToPhase1}
               />

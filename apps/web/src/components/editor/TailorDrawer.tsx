@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useResumeStore } from "@/lib/store/resumeStore";
+import { createClient } from "@/lib/supabase/client";
 import type { TailorResponse } from "@resumeai/shared";
 
 interface TailorDrawerProps {
@@ -29,9 +30,26 @@ export default function TailorDrawer({
     setResult(null);
 
     try {
-      const res = await fetch("/api/ai/tailor", {
+      const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+      const hasSupabaseConfig =
+        Boolean(process.env.NEXT_PUBLIC_SUPABASE_URL) &&
+        Boolean(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+      let accessToken = "";
+
+      if (hasSupabaseConfig) {
+        const supabase = createClient();
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        accessToken = session?.access_token ?? "";
+      }
+
+      const res = await fetch(`${API_URL}/api/ai/tailor`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(accessToken ? { Authorization: `Bearer ${accessToken}` } : {}),
+        },
         body: JSON.stringify({
           resumeId: resume.id,
           jobDescription,
@@ -39,11 +57,21 @@ export default function TailorDrawer({
         }),
       });
 
-      if (!res.ok) throw new Error();
+      if (!res.ok) {
+        const error = await res
+          .json()
+          .catch(() => ({ error: "Tailoring failed" }));
+        throw new Error(
+          typeof error?.error === "string" ? error.error : "Tailoring failed"
+        );
+      }
       const data = await res.json();
       setResult(data);
-    } catch {
-      addToast("Tailoring failed", "error");
+    } catch (error) {
+      addToast(
+        error instanceof Error ? error.message : "Tailoring failed",
+        "error"
+      );
     } finally {
       setLoading(false);
     }

@@ -93,6 +93,17 @@ route.post("/", optionalAuthMiddleware, async (c) => {
         inspectedRepoCount: inspectedRepos.length,
         totalCandidateRepoCount: repos.length,
       },
+      repoEvidence: inspectedRepos.map((repo) => ({
+        name: repo.name,
+        description: repo.description,
+        url: repo.html_url,
+        stars: repo.stars,
+        language: repo.language,
+        languages: repo.languages,
+        topics: repo.topics,
+        updatedAt: repo.updated_at,
+        readme: repo.readme,
+      })),
       ...projects,
     });
   } catch (error) {

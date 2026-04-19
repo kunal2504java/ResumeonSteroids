@@ -7,6 +7,21 @@ function cleanImportedName(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
+function normalizeExperienceKey(company: string, title: string): string {
+  return `${company}::${title}`.trim().toLowerCase();
+}
+
+function parseEnrichedDuration(duration: string): { startDate: string; endDate: string } {
+  const separators = [" -- ", " - ", " – ", " — ", "–", "—"];
+  for (const separator of separators) {
+    if (duration.includes(separator)) {
+      const [startDate, endDate] = duration.split(separator).map((part) => part.trim());
+      return { startDate, endDate };
+    }
+  }
+  return { startDate: duration.trim(), endDate: "" };
+}
+
 interface ResumeStore {
   resume: Resume | null;
   isDirty: boolean;
@@ -485,6 +500,79 @@ export const useResumeStore = create<ResumeStore>()(
           importedResumeName || importedLinkedinName;
         if (preferredImportedName) {
           state.resume.personalInfo.name = preferredImportedName;
+        }
+
+        const experienceEnrichment = data.experience_enrichment as
+          | {
+              experience?: Array<{
+                company?: string;
+                title?: string;
+                duration?: string;
+                location?: string;
+                bullets?: Array<{ text?: string }>;
+                status?: string;
+              }>;
+            }
+          | undefined;
+
+        if (experienceEnrichment?.experience?.length) {
+          const existingIndexByKey = new Map(
+            state.resume.experience.map((entry) => [
+              normalizeExperienceKey(entry.company, entry.title),
+              entry,
+            ])
+          );
+
+          for (const enriched of experienceEnrichment.experience) {
+            if (!enriched) {
+              continue;
+            }
+
+            const company = cleanImportedName(enriched.company);
+            const title = cleanImportedName(enriched.title);
+            const key = normalizeExperienceKey(company, title);
+            const bulletTexts = (enriched.bullets ?? [])
+              .map((bullet) => cleanImportedName(bullet?.text))
+              .filter(Boolean);
+
+            if (!company && !title) {
+              continue;
+            }
+
+            const matched = existingIndexByKey.get(key);
+            const { startDate, endDate } = parseEnrichedDuration(
+              cleanImportedName(enriched.duration)
+            );
+
+            if (enriched.status === "awaiting_user_input") {
+              if (matched) {
+                matched.bullets = [""];
+              }
+              continue;
+            }
+
+            if (matched) {
+              matched.company = company || matched.company;
+              matched.title = title || matched.title;
+              matched.location = cleanImportedName(enriched.location) || matched.location;
+              matched.startDate = startDate || matched.startDate;
+              matched.endDate = endDate || matched.endDate;
+              if (bulletTexts.length) {
+                matched.bullets = bulletTexts;
+              }
+              continue;
+            }
+
+            state.resume.experience.push({
+              id: uuid(),
+              company,
+              title,
+              location: cleanImportedName(enriched.location),
+              startDate,
+              endDate,
+              bullets: bulletTexts.length ? bulletTexts : [""],
+            });
+          }
         }
 
         state.isDirty = true;
