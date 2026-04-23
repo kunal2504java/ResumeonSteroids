@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useResumeStore } from "@/lib/store/resumeStore";
+import { dedupeProjects } from "@/lib/resume/output";
+import { mergeSkills, normalizeSkillsInput } from "@/lib/resume/skills";
 import { v4 as uuid } from "uuid";
 import type { Project } from "@resumeai/shared";
 
@@ -33,6 +35,24 @@ function cleanImportedName(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
+function normalizeExperienceKey(company: string, title: string): string {
+  return `${company}::${title}`.trim().toLowerCase();
+}
+
+function parseEnrichedDuration(duration: string): {
+  startDate: string;
+  endDate: string;
+} {
+  const separators = [" -- ", " - ", " – ", " — ", "–", "—"];
+  for (const separator of separators) {
+    if (duration.includes(separator)) {
+      const [startDate, endDate] = duration.split(separator).map((part) => part.trim());
+      return { startDate, endDate };
+    }
+  }
+  return { startDate: duration.trim(), endDate: "" };
+}
+
 export default function ImportWizard({ onComplete }: { onComplete: () => void }) {
   const [step, setStep] = useState(1);
   const [selected, setSelected] = useState<Set<ImportSource>>(new Set());
@@ -54,6 +74,8 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
   async function runImports() {
     setStep(3);
     const items: ProgressItem[] = [];
+    const aggregatedData: Record<string, unknown> = {};
+    const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
 
     for (const src of selected) {
       if (src === "manual") continue;
@@ -70,7 +92,7 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
         let result: unknown;
 
         if (items[i].source === "github") {
-          const res = await fetch("/api/ai/import/github", {
+          const res = await fetch(`${API_URL}/api/ai/import/github`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username: inputs.github }),
@@ -79,9 +101,10 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
           result = await res.json();
           const data = result as { projects?: { name: string; description: string; techStack: string[]; highlights: string[]; url: string; stars: number }[]; profile?: { name: string } };
           items[i].message = `Fetched ${data.projects?.length || 0} projects`;
+          aggregatedData.github = data;
           setImportedData((d) => ({ ...d, github: data }));
         } else if (items[i].source === "leetcode") {
-          const res = await fetch("/api/ai/import/leetcode", {
+          const res = await fetch(`${API_URL}/api/ai/import/leetcode`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username: inputs.leetcode }),
@@ -90,9 +113,10 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
           result = await res.json();
           const data = result as { stats?: { totalSolved: number }; achievement?: string };
           items[i].message = `${data.stats?.totalSolved || 0} problems solved`;
+          aggregatedData.leetcode = data;
           setImportedData((d) => ({ ...d, leetcode: data }));
         } else if (items[i].source === "codeforces") {
-          const res = await fetch("/api/ai/import/codeforces", {
+          const res = await fetch(`${API_URL}/api/ai/import/codeforces`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ handle: inputs.codeforces }),
@@ -101,19 +125,36 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
           result = await res.json();
           const data = result as { stats?: { maxRank: string; maxRating: number } };
           items[i].message = `${data.stats?.maxRank} (${data.stats?.maxRating})`;
+          aggregatedData.codeforces = data;
           setImportedData((d) => ({ ...d, codeforces: data }));
         } else if (items[i].source === "resume") {
           if (!file) throw new Error("No file");
           const formData = new FormData();
           formData.append("file", file);
-          const res = await fetch("/api/ai/import/resume", {
+          const res = await fetch(`${API_URL}/api/ai/import/resume`, {
             method: "POST",
             body: formData,
           });
           if (!res.ok) throw new Error("Failed");
           result = await res.json();
           items[i].message = "Resume parsed successfully";
+          aggregatedData.resume = result;
           setImportedData((d) => ({ ...d, resume: result }));
+        } else if (items[i].source === "linkedin") {
+          const res = await fetch(`${API_URL}/api/ai/import/linkedin`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ profileUrl: inputs.linkedin }),
+          });
+          if (!res.ok) throw new Error("Failed");
+          result = await res.json();
+          const data = result as {
+            profile?: { name?: string };
+            experience?: unknown[];
+          };
+          items[i].message = `${data.experience?.length || 0} roles imported`;
+          aggregatedData.linkedin = data;
+          setImportedData((d) => ({ ...d, linkedin: data }));
         }
 
         items[i].status = "done";
@@ -122,6 +163,31 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
         items[i].message = `Failed to import from ${items[i].source}`;
       }
       setProgress([...items]);
+    }
+
+    if (
+      aggregatedData.linkedin ||
+      aggregatedData.resume ||
+      aggregatedData.github
+    ) {
+      try {
+        const res = await fetch(`${API_URL}/api/ai/enrich-experience`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            linkedin: aggregatedData.linkedin ?? null,
+            github: aggregatedData.github ?? null,
+            resume: aggregatedData.resume ?? null,
+          }),
+        });
+        if (res.ok) {
+          const enrichment = await res.json();
+          aggregatedData.experience_enrichment = enrichment;
+          setImportedData((d) => ({ ...d, experience_enrichment: enrichment }));
+        }
+      } catch {
+        // Non-blocking: the base imports still work without the enrichment pass.
+      }
     }
 
     // Auto-advance if only manual selected or everything done
@@ -173,7 +239,12 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
           coursework: (e.coursework as string[]) || [],
         }));
       }
-      if (rd.skills) updated.skills = { ...updated.skills, ...(rd.skills as Record<string, string[]>) };
+      if (rd.skills) {
+        updated.skills = mergeSkills(
+          updated.skills,
+          normalizeSkillsInput(rd.skills as Record<string, string[]>),
+        );
+      }
       if (rd.projects && Array.isArray(rd.projects)) {
         updated.projects = (rd.projects as Record<string, unknown>[]).map((p) => ({
           id: uuid(),
@@ -199,11 +270,16 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
         endDate: "",
         bullets: p.highlights || [p.description],
       }));
-      updated.projects = [...updated.projects, ...ghProjects.slice(0, 4)];
+      updated.projects = dedupeProjects([
+        ...updated.projects,
+        ...ghProjects.slice(0, 4),
+      ]);
     }
 
     // Apply LeetCode
-    const lcData = importedData.leetcode as { achievement?: string } | undefined;
+    const lcData = importedData.leetcode as
+      | { achievement?: string; skills?: string[] }
+      | undefined;
     if (lcData?.achievement) {
       updated.achievements = [...updated.achievements, lcData.achievement];
     }
@@ -214,6 +290,17 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
       updated.achievements = [...updated.achievements, cfData.achievement];
     }
 
+    if (Array.isArray(lcData?.skills) && lcData.skills.length > 0) {
+      updated.skills = mergeSkills(updated.skills, { tools: lcData.skills });
+    }
+
+    const liDataWithSkills = importedData.linkedin as
+      | { profile?: { name?: string }; skills?: Record<string, string[]> }
+      | undefined;
+    if (liDataWithSkills?.skills) {
+      updated.skills = mergeSkills(updated.skills, liDataWithSkills.skills);
+    }
+
     const liData = importedData.linkedin as { profile?: { name?: string } } | undefined;
     const importedLinkedinName = cleanImportedName(liData?.profile?.name);
     const preferredImportedName = importedResumeName || importedLinkedinName;
@@ -221,6 +308,74 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
       updated.personalInfo.name = preferredImportedName;
     }
 
+    const experienceEnrichment = importedData.experience_enrichment as
+      | {
+          experience?: Array<{
+            company?: string;
+            title?: string;
+            duration?: string;
+            location?: string;
+            bullets?: Array<{ text?: string }>;
+            status?: string;
+          }>;
+        }
+      | undefined;
+
+    if (experienceEnrichment?.experience?.length) {
+      const existingIndexByKey = new Map(
+        updated.experience.map((entry) => [
+          normalizeExperienceKey(entry.company, entry.title),
+          entry,
+        ])
+      );
+
+      for (const enriched of experienceEnrichment.experience) {
+        if (!enriched) continue;
+
+        const company = cleanImportedName(enriched.company);
+        const title = cleanImportedName(enriched.title);
+        const key = normalizeExperienceKey(company, title);
+        const bulletTexts = (enriched.bullets ?? [])
+          .map((bullet) => cleanImportedName(bullet?.text))
+          .filter(Boolean);
+        const matched = existingIndexByKey.get(key);
+        const { startDate, endDate } = parseEnrichedDuration(
+          cleanImportedName(enriched.duration)
+        );
+
+        if (enriched.status === "awaiting_user_input") {
+          if (matched) {
+            matched.bullets = [""];
+          }
+          continue;
+        }
+
+        if (matched) {
+          matched.company = company || matched.company;
+          matched.title = title || matched.title;
+          matched.location = cleanImportedName(enriched.location) || matched.location;
+          matched.startDate = startDate || matched.startDate;
+          matched.endDate = endDate || matched.endDate;
+          if (bulletTexts.length) {
+            matched.bullets = bulletTexts;
+          }
+          continue;
+        }
+
+        updated.experience.push({
+          id: uuid(),
+          company,
+          title,
+          location: cleanImportedName(enriched.location),
+          startDate,
+          endDate,
+          bullets: bulletTexts.length ? bulletTexts : [""],
+        });
+      }
+    }
+
+    updated.projects = dedupeProjects(updated.projects);
+    updated.skills = normalizeSkillsInput(updated.skills);
     updated.updatedAt = new Date().toISOString();
     setResume(updated);
     addToast("Profile data imported", "success");
@@ -490,6 +645,25 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
               <p className="text-sm text-[#71717A] text-center mb-8">
                 Review what we found, then start editing.
               </p>
+
+              {(
+                importedData.experience_enrichment as
+                  | { rolesNeedingInput?: string[]; questionsBlock?: string }
+                  | undefined
+              )?.rolesNeedingInput?.length ? (
+                <div className="mb-6 rounded-2xl border border-amber-500/20 bg-amber-500/5 p-5">
+                  <h4 className="text-sm font-semibold text-amber-100">
+                    Some experience roles still need more detail
+                  </h4>
+                  <pre className="mt-3 whitespace-pre-wrap text-xs leading-6 text-amber-50/90">
+                    {(
+                      importedData.experience_enrichment as
+                        | { questionsBlock?: string }
+                        | undefined
+                    )?.questionsBlock || ""}
+                  </pre>
+                </div>
+              ) : null}
 
               <div className="space-y-3 mb-8 max-h-[400px] overflow-y-auto">
                 {Object.entries(importedData).map(([source, data]) => (

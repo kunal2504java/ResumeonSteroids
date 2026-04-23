@@ -157,6 +157,7 @@ export default function Pricing() {
                 <div className="mt-8">
                   <Button
                     variant={tier.highlighted ? "primary" : "ghost"}
+                    href={tier.name === "Team" ? "#pricing" : "/dashboard"}
                     className="w-full text-sm"
                   >
                     {tier.cta}

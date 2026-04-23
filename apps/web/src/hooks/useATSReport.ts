@@ -9,6 +9,7 @@ export function useATSReport(
   runId: string | null,
   resume: Resume | null,
   jobDescription: string,
+  maxPages?: 1 | 2,
 ) {
   const setResume = useResumeStore((state) => state.setResume);
   const deferredResume = useDeferredValue(resume);
@@ -37,6 +38,7 @@ export function useATSReport(
             run_id: runId,
             assembled_resume: deferredResume,
             job_description: deferredJobDescription,
+            max_pages: maxPages,
           }),
         });
         const data = (await res.json()) as ATSSimulationResponse | { error?: string };
@@ -63,7 +65,7 @@ export function useATSReport(
       controller.abort();
       window.clearTimeout(timeout);
     };
-  }, [runId, deferredResume, deferredJobDescription]);
+  }, [runId, deferredResume, deferredJobDescription, maxPages]);
 
   const triggerFix = async (ruleId: string) => {
     if (!runId) {

@@ -1,17 +1,29 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import type { Resume } from "@resumeai/shared";
 import { useResumeStore } from "@/lib/store/resumeStore";
+import { prepareResumeForOutput } from "@/lib/resume/output";
 import JakeTemplate from "./JakeTemplate";
 
 interface ResumePreviewProps {
   highlightedSection?: string;
+  resumeOverride?: Resume | null;
+  maxPages?: 1 | 2;
 }
 
-export default function ResumePreview({ highlightedSection }: ResumePreviewProps) {
+export default function ResumePreview({
+  highlightedSection,
+  resumeOverride,
+  maxPages = 1,
+}: ResumePreviewProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const requestIdRef = useRef(0);
-  const resume = useResumeStore((s) => s.resume);
+  const storeResume = useResumeStore((s) => s.resume);
+  const resume = useMemo(() => {
+    const source = resumeOverride ?? storeResume;
+    return source ? prepareResumeForOutput(source, { maxPages }) : null;
+  }, [maxPages, resumeOverride, storeResume]);
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "loading" | "ready" | "error">(
     "idle"
@@ -115,7 +127,10 @@ export default function ResumePreview({ highlightedSection }: ResumePreviewProps
         {showFallback && (
           <div className="flex min-h-full items-start justify-center">
             <div className="shadow-2xl shadow-black/50">
-              <JakeTemplate highlightedSection={highlightedSection} />
+              <JakeTemplate
+                highlightedSection={highlightedSection}
+                resumeOverride={resume}
+              />
             </div>
           </div>
         )}
@@ -141,7 +156,10 @@ export default function ResumePreview({ highlightedSection }: ResumePreviewProps
       )}
 
       <div className="pointer-events-none fixed -left-[10000px] top-0">
-        <JakeTemplate highlightedSection={highlightedSection} />
+        <JakeTemplate
+          highlightedSection={highlightedSection}
+          resumeOverride={resume}
+        />
       </div>
     </div>
   );

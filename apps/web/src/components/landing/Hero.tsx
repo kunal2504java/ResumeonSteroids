@@ -91,11 +91,19 @@ export default function Hero() {
 
             {/* CTAs */}
             <motion.div variants={fadeUp} className="flex flex-wrap gap-4 mb-10">
-              <Button variant="primary" className="text-sm px-8 py-4 font-semibold">
+              <Button
+                variant="primary"
+                href="/dashboard"
+                className="text-sm px-8 py-4 font-semibold"
+              >
                 Build my resume free
                 <span aria-hidden="true" className="ml-2">&rarr;</span>
               </Button>
-              <Button variant="ghost" className="text-sm px-8 py-4 font-semibold text-zinc-300 hover:text-white">
+              <Button
+                variant="ghost"
+                href="#how-it-works"
+                className="text-sm px-8 py-4 font-semibold text-zinc-300 hover:text-white"
+              >
                 See how it works
               </Button>
             </motion.div>

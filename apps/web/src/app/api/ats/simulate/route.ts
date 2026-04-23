@@ -10,6 +10,7 @@ export async function POST(request: Request) {
       assembled_resume?: Resume;
       job_description?: string;
       run_id?: string;
+      max_pages?: number;
     };
 
     if (!body.assembled_resume || !body.run_id) {
@@ -23,6 +24,7 @@ export async function POST(request: Request) {
       run_id: body.run_id,
       assembled_resume: body.assembled_resume,
       job_description: body.job_description ?? "",
+      max_pages: body.max_pages,
     });
 
     return NextResponse.json({

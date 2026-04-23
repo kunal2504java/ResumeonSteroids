@@ -227,7 +227,7 @@ function buildSkills(skills: Skills): string {
   if (skills.frameworks.length)
     rows.push(`     \\textbf{Frameworks}{: ${skills.frameworks.map(esc).join(", ")}}`);
   if (skills.tools.length)
-    rows.push(`     \\textbf{Developer Tools}{: ${skills.tools.map(esc).join(", ")}}`);
+    rows.push(`     \\textbf{Platforms \\& Concepts}{: ${skills.tools.map(esc).join(", ")}}`);
   if (skills.databases.length)
     rows.push(`     \\textbf{Databases}{: ${skills.databases.map(esc).join(", ")}}`);
 

@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import { useResumeStore } from "@/lib/store/resumeStore";
+import type { Resume } from "@resumeai/shared";
 import SectionTabs from "./LeftPanel/SectionTabs";
 import PersonalInfo from "./LeftPanel/PersonalInfo";
 import SummaryEditor from "./LeftPanel/SummaryEditor";
@@ -16,6 +17,11 @@ import ToastContainer from "@/components/ui/Toast";
 import { ATSReportPanel } from "@/components/ats/ATSReportPanel";
 import { ResumePreviewPanel } from "@/components/resume/ResumePreviewPanel";
 import { useATSReport } from "@/hooks/useATSReport";
+import {
+  estimateResumePages,
+  prepareResumeForOutput,
+  shouldOfferTwoPageResume,
+} from "@/lib/resume/output";
 
 export default function EditorLayout() {
   const activeSection = useResumeStore((s) => s.activeSection);
@@ -33,13 +39,53 @@ export default function EditorLayout() {
   const [jobDescription, setJobDescription] = useState("");
   const [highlightedSection, setHighlightedSection] = useState<string | undefined>();
   const [mobileTab, setMobileTab] = useState<"resume" | "ats">("resume");
+  const [pagePreference, setPagePreference] = useState<1 | 2 | null>(null);
   const dragging = useRef(false);
   const atsRunId = resume ? `ats-${resume.id}` : null;
+  const canOfferTwoPages = useMemo(
+    () => (resume ? shouldOfferTwoPageResume(resume) : false),
+    [resume],
+  );
+  const effectiveMaxPages: 1 | 2 = canOfferTwoPages && pagePreference === 2 ? 2 : 1;
+  const outputResume = useMemo<Resume | null>(
+    () => (resume ? prepareResumeForOutput(resume, { maxPages: effectiveMaxPages }) : null),
+    [effectiveMaxPages, resume],
+  );
+  const estimatedRawPages = useMemo(
+    () => (resume ? estimateResumePages(resume) : 0),
+    [resume],
+  );
   const { report, loading: atsLoading, error: atsError, triggerFix } = useATSReport(
     atsRunId,
-    resume,
-    jobDescription
+    outputResume,
+    jobDescription,
+    effectiveMaxPages,
   );
+
+  useEffect(() => {
+    if (!resume) {
+      setPagePreference(null);
+      return;
+    }
+
+    const key = `resumeai:max-pages:${resume.id}`;
+    const stored = window.localStorage.getItem(key);
+    setPagePreference(stored === "2" ? 2 : stored === "1" ? 1 : null);
+  }, [resume?.id]);
+
+  useEffect(() => {
+    if (!resume?.id) {
+      return;
+    }
+
+    const key = `resumeai:max-pages:${resume.id}`;
+    if (pagePreference == null) {
+      window.localStorage.removeItem(key);
+      return;
+    }
+
+    window.localStorage.setItem(key, String(pagePreference));
+  }, [pagePreference, resume?.id]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -102,7 +148,7 @@ export default function EditorLayout() {
    * (html-to-image) method if pdflatex is not available.
    */
   async function handleDownloadLatexPDF() {
-    if (!resume) return;
+    if (!outputResume) return;
     try {
       addToast("Compiling LaTeX PDF...", "info");
       const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
@@ -110,13 +156,13 @@ export default function EditorLayout() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          personalInfo: resume.personalInfo,
-          summary: resume.summary,
-          experience: resume.experience,
-          education: resume.education,
-          projects: resume.projects,
-          skills: resume.skills,
-          achievements: resume.achievements,
+          personalInfo: outputResume.personalInfo,
+          summary: outputResume.summary,
+          experience: outputResume.experience,
+          education: outputResume.education,
+          projects: outputResume.projects,
+          skills: outputResume.skills,
+          achievements: outputResume.achievements,
         }),
       });
 
@@ -130,7 +176,7 @@ export default function EditorLayout() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${resume.personalInfo.name || "resume"}_resume.pdf`;
+      a.download = `${outputResume.personalInfo.name || "resume"}_resume.pdf`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -171,9 +217,9 @@ export default function EditorLayout() {
   }
 
   async function handleCopyLaTeX() {
-    if (!resume) return;
+    if (!outputResume) return;
     const { generateLaTeX } = await import("@/lib/pdf/latex");
-    const latex = generateLaTeX(resume);
+    const latex = generateLaTeX(outputResume);
     navigator.clipboard.writeText(latex);
     addToast("LaTeX copied to clipboard", "success");
   }
@@ -222,6 +268,46 @@ export default function EditorLayout() {
         {/* Right Panel */}
         <div className="flex-1 overflow-hidden" data-resume-preview-container>
           <div className="flex h-full flex-col gap-4 p-4">
+            {canOfferTwoPages && (
+              <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4">
+                <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
+                  <div>
+                    <div className="text-sm font-semibold text-amber-100">
+                      This candidate has enough high-signal content for a 2-page resume.
+                    </div>
+                    <p className="mt-1 text-xs leading-5 text-amber-100/80">
+                      Defaulting to 1 page. Current raw content estimates at {estimatedRawPages.toFixed(2)} pages.
+                      Allow 2 pages only if you want to keep the extra experience and achievements.
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setPagePreference(1)}
+                      className={`rounded-xl px-4 py-2 text-sm transition ${
+                        effectiveMaxPages === 1
+                          ? "bg-white text-[#0D1117]"
+                          : "border border-white/15 text-white/80 hover:border-white/30 hover:text-white"
+                      }`}
+                    >
+                      Keep 1 page
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPagePreference(2)}
+                      className={`rounded-xl px-4 py-2 text-sm transition ${
+                        effectiveMaxPages === 2
+                          ? "bg-indigo-500 text-white"
+                          : "border border-indigo-400/30 text-indigo-100 hover:border-indigo-300/50 hover:text-white"
+                      }`}
+                    >
+                      Allow 2 pages
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="flex items-center justify-between rounded-2xl border border-[#1E2535] bg-[#111827] p-2 lg:hidden">
               <button
                 type="button"
@@ -249,7 +335,11 @@ export default function EditorLayout() {
 
             <div className="hidden h-full gap-4 lg:flex">
               <div className="min-w-0 flex-[3]">
-                <ResumePreviewPanel highlightedSection={highlightedSection} />
+                <ResumePreviewPanel
+                  highlightedSection={highlightedSection}
+                  resume={outputResume}
+                  maxPages={effectiveMaxPages}
+                />
               </div>
               <div className="min-w-0 flex-[2]">
                 <ATSReportPanel
@@ -264,7 +354,11 @@ export default function EditorLayout() {
 
             <div className="min-h-0 flex-1 lg:hidden">
               {mobileTab === "resume" ? (
-                <ResumePreviewPanel highlightedSection={highlightedSection} />
+                <ResumePreviewPanel
+                  highlightedSection={highlightedSection}
+                  resume={outputResume}
+                  maxPages={effectiveMaxPages}
+                />
               ) : (
                 <ATSReportPanel
                   report={report}

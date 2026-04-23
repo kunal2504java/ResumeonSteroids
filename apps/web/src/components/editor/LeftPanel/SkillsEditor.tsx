@@ -5,7 +5,7 @@ import { useResumeStore } from "@/lib/store/resumeStore";
 const categories = [
   { key: "languages", label: "Languages", placeholder: "Python, TypeScript, Java, C++" },
   { key: "frameworks", label: "Frameworks", placeholder: "React, Next.js, Node.js, Django" },
-  { key: "tools", label: "Developer Tools", placeholder: "Git, Docker, AWS, VS Code" },
+  { key: "tools", label: "Platforms & Concepts", placeholder: "Docker, AWS, CI/CD, REST APIs, System Design" },
   { key: "databases", label: "Databases", placeholder: "PostgreSQL, MongoDB, Redis" },
 ];
 

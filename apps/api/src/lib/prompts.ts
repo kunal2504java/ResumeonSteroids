@@ -244,12 +244,27 @@ Write 2–3 bullets per role following ALL of these rules strictly:
 - Each bullet must contain at least one ATS keyword relevant to the role
   (pull from jd_analysis.ats_keywords if available, else use role-appropriate
   standard keywords)
+- Each bullet must contain at least one concrete technical detail:
+  technology, system component, architecture decision, shipped feature,
+  integration, pipeline, data flow, or operational improvement
 - No first-person pronouns
 - No vague scope words: "various", "multiple", "several", "numerous"
 - Bullets within the same role must cover different angles:
   Bullet 1: Technical achievement (what you built/shipped)
   Bullet 2: Impact/scale (users, performance, revenue, time saved)
   Bullet 3 (if warranted): Team/process (leadership, process improvement, mentoring)
+
+### Hard failure cases
+If a bullet sounds like generic LinkedIn filler, it is a failure and must be rewritten.
+Never output bullets like:
+- "Contributing to product engineering initiatives..."
+- "Working with cross-functional teams..."
+- "Supported strategic initiatives..."
+- "Collaborated with leadership..."
+- Any bullet that does not name the thing built, the technology used, or the measurable outcome
+
+If source evidence is rich or partial, do NOT ask the user questions just because
+the wording is weak. Rewrite the bullet using the strongest grounded evidence available.
 
 ### ATS keyword injection rules
 - At least 2 ATS keywords per role, placed naturally inside bullets

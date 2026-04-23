@@ -65,10 +65,18 @@ export default function Navbar() {
 
         {/* Right buttons */}
         <div className="flex items-center gap-3">
-          <Button variant="ghost" className="hidden sm:inline-flex text-xs px-4 py-2">
+          <Button
+            variant="ghost"
+            href="/dashboard"
+            className="hidden sm:inline-flex text-xs px-4 py-2"
+          >
             Sign in
           </Button>
-          <Button variant="primary" className="text-xs px-4 py-2">
+          <Button
+            variant="primary"
+            href="/dashboard"
+            className="text-xs px-4 py-2"
+          >
             Get started free
           </Button>
         </div>

@@ -289,7 +289,7 @@ export function generateLaTeX(resume: {
   if (skills.frameworks.length)
     skillRows.push(`     \\textbf{Frameworks}{: ${skills.frameworks.map(esc).join(", ")}}`);
   if (skills.tools.length)
-    skillRows.push(`     \\textbf{Developer Tools}{: ${skills.tools.map(esc).join(", ")}}`);
+    skillRows.push(`     \\textbf{Platforms \\& Concepts}{: ${skills.tools.map(esc).join(", ")}}`);
   if (skills.databases.length)
     skillRows.push(`     \\textbf{Databases}{: ${skills.databases.map(esc).join(", ")}}`);
 

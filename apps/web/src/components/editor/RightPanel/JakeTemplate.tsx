@@ -2,9 +2,11 @@
 
 import { useResumeStore } from "@/lib/store/resumeStore";
 import { forwardRef } from "react";
+import type { Resume } from "@resumeai/shared";
 
 interface JakeTemplateProps {
   highlightedSection?: string;
+  resumeOverride?: Resume | null;
 }
 
 /**
@@ -49,10 +51,11 @@ function isHighlighted(currentSection: string, highlightedSection?: string): boo
 }
 
 const JakeTemplate = forwardRef<HTMLDivElement, JakeTemplateProps>(function JakeTemplate(
-  { highlightedSection },
+  { highlightedSection, resumeOverride },
   ref,
 ) {
-  const resume = useResumeStore((s) => s.resume);
+  const storeResume = useResumeStore((s) => s.resume);
+  const resume = resumeOverride ?? storeResume;
 
   if (!resume) return null;
 
@@ -235,7 +238,7 @@ const JakeTemplate = forwardRef<HTMLDivElement, JakeTemplateProps>(function Jake
             )}
             {skills.tools.length > 0 && (
               <div>
-                <span className="font-bold">Developer Tools: </span>
+                <span className="font-bold">Platforms & Concepts: </span>
                 {skills.tools.join(", ")}
               </div>
             )}

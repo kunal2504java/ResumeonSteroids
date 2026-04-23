@@ -2,6 +2,8 @@ import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import type { Resume, SectionKey, Experience, Education, Project } from "@resumeai/shared";
 import { v4 as uuid } from "uuid";
+import { dedupeProjects } from "@/lib/resume/output";
+import { mergeSkills, normalizeSkillsInput } from "@/lib/resume/skills";
 
 function cleanImportedName(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
@@ -347,7 +349,10 @@ export const useResumeStore = create<ResumeStore>()(
               endDate: "",
               bullets: p.highlights?.length ? p.highlights : [p.description || ""],
             }));
-            state.resume.projects.push(...newProjects);
+            state.resume.projects = dedupeProjects([
+              ...state.resume.projects,
+              ...newProjects,
+            ]);
           }
           if (ghData.profile?.url) {
             state.resume.personalInfo.github = ghData.profile.url;
@@ -359,9 +364,9 @@ export const useResumeStore = create<ResumeStore>()(
         if (lcData) {
           if (lcData.achievement) state.resume.achievements.push(lcData.achievement);
           if (lcData.skills) {
-            const existing = new Set(state.resume.skills.tools);
-            lcData.skills.forEach((s: string) => existing.add(s));
-            state.resume.skills.tools = Array.from(existing);
+            state.resume.skills = mergeSkills(state.resume.skills, {
+              tools: Array.isArray(lcData.skills) ? lcData.skills : [],
+            });
           }
         }
 
@@ -412,14 +417,7 @@ export const useResumeStore = create<ResumeStore>()(
             }
           }
           if (liData.skills) {
-            const existing = new Set(state.resume.skills.tools);
-            const newSkills = [
-              ...(liData.skills.tools || []),
-              ...(liData.skills.languages || []),
-              ...(liData.skills.frameworks || []),
-            ];
-            newSkills.forEach((s: string) => { if (s) existing.add(s); });
-            state.resume.skills.tools = Array.from(existing);
+            state.resume.skills = mergeSkills(state.resume.skills, liData.skills);
           }
         }
 
@@ -468,7 +466,8 @@ export const useResumeStore = create<ResumeStore>()(
             }));
           }
           if (Array.isArray(rd.projects) && rd.projects.length) {
-            state.resume.projects.push(
+            state.resume.projects = dedupeProjects([
+              ...state.resume.projects,
               ...rd.projects.map((p: any) => ({
                 id: uuid(),
                 name: p.name || "",
@@ -477,21 +476,13 @@ export const useResumeStore = create<ResumeStore>()(
                 startDate: p.startDate || "",
                 endDate: p.endDate || "",
                 bullets: p.bullets || [""],
-              }))
-            );
+              })),
+            ]);
           }
           if (rd.skills && typeof rd.skills === "object") {
-            Object.entries(rd.skills as Record<string, string[]>).forEach(
-              ([key, values]) => {
-                if (Array.isArray(values)) {
-                  const existing = new Set(
-                    (state.resume!.skills as Record<string, string[]>)[key] || []
-                  );
-                  values.forEach((v) => existing.add(v));
-                  (state.resume!.skills as Record<string, string[]>)[key] =
-                    Array.from(existing);
-                }
-              }
+            state.resume.skills = mergeSkills(
+              state.resume.skills,
+              normalizeSkillsInput(rd.skills as Record<string, string[]>),
             );
           }
         }
@@ -574,6 +565,9 @@ export const useResumeStore = create<ResumeStore>()(
             });
           }
         }
+
+        state.resume.projects = dedupeProjects(state.resume.projects);
+        state.resume.skills = normalizeSkillsInput(state.resume.skills);
 
         state.isDirty = true;
         state.resume.updatedAt = new Date().toISOString();

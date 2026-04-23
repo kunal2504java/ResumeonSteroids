@@ -62,12 +62,14 @@ export default function CTA() {
               Join thousands of engineers who landed their dream jobs with
               ResumeAI.
             </p>
-            <button
-              className="mt-6 bg-indigo-500 text-white font-semibold tracking-wide py-4 px-12 rounded-full shadow-[0_0_24px_rgba(99,102,241,0.25)] hover:shadow-[0_0_32px_rgba(99,102,241,0.4)] hover:bg-indigo-400 hover:scale-105 transition-all flex items-center gap-3 text-base"
+            <Button
+              variant="primary"
+              href="/dashboard"
+              className="mt-6 rounded-full px-12 py-4 text-base"
             >
               Get started free
               <span aria-hidden="true">&rarr;</span>
-            </button>
+            </Button>
           </div>
         </motion.div>
       </div>

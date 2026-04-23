@@ -66,7 +66,7 @@ export function resumeToPlainText(resume: Resume): string {
     if (resume.skills.frameworks.length)
       lines.push(`Frameworks: ${resume.skills.frameworks.join(", ")}`);
     if (resume.skills.tools.length)
-      lines.push(`Developer Tools: ${resume.skills.tools.join(", ")}`);
+      lines.push(`Platforms & Concepts: ${resume.skills.tools.join(", ")}`);
     if (resume.skills.databases.length)
       lines.push(`Databases: ${resume.skills.databases.join(", ")}`);
   }
