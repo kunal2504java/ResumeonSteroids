@@ -53,6 +53,10 @@ export default function DashboardPage() {
             </svg>
             <span className="text-sm font-bold text-white">ResumeAI</span>
           </a>
+          <nav className="hidden items-center gap-5 text-sm text-[#A1A1AA] sm:flex">
+            <a href="/dashboard" className="text-white">Resumes</a>
+            <a href="/tracker" className="transition hover:text-white">Tracker</a>
+          </nav>
           <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#6366f1]/60 to-[#22d3ee]/40 flex items-center justify-center text-[10px] font-bold text-white">
             U
           </div>

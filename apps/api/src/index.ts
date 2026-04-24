@@ -7,6 +7,9 @@ import { resumeRoutes } from "./routes/resume";
 import { pdfExportRoute } from "./routes/export/pdf";
 import { latexExportRoute } from "./routes/export/latex";
 import { buildResumeRoute } from "./routes/build-resume";
+import { applicationRoutes } from "./routes/applications";
+import { outreachRoutes } from "./routes/outreach";
+import { nudgeRoutes } from "./routes/nudges";
 
 const app = new Hono();
 
@@ -24,6 +27,9 @@ app.route("/api/resume", resumeRoutes);
 app.route("/api/export/pdf", pdfExportRoute);
 app.route("/api/export/latex", latexExportRoute);
 app.route("/api/build-resume", buildResumeRoute);
+app.route("/api/applications", applicationRoutes);
+app.route("/api/outreach", outreachRoutes);
+app.route("/api/nudges", nudgeRoutes);
 
 app.get("/health", (c) => c.json({ status: "ok" }));
 

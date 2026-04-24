@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import dynamic from "next/dynamic";
+import Link from "next/link";
 import type { ConnectionStatus } from "@/hooks/useConnectionFlow";
 import { useResumeStore } from "@/lib/store/resumeStore";
 import { SourceIcon } from "./SourceIcon";
@@ -243,13 +244,21 @@ export default function Phase4_Results({
         >
           &larr; Connect more
         </button>
-        <button
-          onClick={onConfirm}
-          disabled={!isNameConfirmed}
-          className="px-8 py-3.5 rounded-xl text-sm font-semibold bg-indigo-500 hover:bg-indigo-400 text-white shadow-lg shadow-indigo-500/20 transition-all cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
-        >
-          Open my resume &rarr;
-        </button>
+        <div className="flex items-center gap-3">
+          <Link
+            href="/tracker"
+            className="px-6 py-3 rounded-xl text-sm font-semibold border border-white/10 text-white hover:border-white/20 hover:bg-white/[0.03] transition-colors"
+          >
+            Track this application
+          </Link>
+          <button
+            onClick={onConfirm}
+            disabled={!isNameConfirmed}
+            className="px-8 py-3.5 rounded-xl text-sm font-semibold bg-indigo-500 hover:bg-indigo-400 text-white shadow-lg shadow-indigo-500/20 transition-all cursor-pointer disabled:cursor-not-allowed disabled:opacity-40"
+          >
+            Open my resume &rarr;
+          </button>
+        </div>
       </motion.div>
     </div>
   );
