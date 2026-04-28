@@ -41,7 +41,8 @@ export default function EditorLayout() {
   const [mobileTab, setMobileTab] = useState<"resume" | "ats">("resume");
   const [pagePreference, setPagePreference] = useState<1 | 2 | null>(null);
   const dragging = useRef(false);
-  const atsRunId = resume ? `ats-${resume.id}` : null;
+  const resumeId = resume?.id ?? null;
+  const atsRunId = resumeId ? `ats-${resumeId}` : null;
   const canOfferTwoPages = useMemo(
     () => (resume ? shouldOfferTwoPageResume(resume) : false),
     [resume],
@@ -63,29 +64,29 @@ export default function EditorLayout() {
   );
 
   useEffect(() => {
-    if (!resume) {
+    if (!resumeId) {
       setPagePreference(null);
       return;
     }
 
-    const key = `resumeai:max-pages:${resume.id}`;
+    const key = `resumeai:max-pages:${resumeId}`;
     const stored = window.localStorage.getItem(key);
     setPagePreference(stored === "2" ? 2 : stored === "1" ? 1 : null);
-  }, [resume?.id]);
+  }, [resumeId]);
 
   useEffect(() => {
-    if (!resume?.id) {
+    if (!resumeId) {
       return;
     }
 
-    const key = `resumeai:max-pages:${resume.id}`;
+    const key = `resumeai:max-pages:${resumeId}`;
     if (pagePreference == null) {
       window.localStorage.removeItem(key);
       return;
     }
 
     window.localStorage.setItem(key, String(pagePreference));
-  }, [pagePreference, resume?.id]);
+  }, [pagePreference, resumeId]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -235,7 +236,7 @@ export default function EditorLayout() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-[#0D1117] text-white overflow-hidden">
+    <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">
       <Toolbar
         onDownloadPDF={handleDownloadLatexPDF}
         onCopyLaTeX={handleCopyLaTeX}
@@ -246,7 +247,7 @@ export default function EditorLayout() {
       <div className="flex flex-1 overflow-hidden">
         {/* Left Panel */}
         <div
-          className="flex flex-col border-r border-[#1E2535] overflow-hidden"
+          className="flex flex-col border-r border-border overflow-hidden"
           style={{ width: dividerX }}
         >
           <SectionTabs />
@@ -257,7 +258,7 @@ export default function EditorLayout() {
 
         {/* Divider */}
         <div
-          className="w-1 bg-[#1E2535] hover:bg-[#6366f1]/40 cursor-col-resize shrink-0 transition-colors"
+          className="w-1 bg-border hover:bg-indigo/40 cursor-col-resize shrink-0 transition-colors"
           onMouseDown={() => {
             dragging.current = true;
             document.body.style.cursor = "col-resize";

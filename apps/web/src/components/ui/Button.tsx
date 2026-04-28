@@ -24,9 +24,9 @@ export default function Button({
 
   const variants: Record<ButtonVariant, string> = {
     primary:
-      "bg-indigo text-white hover:bg-indigo-light shadow-[0_0_24px_rgba(99,102,241,0.25)] hover:shadow-[0_0_32px_rgba(99,102,241,0.4)]",
+      "bg-indigo text-[var(--accent-contrast)] hover:bg-indigo-light shadow-[0_12px_36px_rgb(var(--accent-rgb)_/_0.22)] hover:shadow-[0_16px_44px_rgb(var(--accent-rgb)_/_0.32)]",
     ghost:
-      "bg-transparent text-foreground border border-border hover:border-white/25 hover:text-white",
+      "bg-transparent text-foreground border border-border hover:border-[var(--border-strong)] hover:bg-surface",
   };
 
   const classes = `${base} ${variants[variant]} ${className}`;

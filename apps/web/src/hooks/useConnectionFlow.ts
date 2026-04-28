@@ -1,4 +1,5 @@
 import { useState, useCallback, useRef } from "react";
+import type { MutableRefObject } from "react";
 import { CONNECTION_STAGES, interpolateStageMessage, getImportedItems } from "@/lib/connectionStages";
 import { getSourceMeta } from "@/lib/sourceMeta";
 
@@ -56,6 +57,7 @@ export function useConnectionFlow(
   });
   const [isRunning, setIsRunning] = useState(false);
   const [allDone, setAllDone] = useState(false);
+  const [results, setResults] = useState<Record<string, unknown>>({});
   const resultsRef = useRef<Record<string, unknown>>({});
 
   const updateConnection = useCallback(
@@ -94,6 +96,7 @@ export function useConnectionFlow(
     setIsRunning(true);
     setAllDone(false);
     resultsRef.current = {};
+    setResults({});
 
     const promises = activeSources.map((sourceId) =>
       runSource(
@@ -136,7 +139,9 @@ export function useConnectionFlow(
     setAllDone(true);
     setIsRunning(false);
 
-    return resultsRef.current;
+    const finalResults = { ...resultsRef.current };
+    setResults(finalResults);
+    return finalResults;
   }, [selectedSources, inputs, file, updateConnection]);
 
   return {
@@ -145,7 +150,7 @@ export function useConnectionFlow(
     totalProgress,
     isRunning,
     allDone,
-    results: resultsRef.current,
+    results,
     runAll,
   };
 }
@@ -160,7 +165,7 @@ async function runSource(
   file: File | null,
   update: (id: string, patch: Partial<ConnectionStatus>) => void,
   setGlobalStage: (stage: GlobalStageInfo) => void,
-  resultsRef: React.MutableRefObject<Record<string, unknown>>
+  resultsRef: MutableRefObject<Record<string, unknown>>
 ) {
   const stages = CONNECTION_STAGES[sourceId];
   if (!stages) return;

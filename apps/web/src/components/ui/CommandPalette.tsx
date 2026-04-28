@@ -30,11 +30,13 @@ export default function CommandPalette({
   );
 
   useEffect(() => {
-    if (isOpen) {
+    if (!isOpen) return;
+    const timer = window.setTimeout(() => {
       setQuery("");
       setSelected(0);
-      setTimeout(() => inputRef.current?.focus(), 50);
-    }
+      inputRef.current?.focus();
+    }, 50);
+    return () => window.clearTimeout(timer);
   }, [isOpen]);
 
   useEffect(() => {

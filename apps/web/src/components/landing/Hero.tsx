@@ -161,17 +161,23 @@ export default function Hero() {
                   </p>
                 </div>
 
-                <div className="space-y-4 font-sans">
-                  {['Education', 'Experience', 'Projects', 'Skills'].map(section => (
-                    <div key={section} className="space-y-2">
-                       <h4 className="text-xs font-bold text-zinc-800 uppercase tracking-widest">{section}</h4>
-                       <div className="space-y-1.5 pl-2">
-                         <div className="w-full h-1.5 bg-zinc-200 rounded-full" />
-                         <div className="w-5/6 h-1.5 bg-zinc-200 rounded-full" />
-                         <div className="w-4/6 h-1.5 bg-zinc-200 rounded-full" />
-                       </div>
-                    </div>
-                  ))}
+                <div className="space-y-1.5 font-sans">
+                  {resumeLines.map((line, index) =>
+                    line.label ? (
+                      <div
+                        key={`${line.label}-${index}`}
+                        className={`${line.size} ${
+                          line.bold
+                            ? "font-bold text-zinc-900 uppercase tracking-wider"
+                            : "text-zinc-700"
+                        }`}
+                      >
+                        {line.label}
+                      </div>
+                    ) : (
+                      <div key={`spacer-${index}`} className="h-2" />
+                    )
+                  )}
                 </div>
 
                 {/* AI cursor indicator */}

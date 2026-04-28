@@ -47,9 +47,11 @@ export default function Phase4_Results({
   const questionsBlock = experienceEnrichment?.questionsBlock?.trim() ?? "";
 
   useEffect(() => {
-    if (!isNameConfirmed) {
+    if (isNameConfirmed) return;
+    const timer = window.setTimeout(() => {
       setDraftName(resume?.personalInfo.name || "");
-    }
+    }, 0);
+    return () => window.clearTimeout(timer);
   }, [resume?.personalInfo.name, isNameConfirmed]);
 
   function handleConfirmName() {

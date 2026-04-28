@@ -10,7 +10,9 @@ const features = [
       "Automatically generates impactful, quantified bullet points from your raw experience. No more staring at a blank page.",
     preview: (
       <div className="font-mono text-[11px] leading-relaxed space-y-3">
-        <div className="text-indigo-400/80 mb-4">// Analyzing your GitHub + experience...</div>
+        <div className="text-indigo-400/80 mb-4">
+          {"// Analyzing your GitHub + experience..."}
+        </div>
         {[
           'Architected real-time data pipeline handling 2M+ events/day, reducing processing latency by 65%',
           'Led migration from monolith to microservices, improving deployment frequency from weekly to 15x/day',

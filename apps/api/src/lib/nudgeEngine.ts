@@ -318,7 +318,10 @@ export function runNudgeEngineForApplication(input: NudgeEngineInput): NudgeEngi
   }
 
   const autoTransitionTo =
-    application.status === "applied" && daysSinceLastEvent >= 21 ? "ghosted" : undefined;
+    (application.status === "applied" && daysSinceLastEvent >= 14) ||
+    (application.status === "outreach_sent" && daysSinceLastEvent >= 7)
+      ? "ghosted"
+      : undefined;
 
   return { nudges, autoTransitionTo };
 }

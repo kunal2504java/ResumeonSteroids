@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useGithubValidation } from "@/hooks/useGithubValidation";
 import { SourceIcon } from "../SourceIcon";
 
@@ -79,9 +80,11 @@ export default function GithubInput({ value, onChange }: GithubInputProps) {
       {/* Profile preview */}
       {isValid && profile && (
         <div className="flex items-center gap-3 p-3 rounded-xl bg-emerald-500/5 border border-emerald-500/10">
-          <img
+          <Image
             src={profile.avatar_url}
-            alt=""
+            alt={`${profile.name || profile.login} GitHub avatar`}
+            width={32}
+            height={32}
             className="w-8 h-8 rounded-full"
           />
           <span className="text-xs text-zinc-300">

@@ -360,6 +360,10 @@ outreachRoutes.post("/find-targets", authMiddleware, async (c: AuthContext) => {
       scrape_source: "linkedin_search",
     }));
 
+    if (rows.length === 0) {
+      return c.json({ targets: [], status: "not_found" });
+    }
+
     const { data, error } = await getSupabaseAdmin()
       .from("outreach_targets")
       .insert(rows)
@@ -538,6 +542,10 @@ outreachRoutes.post("/drafts/:draft_id/mark-sent", authMiddleware, async (c: Aut
       return c.json({ error: "Draft not found" }, 404);
     }
 
+    if (draft.is_sent) {
+      return c.json({ draft });
+    }
+
     const { data: application, error: appError } = await fetchApplication(
       draft.application_id,
       userId,
@@ -591,21 +599,32 @@ outreachRoutes.post("/drafts/:draft_id/mark-sent", authMiddleware, async (c: Aut
       });
     }
 
-    await getSupabaseAdmin().from("nudges").insert({
-      application_id: draft.application_id,
-      user_id: userId,
-      nudge_type: "send_follow_up",
-      priority: "medium",
-      title: `Follow up with ${application.company_name}`,
-      body: "If there is no response, send a concise follow-up five days after this outreach.",
-      action_label: "Draft follow-up",
-      action_type: "generate_draft",
-      action_payload: {
-        draft_type: "follow_up",
-        outreach_target_id: draft.outreach_target_id,
-      },
-      due_date: isoDateAfter(5),
-    });
+    const existingFollowUp = await getSupabaseAdmin()
+      .from("nudges")
+      .select("id")
+      .eq("application_id", draft.application_id)
+      .eq("user_id", userId)
+      .eq("nudge_type", "send_follow_up")
+      .eq("is_dismissed", false)
+      .limit(1);
+
+    if (!existingFollowUp.data?.length) {
+      await getSupabaseAdmin().from("nudges").insert({
+        application_id: draft.application_id,
+        user_id: userId,
+        nudge_type: "send_follow_up",
+        priority: "medium",
+        title: `Follow up with ${application.company_name}`,
+        body: "If there is no response, send a concise follow-up five days after this outreach.",
+        action_label: "Draft follow-up",
+        action_type: "generate_draft",
+        action_payload: {
+          draft_type: "follow_up",
+          outreach_target_id: draft.outreach_target_id,
+        },
+        due_date: isoDateAfter(5),
+      });
+    }
 
     return c.json({ draft: updatedDraft });
   } catch (error) {

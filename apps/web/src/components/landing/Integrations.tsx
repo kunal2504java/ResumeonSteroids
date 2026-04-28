@@ -67,7 +67,7 @@ export default function Integrations() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.08 }}
-              whileHover={{ y: -2, borderColor: "rgba(99,102,241,0.4)" }}
+              whileHover={{ y: -2, borderColor: "var(--accent)" }}
               className="flex items-center gap-3 px-6 py-4 bg-white/[0.02] border border-white/5 rounded-xl text-sm text-zinc-300 transition-all duration-200"
             >
               <span className="text-zinc-500">{item.icon}</span>

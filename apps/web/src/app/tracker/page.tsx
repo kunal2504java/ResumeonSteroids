@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import { AddApplicationModal } from "@/components/tracker/AddApplicationModal";
 import { ApplicationBoard } from "@/components/tracker/ApplicationBoard";
 import { NudgeList } from "@/components/tracker/NudgeList";
+import ThemeToggle from "@/components/theme/ThemeToggle";
 import { trackerApi } from "@/lib/trackerApi";
 import type { Application, ApplicationStatus, Nudge } from "@/types/tracker";
 
@@ -75,22 +76,25 @@ export default function TrackerPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#0D1117] text-white">
-      <header className="border-b border-[#1E2535]">
+    <main className="min-h-screen bg-background text-foreground">
+      <header className="border-b border-border bg-surface/70 backdrop-blur">
         <div className="mx-auto flex max-w-[1500px] items-center justify-between px-6 py-4">
           <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="text-sm font-semibold text-white">
+            <Link href="/dashboard" className="text-sm font-semibold text-foreground">
               ResumeAI
             </Link>
-            <span className="text-xs text-[#52525B]">/</span>
-            <span className="text-sm text-[#A1A1AA]">Application tracker</span>
+            <span className="text-xs text-muted">/</span>
+            <span className="text-sm text-muted">Application tracker</span>
           </div>
-          <button
-            onClick={() => setModalOpen(true)}
-            className="bg-[#6366F1] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#818CF8]"
-          >
-            Add application
-          </button>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <button
+              onClick={() => setModalOpen(true)}
+              className="bg-indigo px-4 py-2 text-sm font-semibold text-[var(--accent-contrast)] transition hover:bg-indigo-light"
+            >
+              Add application
+            </button>
+          </div>
         </div>
       </header>
 
@@ -102,13 +106,13 @@ export default function TrackerPage() {
         >
           <div>
             <h1 className="text-3xl font-semibold tracking-tight">Pipeline</h1>
-            <p className="mt-2 text-sm text-[#71717A]">
+            <p className="mt-2 text-sm text-muted">
               Track applications, outreach, interviews, and next actions from one board.
             </p>
           </div>
           <div className="flex gap-6 text-sm">
-            <span className="text-[#A1A1AA]">{applications.length} applications</span>
-            <span className="text-[#A1A1AA]">{nudges.length} nudges</span>
+            <span className="text-muted">{applications.length} applications</span>
+            <span className="text-muted">{nudges.length} nudges</span>
           </div>
         </motion.div>
 
@@ -119,7 +123,7 @@ export default function TrackerPage() {
         )}
 
         {loading ? (
-          <div className="border border-[#1E2535] bg-[#101620] p-8 text-sm text-[#71717A]">
+          <div className="border border-border bg-surface p-8 text-sm text-muted">
             Loading tracker...
           </div>
         ) : (
@@ -139,4 +143,3 @@ export default function TrackerPage() {
     </main>
   );
 }
-

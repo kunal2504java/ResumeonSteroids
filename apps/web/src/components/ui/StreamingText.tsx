@@ -36,7 +36,7 @@ export default function StreamingText({
     <span className={className}>
       {displayed}
       {displayed.length < text.length && (
-        <span className="inline-block w-0.5 h-4 bg-[#6366f1] animate-pulse ml-0.5 align-middle" />
+        <span className="inline-block w-0.5 h-4 bg-indigo animate-pulse ml-0.5 align-middle" />
       )}
     </span>
   );

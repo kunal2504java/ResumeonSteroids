@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import type { Resume, SectionKey, Experience, Education, Project } from "@resumeai/shared";
@@ -643,10 +644,18 @@ export const useResumeStore = create<ResumeStore>()(
 export function useAutoSave() {
   const { isDirty, save } = useResumeStore();
 
-  if (isDirty) {
+  useEffect(() => {
+    if (!isDirty) return;
     if (saveTimeout) clearTimeout(saveTimeout);
     saveTimeout = setTimeout(() => {
       save();
     }, 1500);
-  }
+
+    return () => {
+      if (saveTimeout) {
+        clearTimeout(saveTimeout);
+        saveTimeout = null;
+      }
+    };
+  }, [isDirty, save]);
 }

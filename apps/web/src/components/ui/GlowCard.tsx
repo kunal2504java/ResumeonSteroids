@@ -17,7 +17,7 @@ export default function GlowCard({
     <motion.div
       className={`relative bg-surface border border-border p-6 transition-all duration-300 ${
         hoverGlow
-          ? "hover:border-indigo/40 hover:shadow-[0_8px_40px_rgba(99,102,241,0.1)]"
+          ? "hover:border-indigo/40 hover:shadow-[0_8px_40px_rgb(var(--accent-rgb)_/_0.14)]"
           : ""
       } ${className}`}
       whileHover={hoverGlow ? { y: -4 } : undefined}

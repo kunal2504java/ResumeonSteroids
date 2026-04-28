@@ -100,7 +100,7 @@ export default function Testimonials() {
 
               {/* Quote */}
               <p className="text-zinc-300 leading-relaxed mb-8 flex-1">
-                "{t.quote}"
+                &ldquo;{t.quote}&rdquo;
               </p>
 
               {/* Author — always at bottom, never clipped */}

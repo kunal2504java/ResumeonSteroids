@@ -73,10 +73,23 @@ test("ghosted nudge fires at 14 days", () => {
   assert.equal(result.nudges.some((nudge) => nudge.nudge_type === "ghosted_alert"), true);
 });
 
-test("auto transition to ghosted after 21 days", () => {
+test("auto transition to ghosted after 14 days with no reply", () => {
   const result = runNudgeEngineForApplication({
-    application: app({ applied_at: "2026-04-01T12:00:00Z", created_at: "2026-04-01T12:00:00Z" }),
+    application: app({ applied_at: "2026-04-10T12:00:00Z", created_at: "2026-04-10T12:00:00Z" }),
     events: [],
+    now: NOW,
+  });
+  assert.equal(result.autoTransitionTo, "ghosted");
+});
+
+test("outreach sent auto transitions to ghosted after 7 days with no reply", () => {
+  const result = runNudgeEngineForApplication({
+    application: app({
+      status: "outreach_sent",
+      applied_at: "2026-04-10T12:00:00Z",
+      created_at: "2026-04-10T12:00:00Z",
+    }),
+    events: [event("email_sent", "2026-04-16T12:00:00Z")],
     now: NOW,
   });
   assert.equal(result.autoTransitionTo, "ghosted");

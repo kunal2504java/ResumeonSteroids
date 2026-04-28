@@ -420,6 +420,14 @@ applicationRoutes.post("/:id/offer", authMiddleware, async (c) => {
       return c.json({ error: "amount must be a positive number" }, 400);
     }
 
+    const currentStatus = application.status as ApplicationStatus;
+    if (currentStatus !== "offer" && !canTransitionStatus(currentStatus, "offer")) {
+      return c.json(
+        { error: `Cannot record an offer while application is ${currentStatus}` },
+        400,
+      );
+    }
+
     const totalComp = computeTotalComp({
       base_salary: baseSalary,
       bonus,
@@ -475,6 +483,26 @@ applicationRoutes.post("/:id/offer", authMiddleware, async (c) => {
         offer_vs_market: offerVsMarket,
       },
     });
+
+    if (currentStatus !== "offer") {
+      await getSupabaseAdmin()
+        .from("applications")
+        .update({ status: "offer" })
+        .eq("id", id)
+        .eq("user_id", userId);
+
+      await logApplicationEvent({
+        applicationId: id,
+        userId,
+        eventType: "status_changed",
+        eventData: {
+          from_status: currentStatus,
+          to_status: "offer",
+          reason: "offer_details_submitted",
+        },
+      });
+    }
+
     await refreshNudgesSafely(id, userId);
 
     return c.json({

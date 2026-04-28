@@ -40,17 +40,42 @@ export interface LeetCodeData {
   ranking: number;
 }
 
+interface LeetCodeProfileResponse {
+  data?: {
+    matchedUser?: {
+      profile?: {
+        ranking?: number;
+      };
+      submitStatsGlobal?: {
+        acSubmissionNum?: Array<{
+          difficulty?: string;
+          count?: number;
+        }>;
+      };
+    } | null;
+  };
+}
+
+interface LeetCodeContestResponse {
+  data?: {
+    userContestRanking?: {
+      rating?: number;
+      topPercentage?: number;
+    } | null;
+  };
+}
+
 async function queryLeetCode(
   query: string,
   variables: Record<string, string>
-) {
+): Promise<LeetCodeProfileResponse | LeetCodeContestResponse> {
   const res = await fetch(LEETCODE_GRAPHQL, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ query, variables }),
   });
   if (!res.ok) throw new Error("LeetCode API request failed");
-  return res.json();
+  return res.json() as Promise<LeetCodeProfileResponse | LeetCodeContestResponse>;
 }
 
 export async function fetchLeetCodeStats(
@@ -68,15 +93,16 @@ export async function fetchLeetCodeStats(
     ranking = 0;
 
   if (profileRes.status === "fulfilled") {
-    const user = profileRes.value?.data?.matchedUser;
+    const user = (profileRes.value as LeetCodeProfileResponse).data?.matchedUser;
     if (user) {
       ranking = user.profile?.ranking || 0;
       const stats = user.submitStatsGlobal?.acSubmissionNum || [];
       for (const s of stats) {
-        if (s.difficulty === "All") totalSolved = s.count;
-        if (s.difficulty === "Easy") easySolved = s.count;
-        if (s.difficulty === "Medium") mediumSolved = s.count;
-        if (s.difficulty === "Hard") hardSolved = s.count;
+        const count = s.count ?? 0;
+        if (s.difficulty === "All") totalSolved = count;
+        if (s.difficulty === "Easy") easySolved = count;
+        if (s.difficulty === "Medium") mediumSolved = count;
+        if (s.difficulty === "Hard") hardSolved = count;
       }
     }
   }
@@ -85,7 +111,7 @@ export async function fetchLeetCodeStats(
     topPercentage = 0;
 
   if (contestRes.status === "fulfilled") {
-    const contest = contestRes.value?.data?.userContestRanking;
+    const contest = (contestRes.value as LeetCodeContestResponse).data?.userContestRanking;
     if (contest) {
       contestRating = Math.round(contest.rating || 0);
       topPercentage = Math.round((contest.topPercentage || 0) * 10) / 10;

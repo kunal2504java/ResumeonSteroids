@@ -200,7 +200,7 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
 
   function applyImports() {
     if (!resume) return;
-    let updated = { ...resume };
+    const updated = { ...resume };
 
     // Apply resume import
     const resumeImport = importedData.resume as { resumeData?: Record<string, unknown> } | undefined;

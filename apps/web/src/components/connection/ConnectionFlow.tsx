@@ -8,6 +8,7 @@ import Phase1_SourcePicker from "./Phase1_SourcePicker";
 import Phase2_Inputs from "./Phase2_Inputs";
 import Phase3_Analysis from "./Phase3_Analysis";
 import Phase4_Results from "./Phase4_Results";
+import ThemeToggle from "@/components/theme/ThemeToggle";
 
 interface ConnectionFlowProps {
   resumeId: string;
@@ -93,7 +94,8 @@ export default function ConnectionFlow({
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="min-h-screen bg-[#0D1117] flex items-center justify-center p-6 sm:p-10">
+      <div className="relative min-h-screen bg-background text-foreground flex items-center justify-center p-6 sm:p-10">
+        <ThemeToggle className="absolute right-6 top-6 z-20" />
         <AnimatePresence mode="wait">
           {phase === 1 && (
             <motion.div

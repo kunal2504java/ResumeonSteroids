@@ -118,7 +118,7 @@ export default function Pricing() {
               transition={{ duration: 0.5, delay: i * 0.1 }}
               className={`relative bg-white/[0.02] border rounded-2xl p-8 flex flex-col h-full transition-all duration-300 ${
                 tier.highlighted
-                  ? "border-indigo-500 shadow-[0_0_40px_rgba(99,102,241,0.1)]"
+                  ? "border-indigo-500 shadow-[0_0_40px_rgb(var(--accent-rgb)_/_0.14)]"
                   : "border-white/5"
               }`}
             >
