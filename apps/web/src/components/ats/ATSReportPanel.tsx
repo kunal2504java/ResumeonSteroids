@@ -15,6 +15,7 @@ interface Props {
   error: string | null;
   onFix: (ruleId: string) => Promise<void>;
   onHighlightSection?: (section: string | undefined) => void;
+  onRequestAnalysis?: () => void;
 }
 
 const CATEGORY_LABELS: Record<ATSCategory, string> = {
@@ -47,6 +48,7 @@ export function ATSReportPanel({
   error,
   onFix,
   onHighlightSection,
+  onRequestAnalysis,
 }: Props) {
   const [selectedRule, setSelectedRule] = useState<ATSRuleResult | null>(null);
 
@@ -77,7 +79,7 @@ export function ATSReportPanel({
       };
 
   return (
-    <div className="relative h-full overflow-hidden rounded-[28px] border border-[#1E2535] bg-[#0B1120]">
+    <div className="relative h-full overflow-hidden rounded-[28px] border border-white/10 bg-black/45 shadow-[0_30px_120px_rgba(0,0,0,0.38)] backdrop-blur-xl">
       <div className="h-full overflow-y-auto p-4 sm:p-5">
         <div className="space-y-4">
           <ATSScoreGauge
@@ -120,7 +122,7 @@ export function ATSReportPanel({
                   <details
                     key={category}
                     open={category === "parsing"}
-                    className="rounded-3xl border border-[#1E2535] bg-[#111827] p-5"
+                    className="rounded-3xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-md"
                   >
                     <summary className="cursor-pointer list-none text-sm font-semibold text-white">
                       {CATEGORY_LABELS[category]}
@@ -148,7 +150,20 @@ export function ATSReportPanel({
 
           {!report && !loading && (
             <div className="rounded-2xl border border-dashed border-white/12 bg-white/[0.02] p-6 text-sm text-white/55">
-              Paste the job description in the Tailor panel to generate the ATS report.
+              <div className="text-sm font-semibold text-white">Run ATS simulation</div>
+              <p className="mt-2 leading-6">
+                Paste a job description to check parser compatibility, keyword placement,
+                formatting, and content quality against this resume.
+              </p>
+              {onRequestAnalysis && (
+                <button
+                  type="button"
+                  onClick={onRequestAnalysis}
+                  className="mt-5 inline-flex h-10 items-center justify-center rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--accent-contrast)] transition hover:bg-[var(--accent-hover)]"
+                >
+                  Check ATS score
+                </button>
+              )}
             </div>
           )}
         </div>

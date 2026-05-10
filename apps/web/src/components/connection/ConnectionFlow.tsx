@@ -94,7 +94,7 @@ export default function ConnectionFlow({
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="relative min-h-screen bg-background text-foreground flex items-center justify-center p-6 sm:p-10">
+      <div className="theme-adaptive relative min-h-screen bg-background text-foreground flex items-center justify-center p-6 sm:p-10">
         <ThemeToggle className="absolute right-6 top-6 z-20" />
         <AnimatePresence mode="wait">
           {phase === 1 && (

@@ -1,25 +1,25 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, DM_Sans, JetBrains_Mono } from "next/font/google";
+import { DM_Sans, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 
 const themeBootScript = `
 (() => {
   try {
     const stored = window.localStorage.getItem("resumeai-theme");
-    const theme = stored === "dark" ? "dark" : "light";
+    const theme = stored === "light" ? "light" : "dark";
     const root = document.documentElement;
     root.dataset.theme = theme;
     root.classList.toggle("dark", theme === "dark");
     root.style.colorScheme = theme;
   } catch {
-    document.documentElement.dataset.theme = "light";
-    document.documentElement.style.colorScheme = "light";
+    document.documentElement.dataset.theme = "dark";
+    document.documentElement.style.colorScheme = "dark";
   }
 })();
 `;
 
-const bricolage = Bricolage_Grotesque({
-  variable: "--font-bricolage",
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
   display: "swap",
   weight: ["400", "500", "600", "700", "800"],
@@ -81,9 +81,9 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      data-theme="light"
+      data-theme="dark"
       suppressHydrationWarning
-      className={`${bricolage.variable} ${dmSans.variable} ${jetbrains.variable} antialiased`}
+      className={`${inter.variable} ${dmSans.variable} ${jetbrains.variable} antialiased`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />

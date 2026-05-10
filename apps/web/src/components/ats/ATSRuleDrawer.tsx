@@ -53,8 +53,8 @@ export function ATSRuleDrawer({ rule, onClose, onFix, loading }: Props) {
         rule ? "translate-x-0" : "translate-x-full"
       }`}
     >
-      <div className="pointer-events-auto h-full border-l border-[#1E2535] bg-[#0B1120]/98 shadow-[-24px_0_64px_-36px_rgba(0,0,0,0.9)] backdrop-blur-xl">
-        <div className="flex items-center justify-between border-b border-[#1E2535] px-5 py-4">
+      <div className="pointer-events-auto h-full border-l border-white/10 bg-black/90 shadow-[-24px_0_64px_-36px_rgba(0,0,0,0.9)] backdrop-blur-2xl">
+        <div className="flex items-center justify-between border-b border-white/10 px-5 py-4">
           <div>
             <div className="text-sm font-semibold text-white">
               {rule?.rule_name || "ATS Rule"}
@@ -115,12 +115,12 @@ export function ATSRuleDrawer({ rule, onClose, onFix, loading }: Props) {
             </div>
 
             {(rule.status === "fail" || rule.status === "warn") && (
-              <div className="border-t border-[#1E2535] px-5 py-4">
+              <div className="border-t border-white/10 px-5 py-4">
                 <button
                   type="button"
                   onClick={() => onFix(rule.rule_id)}
                   disabled={loading}
-                  className="w-full rounded-2xl bg-white px-4 py-3 text-sm font-medium text-[#0B1120] transition hover:bg-white/90 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="w-full rounded-full bg-white px-4 py-3 text-sm font-medium text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-50"
                 >
                   {loading ? "Applying fix..." : "Apply fix"}
                 </button>

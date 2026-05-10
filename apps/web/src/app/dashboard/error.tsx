@@ -14,11 +14,11 @@ export default function DashboardError({
   }, [error]);
 
   return (
-    <div className="min-h-screen bg-[#0D1117] flex items-center justify-center p-6">
-      <div className="max-w-md w-full bg-[#111118] border border-white/10 p-8 text-center">
-        <div className="w-12 h-12 mx-auto mb-5 flex items-center justify-center bg-red-500/10 border border-red-500/20">
+    <div className="flex min-h-screen items-center justify-center bg-black p-6 text-white">
+      <div className="w-full max-w-md rounded-[2rem] border border-white/10 bg-white/[0.04] p-8 text-center shadow-[0_30px_120px_rgba(0,0,0,0.35)] backdrop-blur-xl">
+        <div className="mx-auto mb-5 flex h-12 w-12 items-center justify-center rounded-2xl border border-red-500/20 bg-red-500/10">
           <svg
-            className="w-6 h-6 text-red-400"
+            className="h-6 w-6 text-red-400"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -31,15 +31,15 @@ export default function DashboardError({
             />
           </svg>
         </div>
-        <h2 className="text-lg font-semibold text-white mb-2">
+        <h2 className="mb-2 text-lg font-semibold tracking-tight text-white">
           Could not load your resumes
         </h2>
-        <p className="text-sm text-[#71717A] mb-6 leading-relaxed">
-          There was an issue loading the dashboard. Your data is safe.
+        <p className="mb-6 text-sm leading-relaxed text-zinc-400">
+          There was an issue loading the dashboard. Your local data is safe.
         </p>
         <button
           onClick={reset}
-          className="px-5 py-2.5 bg-[#6366f1] text-white text-sm font-medium hover:bg-[#818cf8] transition-colors cursor-pointer"
+          className="cursor-pointer rounded-full bg-white px-5 py-2.5 text-sm font-medium text-black transition hover:bg-zinc-200"
         >
           Try again
         </button>

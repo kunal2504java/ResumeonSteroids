@@ -20,7 +20,7 @@ export default function ResumeCard({
   return (
     <motion.div
       whileHover={{ y: -2 }}
-      className="bg-[#161B27] border border-[#1E2535] group hover:border-[#6366f1]/30 transition-all cursor-pointer overflow-hidden rounded-lg aspect-[3/4] flex flex-col"
+      className="group flex aspect-[3/4] cursor-pointer flex-col overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/[0.045] shadow-[0_28px_90px_rgba(0,0,0,0.32)] backdrop-blur-xl transition-all hover:-translate-y-1 hover:border-white/20 hover:bg-white/[0.065]"
       onClick={onEdit}
     >
       {/* Preview thumbnail — renders at 816px then scales to fit */}
@@ -95,36 +95,36 @@ export default function ResumeCard({
           </div>
         </div>
         {/* Gradient fade at bottom */}
-        <div className="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-[#161B27] to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-zinc-950 to-transparent" />
       </div>
 
       {/* Card footer */}
       <div className="p-5">
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h3 className="text-sm font-medium text-white mb-0.5">
+            <h3 className="mb-0.5 text-sm font-medium tracking-tight text-white">
               {resume.name || "Untitled Resume"}
             </h3>
-            <p className="text-[11px] text-[#71717A]">
+            <p className="text-[11px] text-zinc-500">
               Edited {getTimeSince(resume.updatedAt)}
             </p>
           </div>
-          <span className="text-[10px] px-2 py-0.5 bg-[#6366f1]/10 text-[#818cf8] border border-[#6366f1]/20 shrink-0">
+          <span className="shrink-0 rounded-full border border-white/10 bg-white/[0.06] px-2.5 py-1 text-[10px] font-medium text-zinc-300 backdrop-blur">
             {resume.template}
           </span>
         </div>
 
         {/* Actions */}
-        <div className="flex items-center gap-3 opacity-0 group-hover:opacity-100 transition-opacity pt-3 border-t border-[#1E2535]">
+        <div className="flex items-center gap-3 border-t border-white/10 pt-3 opacity-0 transition-opacity group-hover:opacity-100">
           <button
             onClick={(e) => { e.stopPropagation(); onEdit(); }}
-            className="text-[11px] text-[#6366f1] hover:text-[#818cf8] font-medium transition-colors cursor-pointer"
+            className="cursor-pointer text-[11px] font-medium text-white transition-colors hover:text-zinc-300"
           >
             Edit
           </button>
           <button
             onClick={(e) => { e.stopPropagation(); onDuplicate(); }}
-            className="text-[11px] text-[#71717A] hover:text-white transition-colors cursor-pointer"
+            className="cursor-pointer text-[11px] text-zinc-500 transition-colors hover:text-white"
           >
             Duplicate
           </button>

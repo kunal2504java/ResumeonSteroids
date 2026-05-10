@@ -76,7 +76,7 @@ export default function TrackerPage() {
   }
 
   return (
-    <main className="min-h-screen bg-background text-foreground">
+    <main className="theme-adaptive min-h-screen bg-background text-foreground">
       <header className="border-b border-border bg-surface/70 backdrop-blur">
         <div className="mx-auto flex max-w-[1500px] items-center justify-between px-6 py-4">
           <div className="flex items-center gap-4">

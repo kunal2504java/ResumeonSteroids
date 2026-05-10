@@ -9,7 +9,7 @@ interface Props {
 
 export function PlatformCompatibility({ compatibility, ruleNames = {} }: Props) {
   return (
-    <div className="rounded-3xl border border-[#1E2535] bg-[#111827] p-5">
+    <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)] backdrop-blur-xl">
       <div className="text-sm font-semibold text-white">Platform Compatibility</div>
       <div className="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-1 2xl:grid-cols-2">
         {Object.entries(compatibility).map(([platform, result]) => (
@@ -23,7 +23,7 @@ export function PlatformCompatibility({ compatibility, ruleNames = {} }: Props) 
           >
             <div className="flex items-start justify-between gap-3">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-black/20 text-sm font-semibold text-white">
+                <div className="flex h-10 w-10 items-center justify-center rounded-full border border-white/10 bg-white/[0.06] text-sm font-semibold text-white">
                   {platform.slice(0, 1)}
                 </div>
                 <div>

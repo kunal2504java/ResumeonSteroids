@@ -3,6 +3,12 @@
 import { useResumeStore } from "@/lib/store/resumeStore";
 import BulletEditor from "./BulletEditor";
 
+const cardClass =
+  "space-y-3 rounded-2xl border border-white/10 bg-white/[0.045] p-4 shadow-[0_18px_60px_rgba(0,0,0,0.22)] backdrop-blur-md";
+const inputClass =
+  "w-full rounded-xl border border-white/10 bg-white/[0.045] px-2.5 py-1.5 text-xs text-white shadow-inner shadow-black/40 outline-none backdrop-blur-md transition placeholder:text-zinc-600 focus:border-white/25 focus:bg-white/[0.07]";
+const labelClass = "mb-1 block text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500";
+
 export default function ProjectEditor() {
   const projects = useResumeStore((s) => s.resume?.projects) || [];
   const addProject = useResumeStore((s) => s.addProject);
@@ -10,14 +16,14 @@ export default function ProjectEditor() {
   const removeProject = useResumeStore((s) => s.removeProject);
 
   return (
-    <div className="px-6 py-6 space-y-4">
-      <div className="flex items-center justify-between mb-2">
-        <h3 className="text-xs font-semibold text-zinc-300 uppercase tracking-wide">
+    <div className="space-y-4 px-6 py-6">
+      <div className="mb-2 flex items-center justify-between">
+        <h3 className="text-xs font-semibold uppercase tracking-[0.22em] text-zinc-400">
           Projects
         </h3>
         <button
           onClick={addProject}
-          className="text-xs text-[#6366f1] hover:text-[#818cf8] transition-colors cursor-pointer"
+          className="cursor-pointer rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs text-zinc-300 transition hover:border-white/20 hover:text-white"
         >
           + Add
         </button>
@@ -26,10 +32,10 @@ export default function ProjectEditor() {
       {projects.map((proj, idx) => (
         <div
           key={proj.id}
-          className="bg-zinc-800/50 border border-white/10 rounded-lg p-4 space-y-3"
+          className={cardClass}
         >
           <div className="flex items-center justify-between">
-            <span className="text-[10px] text-[#71717A] font-mono">
+            <span className="font-mono text-[10px] text-zinc-500">
               #{idx + 1}
             </span>
             <button
@@ -42,7 +48,7 @@ export default function ProjectEditor() {
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-[10px] text-zinc-300 mb-1 font-semibold uppercase tracking-wide">
+              <label className={labelClass}>
                 Project Name
               </label>
               <input
@@ -52,11 +58,11 @@ export default function ProjectEditor() {
                   updateProject(proj.id, "name", e.target.value)
                 }
                 placeholder="My Awesome Project"
-                className="w-full bg-zinc-800 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white placeholder:text-zinc-600 outline-none focus:border-[#6366f1]/50 transition-colors"
+                className={inputClass}
               />
             </div>
             <div>
-              <label className="block text-[10px] text-zinc-300 mb-1 font-semibold uppercase tracking-wide">
+              <label className={labelClass}>
                 URL
               </label>
               <input
@@ -66,13 +72,13 @@ export default function ProjectEditor() {
                   updateProject(proj.id, "url", e.target.value)
                 }
                 placeholder="github.com/user/repo"
-                className="w-full bg-zinc-800 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white placeholder:text-zinc-600 outline-none focus:border-[#6366f1]/50 transition-colors"
+                className={inputClass}
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-[10px] text-zinc-300 mb-1 font-semibold uppercase tracking-wide">
+            <label className={labelClass}>
               Tech Stack (comma-separated)
             </label>
             <input
@@ -106,13 +112,13 @@ export default function ProjectEditor() {
                 }
               }}
               placeholder="React, Node.js, PostgreSQL"
-              className="w-full bg-zinc-800 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white placeholder:text-zinc-600 outline-none focus:border-[#6366f1]/50 transition-colors"
+              className={inputClass}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="block text-[10px] text-zinc-300 mb-1 font-semibold uppercase tracking-wide">
+              <label className={labelClass}>
                 Start
               </label>
               <input
@@ -122,11 +128,11 @@ export default function ProjectEditor() {
                   updateProject(proj.id, "startDate", e.target.value)
                 }
                 placeholder="Jan 2024"
-                className="w-full bg-zinc-800 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white placeholder:text-zinc-600 outline-none focus:border-[#6366f1]/50 transition-colors"
+                className={inputClass}
               />
             </div>
             <div>
-              <label className="block text-[10px] text-zinc-300 mb-1 font-semibold uppercase tracking-wide">
+              <label className={labelClass}>
                 End
               </label>
               <input
@@ -136,7 +142,7 @@ export default function ProjectEditor() {
                   updateProject(proj.id, "endDate", e.target.value)
                 }
                 placeholder="Present"
-                className="w-full bg-zinc-800 border border-white/10 rounded-lg px-2.5 py-1.5 text-xs text-white placeholder:text-zinc-600 outline-none focus:border-[#6366f1]/50 transition-colors"
+                className={inputClass}
               />
             </div>
           </div>
@@ -152,7 +158,7 @@ export default function ProjectEditor() {
       {projects.length === 0 && (
         <button
           onClick={addProject}
-          className="w-full py-8 border border-dashed border-white/10 rounded-lg text-sm text-zinc-500 hover:text-white hover:border-[#6366f1]/40 transition-colors cursor-pointer"
+          className="w-full cursor-pointer rounded-2xl border border-dashed border-white/12 bg-white/[0.025] py-8 text-sm text-zinc-500 transition-colors hover:border-white/25 hover:text-white"
         >
           + Add your first project
         </button>

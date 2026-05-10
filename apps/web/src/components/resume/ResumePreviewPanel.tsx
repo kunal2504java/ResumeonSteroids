@@ -15,7 +15,7 @@ export function ResumePreviewPanel({
   maxPages,
 }: Props) {
   return (
-    <div className="h-full overflow-hidden rounded-[28px] border border-[#1E2535] bg-[#0B1120]">
+    <div className="h-full overflow-hidden rounded-[28px] border border-white/10 bg-black/45 shadow-[0_30px_120px_rgba(0,0,0,0.38)] backdrop-blur-xl">
       <ResumePreview
         highlightedSection={highlightedSection}
         resumeOverride={resume}

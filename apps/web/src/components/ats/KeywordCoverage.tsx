@@ -16,8 +16,8 @@ function KeywordColumn({
   values: string[];
 }) {
   return (
-    <div className="rounded-2xl border border-white/8 bg-black/10 p-3">
-      <div className="text-xs uppercase tracking-[0.24em] text-[#94A3B8]">{title}</div>
+    <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-3 backdrop-blur-md">
+      <div className="text-xs uppercase tracking-[0.24em] text-zinc-500">{title}</div>
       <div className="mt-3 flex min-h-12 flex-wrap gap-2">
         {values.length ? (
           values.map((value) => (
@@ -38,7 +38,7 @@ function KeywordColumn({
 
 export function KeywordCoverage({ coverage, onFix, loading }: Props) {
   return (
-    <div className="rounded-3xl border border-[#1E2535] bg-[#111827] p-5">
+    <div className="rounded-3xl border border-white/10 bg-white/[0.04] p-5 shadow-[0_24px_80px_rgba(0,0,0,0.22)] backdrop-blur-xl">
       <div className="flex items-start justify-between gap-4">
         <div>
           <div className="text-sm font-semibold text-white">Keyword Coverage</div>
@@ -50,7 +50,7 @@ export function KeywordCoverage({ coverage, onFix, loading }: Props) {
           type="button"
           onClick={() => onFix("K001")}
           disabled={loading}
-          className="rounded-full border border-indigo-400/20 bg-indigo-500/10 px-3 py-1.5 text-xs font-medium text-indigo-100 transition hover:bg-indigo-500/20 disabled:cursor-not-allowed disabled:opacity-50"
+          className="rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-zinc-300 transition hover:border-white/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
         >
           {loading ? "Updating..." : "Add missing keywords"}
         </button>

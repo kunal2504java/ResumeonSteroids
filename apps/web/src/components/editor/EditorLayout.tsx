@@ -236,7 +236,17 @@ export default function EditorLayout() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-background text-foreground overflow-hidden">
+    <div className="theme-adaptive relative flex h-screen flex-col overflow-hidden bg-background text-foreground">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-50"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px)",
+          backgroundSize: "44px 44px",
+        }}
+      />
+      <div className="pointer-events-none absolute left-1/2 top-[-16rem] h-[30rem] w-[58rem] -translate-x-1/2 rounded-full bg-white/5 blur-[120px]" />
       <Toolbar
         onDownloadPDF={handleDownloadLatexPDF}
         onCopyLaTeX={handleCopyLaTeX}
@@ -244,10 +254,10 @@ export default function EditorLayout() {
         onCommandPalette={() => setCmdOpen(true)}
       />
 
-      <div className="flex flex-1 overflow-hidden">
+      <div className="relative z-10 flex flex-1 overflow-hidden">
         {/* Left Panel */}
         <div
-          className="flex flex-col border-r border-border overflow-hidden"
+          className="flex flex-col overflow-hidden border-r border-white/10 bg-black/45 backdrop-blur-xl"
           style={{ width: dividerX }}
         >
           <SectionTabs />
@@ -258,7 +268,7 @@ export default function EditorLayout() {
 
         {/* Divider */}
         <div
-          className="w-1 bg-border hover:bg-indigo/40 cursor-col-resize shrink-0 transition-colors"
+          className="w-1 shrink-0 cursor-col-resize bg-white/10 transition-colors hover:bg-white/25"
           onMouseDown={() => {
             dragging.current = true;
             document.body.style.cursor = "col-resize";
@@ -270,7 +280,7 @@ export default function EditorLayout() {
         <div className="flex-1 overflow-hidden" data-resume-preview-container>
           <div className="flex h-full flex-col gap-4 p-4">
             {canOfferTwoPages && (
-              <div className="rounded-2xl border border-amber-500/20 bg-amber-500/5 p-4">
+              <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4 shadow-[0_18px_60px_rgba(0,0,0,0.25)] backdrop-blur-xl">
                 <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
                   <div>
                     <div className="text-sm font-semibold text-amber-100">
@@ -288,7 +298,7 @@ export default function EditorLayout() {
                       className={`rounded-xl px-4 py-2 text-sm transition ${
                         effectiveMaxPages === 1
                           ? "bg-white text-[#0D1117]"
-                          : "border border-white/15 text-white/80 hover:border-white/30 hover:text-white"
+                          : "border border-white/15 bg-white/[0.04] text-white/80 hover:border-white/30 hover:text-white"
                       }`}
                     >
                       Keep 1 page
@@ -298,8 +308,8 @@ export default function EditorLayout() {
                       onClick={() => setPagePreference(2)}
                       className={`rounded-xl px-4 py-2 text-sm transition ${
                         effectiveMaxPages === 2
-                          ? "bg-indigo-500 text-white"
-                          : "border border-indigo-400/30 text-indigo-100 hover:border-indigo-300/50 hover:text-white"
+                          ? "bg-white text-black"
+                          : "border border-white/15 bg-white/[0.04] text-white/80 hover:border-white/30 hover:text-white"
                       }`}
                     >
                       Allow 2 pages
@@ -309,7 +319,7 @@ export default function EditorLayout() {
               </div>
             )}
 
-            <div className="flex items-center justify-between rounded-2xl border border-[#1E2535] bg-[#111827] p-2 lg:hidden">
+            <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-white/[0.04] p-2 backdrop-blur-xl lg:hidden">
               <button
                 type="button"
                 onClick={() => setMobileTab("resume")}
@@ -349,6 +359,7 @@ export default function EditorLayout() {
                   error={atsError}
                   onFix={triggerFix}
                   onHighlightSection={setHighlightedSection}
+                  onRequestAnalysis={() => setTailorOpen(true)}
                 />
               </div>
             </div>
@@ -367,6 +378,7 @@ export default function EditorLayout() {
                   error={atsError}
                   onFix={triggerFix}
                   onHighlightSection={setHighlightedSection}
+                  onRequestAnalysis={() => setTailorOpen(true)}
                 />
               )}
             </div>

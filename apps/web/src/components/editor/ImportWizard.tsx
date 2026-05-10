@@ -383,7 +383,7 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
   }
 
   return (
-    <div className="min-h-screen bg-[#0D1117] flex items-center justify-center p-6">
+    <div className="theme-adaptive flex min-h-screen items-center justify-center bg-background p-6 text-foreground">
       <div className="w-full max-w-3xl">
         {/* Step indicator */}
         <div className="flex items-center gap-2 mb-8 justify-center">
@@ -392,8 +392,8 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
               <div
                 className={`w-8 h-8 flex items-center justify-center text-xs font-mono ${
                   step >= s
-                    ? "bg-[#6366f1] text-white"
-                    : "bg-[#161B27] text-[#71717A] border border-[#1E2535]"
+                    ? "bg-white text-black"
+                    : "border border-white/10 bg-white/[0.04] text-zinc-500"
                 }`}
               >
                 {step > s ? "✓" : s}
@@ -401,7 +401,7 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
               {s < 4 && (
                 <div
                   className={`w-12 h-0.5 ${
-                    step > s ? "bg-[#6366f1]" : "bg-[#1E2535]"
+                    step > s ? "bg-white" : "bg-white/10"
                   }`}
                 />
               )}
@@ -421,7 +421,7 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
               <h2 className="text-2xl font-bold text-white text-center mb-2">
                 Let&apos;s build your profile
               </h2>
-              <p className="text-sm text-[#71717A] text-center mb-8">
+              <p className="mb-8 text-center text-sm text-zinc-500">
                 Select your data sources. We&apos;ll pull everything in automatically.
               </p>
 
@@ -432,20 +432,20 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
                     onClick={() => toggleSource(src.id)}
                     className={`text-left p-4 border transition-all cursor-pointer ${
                       selected.has(src.id)
-                        ? "bg-[#6366f1]/10 border-[#6366f1]/50"
-                        : "bg-[#161B27] border-[#1E2535] hover:border-[#6366f1]/30"
+                        ? "border-white/25 bg-white/[0.08]"
+                        : "border-white/10 bg-white/[0.04] hover:border-white/20"
                     }`}
                   >
                     <div className="flex items-start justify-between">
                       <span className="text-xl">{src.icon}</span>
                       {selected.has(src.id) && (
-                        <span className="text-[#6366f1] text-sm">✓</span>
+                        <span className="text-sm text-white">✓</span>
                       )}
                     </div>
                     <h3 className="text-sm font-medium text-white mt-2">
                       {src.title}
                     </h3>
-                    <p className="text-[11px] text-[#71717A] mt-0.5">
+                    <p className="mt-0.5 text-[11px] text-zinc-500">
                       {src.description}
                     </p>
                   </button>
@@ -461,7 +461,7 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
                   }
                 }}
                 disabled={selected.size === 0}
-                className="w-full py-3 bg-[#6366f1] text-white text-sm font-medium hover:bg-[#818cf8] disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+                className="w-full cursor-pointer rounded-full bg-white py-3 text-sm font-medium text-black transition hover:bg-zinc-200 disabled:cursor-not-allowed disabled:opacity-30"
               >
                 Continue
               </button>
@@ -479,7 +479,7 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
               <h2 className="text-2xl font-bold text-white text-center mb-2">
                 Enter your details
               </h2>
-              <p className="text-sm text-[#71717A] text-center mb-8">
+              <p className="mb-8 text-center text-sm text-zinc-500">
                 Provide usernames and files for your selected sources.
               </p>
 
@@ -489,14 +489,14 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
                     initial={{ opacity: 0, x: -20 }}
                     animate={{ opacity: 1, x: 0 }}
                   >
-                    <label className="block text-xs text-[#71717A] mb-1.5">
+                    <label className="mb-1.5 block text-xs text-zinc-500">
                       Upload Resume (PDF/DOCX)
                     </label>
                     <input
                       type="file"
                       accept=".pdf,.docx,.doc"
                       onChange={(e) => setFile(e.target.files?.[0] || null)}
-                      className="w-full bg-[#161B27] border border-[#1E2535] px-3 py-2 text-sm text-white file:mr-3 file:py-1 file:px-3 file:border-0 file:text-xs file:bg-[#6366f1]/20 file:text-[#818cf8] file:cursor-pointer"
+                      className="w-full rounded-xl border border-white/10 bg-white/[0.045] px-3 py-2 text-sm text-white shadow-inner shadow-black/40 file:mr-3 file:cursor-pointer file:rounded-full file:border-0 file:bg-white file:px-3 file:py-1 file:text-xs file:text-black"
                     />
                   </motion.div>
                 )}
@@ -507,7 +507,7 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.05 }}
                   >
-                    <label className="block text-xs text-[#71717A] mb-1.5">
+                    <label className="mb-1.5 block text-xs text-zinc-500">
                       GitHub Username
                     </label>
                     <input
@@ -517,7 +517,7 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
                         setInputs((p) => ({ ...p, github: e.target.value }))
                       }
                       placeholder="octocat"
-                      className="w-full bg-[#161B27] border border-[#1E2535] px-3 py-2 text-sm text-white placeholder:text-[#71717A]/40 outline-none focus:border-[#6366f1]/50 transition-colors font-mono"
+                      className="w-full rounded-xl border border-white/10 bg-white/[0.045] px-3 py-2 font-mono text-sm text-white shadow-inner shadow-black/40 outline-none transition placeholder:text-zinc-600 focus:border-white/25 focus:bg-white/[0.07]"
                     />
                   </motion.div>
                 )}
@@ -528,7 +528,7 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.1 }}
                   >
-                    <label className="block text-xs text-[#71717A] mb-1.5">
+                    <label className="mb-1.5 block text-xs text-zinc-500">
                       LeetCode Username
                     </label>
                     <input
@@ -538,7 +538,7 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
                         setInputs((p) => ({ ...p, leetcode: e.target.value }))
                       }
                       placeholder="leetcoder123"
-                      className="w-full bg-[#161B27] border border-[#1E2535] px-3 py-2 text-sm text-white placeholder:text-[#71717A]/40 outline-none focus:border-[#6366f1]/50 transition-colors font-mono"
+                      className="w-full rounded-xl border border-white/10 bg-white/[0.045] px-3 py-2 font-mono text-sm text-white shadow-inner shadow-black/40 outline-none transition placeholder:text-zinc-600 focus:border-white/25 focus:bg-white/[0.07]"
                     />
                   </motion.div>
                 )}
@@ -549,7 +549,7 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.15 }}
                   >
-                    <label className="block text-xs text-[#71717A] mb-1.5">
+                    <label className="mb-1.5 block text-xs text-zinc-500">
                       Codeforces Handle
                     </label>
                     <input
@@ -559,7 +559,7 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
                         setInputs((p) => ({ ...p, codeforces: e.target.value }))
                       }
                       placeholder="tourist"
-                      className="w-full bg-[#161B27] border border-[#1E2535] px-3 py-2 text-sm text-white placeholder:text-[#71717A]/40 outline-none focus:border-[#6366f1]/50 transition-colors font-mono"
+                      className="w-full rounded-xl border border-white/10 bg-white/[0.045] px-3 py-2 font-mono text-sm text-white shadow-inner shadow-black/40 outline-none transition placeholder:text-zinc-600 focus:border-white/25 focus:bg-white/[0.07]"
                     />
                   </motion.div>
                 )}
@@ -568,13 +568,13 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
               <div className="flex gap-3">
                 <button
                   onClick={() => setStep(1)}
-                  className="px-6 py-3 text-sm text-[#71717A] border border-[#1E2535] hover:text-white transition-colors cursor-pointer"
+                  className="cursor-pointer rounded-full border border-white/10 bg-white/[0.04] px-6 py-3 text-sm text-zinc-400 transition-colors hover:border-white/20 hover:text-white"
                 >
                   Back
                 </button>
                 <button
                   onClick={runImports}
-                  className="flex-1 py-3 bg-[#6366f1] text-white text-sm font-medium hover:bg-[#818cf8] transition-colors cursor-pointer"
+                  className="flex-1 cursor-pointer rounded-full bg-white py-3 text-sm font-medium text-black transition hover:bg-zinc-200"
                 >
                   Import Data
                 </button>
@@ -593,7 +593,7 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
               <h2 className="text-2xl font-bold text-white text-center mb-2">
                 Analyzing your profiles...
               </h2>
-              <p className="text-sm text-[#71717A] text-center mb-8">
+              <p className="mb-8 text-center text-sm text-zinc-500">
                 Sit tight while we fetch and analyze your data.
               </p>
 
@@ -601,17 +601,17 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
                 {progress.map((item) => (
                   <div
                     key={item.source}
-                    className="flex items-center gap-3 bg-[#161B27] border border-[#1E2535] px-4 py-3"
+                    className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/[0.04] px-4 py-3 backdrop-blur-md"
                   >
                     <span className="w-5 text-center">
                       {item.status === "done" && (
                         <span className="text-emerald-400">✓</span>
                       )}
                       {item.status === "loading" && (
-                        <span className="text-[#6366f1] animate-spin inline-block">⟳</span>
+                        <span className="inline-block animate-spin text-white">⟳</span>
                       )}
                       {item.status === "pending" && (
-                        <span className="text-[#71717A]">○</span>
+                        <span className="text-zinc-500">○</span>
                       )}
                       {item.status === "error" && (
                         <span className="text-red-400">✕</span>
@@ -621,7 +621,7 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
                       <span className="text-sm text-white capitalize">
                         {item.source}
                       </span>
-                      <span className="text-xs text-[#71717A] ml-2">
+                      <span className="ml-2 text-xs text-zinc-500">
                         {item.message}
                       </span>
                     </div>
@@ -642,7 +642,7 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
               <h2 className="text-2xl font-bold text-white text-center mb-2">
                 Data imported successfully
               </h2>
-              <p className="text-sm text-[#71717A] text-center mb-8">
+              <p className="mb-8 text-center text-sm text-zinc-500">
                 Review what we found, then start editing.
               </p>
 
@@ -669,12 +669,12 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
                 {Object.entries(importedData).map(([source, data]) => (
                   <div
                     key={source}
-                    className="bg-[#161B27] border border-[#1E2535] p-4"
+                    className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 backdrop-blur-md"
                   >
-                    <h4 className="text-xs font-semibold text-[#6366f1] uppercase tracking-wider mb-2">
+                    <h4 className="mb-2 text-xs font-semibold uppercase tracking-wider text-zinc-300">
                       {source}
                     </h4>
-                    <pre className="text-[10px] text-[#71717A] font-mono overflow-x-auto max-h-32 overflow-y-auto">
+                    <pre className="max-h-32 overflow-y-auto overflow-x-auto font-mono text-[10px] text-zinc-500">
                       {JSON.stringify(data, null, 2).slice(0, 500)}
                     </pre>
                   </div>
@@ -684,13 +684,13 @@ export default function ImportWizard({ onComplete }: { onComplete: () => void })
               <div className="flex gap-3">
                 <button
                   onClick={onComplete}
-                  className="px-6 py-3 text-sm text-[#71717A] border border-[#1E2535] hover:text-white transition-colors cursor-pointer"
+                  className="cursor-pointer rounded-full border border-white/10 bg-white/[0.04] px-6 py-3 text-sm text-zinc-400 transition-colors hover:border-white/20 hover:text-white"
                 >
                   Skip & Edit Manually
                 </button>
                 <button
                   onClick={applyImports}
-                  className="flex-1 py-3 bg-[#6366f1] text-white text-sm font-medium hover:bg-[#818cf8] transition-colors cursor-pointer"
+                  className="flex-1 cursor-pointer rounded-full bg-white py-3 text-sm font-medium text-black transition hover:bg-zinc-200"
                 >
                   Apply & Start Editing
                 </button>

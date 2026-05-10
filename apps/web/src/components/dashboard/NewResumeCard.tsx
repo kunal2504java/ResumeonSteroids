@@ -11,11 +11,11 @@ export default function NewResumeCard({ onClick }: NewResumeCardProps) {
     <motion.button
       whileHover={{ y: -2 }}
       onClick={onClick}
-      className="bg-[#161B27] border border-dashed border-[#1E2535] hover:border-[#6366f1]/40 flex flex-col items-center justify-center aspect-[3/4] rounded-lg transition-all cursor-pointer group"
+      className="group flex aspect-[3/4] cursor-pointer flex-col items-center justify-center rounded-[1.75rem] border border-dashed border-white/12 bg-white/[0.035] shadow-[0_28px_90px_rgba(0,0,0,0.2)] backdrop-blur-xl transition-all hover:-translate-y-1 hover:border-white/25 hover:bg-white/[0.06]"
     >
-      <div className="w-14 h-14 flex items-center justify-center bg-[#6366f1]/10 border border-[#6366f1]/20 mb-5 group-hover:bg-[#6366f1]/20 transition-colors">
+      <div className="mb-5 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/10 bg-white/[0.06] shadow-inner shadow-white/10 transition-colors group-hover:bg-white/10">
         <svg
-          className="w-6 h-6 text-[#6366f1]"
+          className="h-6 w-6 text-white"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -28,7 +28,7 @@ export default function NewResumeCard({ onClick }: NewResumeCardProps) {
           />
         </svg>
       </div>
-      <span className="text-sm font-medium text-[#71717A] group-hover:text-white transition-colors">
+      <span className="text-sm font-medium text-zinc-400 transition-colors group-hover:text-white">
         New Resume
       </span>
     </motion.button>

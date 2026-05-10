@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { AnimatePresence, motion, type Variants } from "framer-motion";
 import Link from "next/link";
+import ThemeToggle from "@/components/theme/ThemeToggle";
 
 const navLinks = [
   { label: "Product", href: "#features" },
@@ -98,7 +99,7 @@ const stagger: Variants = {
 
 function PrimaryCTA({ children, href }: { children: React.ReactNode; href: string }) {
   const className =
-    "inline-flex h-11 items-center justify-center rounded-full bg-white px-6 text-sm font-medium text-black shadow-[inset_0_-1px_0_rgba(0,0,0,0.22),0_16px_48px_rgba(255,255,255,0.08)] transition hover:bg-zinc-200";
+    "inline-flex h-10 items-center justify-center rounded-lg bg-[var(--accent)] px-5 text-sm font-semibold text-[var(--accent-contrast)] transition hover:bg-[var(--accent-hover)]";
 
   if (href.startsWith("/")) {
     return (
@@ -120,7 +121,7 @@ function PrimaryCTA({ children, href }: { children: React.ReactNode; href: strin
 
 function SecondaryCTA({ children, href }: { children: React.ReactNode; href: string }) {
   const className =
-    "inline-flex h-11 items-center justify-center rounded-full border border-white/10 bg-white/[0.03] px-6 text-sm font-medium text-zinc-200 backdrop-blur-md transition hover:border-white/20 hover:bg-white/[0.07] hover:text-white";
+    "inline-flex h-10 items-center justify-center rounded-lg border border-border bg-surface-raised px-5 text-sm font-semibold text-foreground transition hover:border-[var(--border-strong)] hover:bg-surface-muted";
 
   if (href.startsWith("/")) {
     return (
@@ -141,13 +142,15 @@ function SecondaryCTA({ children, href }: { children: React.ReactNode; href: str
 }
 
 function GridOverlay() {
+  const gridColor = "color-mix(in srgb, var(--foreground) 8%, transparent)";
+
   return (
     <div
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 opacity-70"
       style={{
         backgroundImage:
-          "linear-gradient(to right, rgba(255,255,255,0.035) 1px, transparent 1px), linear-gradient(to bottom, rgba(255,255,255,0.035) 1px, transparent 1px)",
+          `linear-gradient(to right, ${gridColor} 1px, transparent 1px), linear-gradient(to bottom, ${gridColor} 1px, transparent 1px)`,
         backgroundSize: "64px 64px",
         maskImage: "linear-gradient(to bottom, black, transparent 72%)",
       }}
@@ -201,7 +204,7 @@ function FeaturePreview({ preview }: { preview: (typeof featureTabs)[number]["pr
             { label: "Hard", value: "112" },
           ].map((stat) => (
             <div key={stat.label} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-center">
-              <div className="text-2xl font-semibold tracking-tighter text-white">{stat.value}</div>
+              <div className="text-2xl font-bold tracking-tighter text-[var(--accent)]">{stat.value}</div>
               <div className="mt-1 text-zinc-500">{stat.label}</div>
             </div>
           ))}
@@ -213,7 +216,7 @@ function FeaturePreview({ preview }: { preview: (typeof featureTabs)[number]["pr
               initial={{ height: 0 }}
               animate={{ height: `${height}%` }}
               transition={{ delay: index * 0.04, duration: 0.45 }}
-              className="flex-1 rounded-t-sm bg-white"
+              className="flex-1 rounded-t-sm bg-[var(--accent)]"
             />
           ))}
         </div>
@@ -264,7 +267,7 @@ function FeaturePreview({ preview }: { preview: (typeof featureTabs)[number]["pr
             </div>
             <div className="mt-2 text-zinc-400">Workday, Greenhouse, Lever, iCIMS</div>
           </div>
-          <div className="text-5xl font-semibold tracking-tighter text-white">94</div>
+          <div className="text-5xl font-bold tracking-tighter text-[var(--accent)]">94</div>
         </div>
         <div className="space-y-3">
           {checks.map((check) => (
@@ -278,7 +281,7 @@ function FeaturePreview({ preview }: { preview: (typeof featureTabs)[number]["pr
                   initial={{ width: 0 }}
                   animate={{ width: `${check.score}%` }}
                   transition={{ duration: 0.6, ease: "easeOut" }}
-                  className="h-full rounded-full bg-white"
+                  className="h-full rounded-full bg-[var(--accent)]"
                 />
               </div>
             </div>
@@ -307,7 +310,7 @@ function FeaturePreview({ preview }: { preview: (typeof featureTabs)[number]["pr
           transition={{ delay: index * 0.1 }}
           className="flex gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-zinc-300"
         >
-          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-white" />
+          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" />
           <span className="leading-5">{bullet}</span>
         </motion.div>
       ))}
@@ -320,7 +323,7 @@ function InteractiveFeatureWindow() {
   const current = featureTabs[active];
 
   return (
-    <section id="features" className="relative border-y border-white/10 bg-black py-28">
+    <section id="features" className="relative border-y border-white/10 bg-background py-28">
       <GridOverlay />
       <div className="relative z-10 mx-auto max-w-7xl px-6">
         <div className="mx-auto max-w-3xl text-center">
@@ -464,9 +467,9 @@ function ResumeMockup() {
                 <div className="space-y-3">
                   <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-4 backdrop-blur-md">
                     <div className="text-[10px] uppercase tracking-[0.22em] text-zinc-500">ATS score</div>
-                    <div className="mt-3 text-4xl font-semibold tracking-tighter text-white">94</div>
+                    <div className="mt-3 text-4xl font-bold tracking-tighter text-[var(--accent)]">94</div>
                     <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
-                      <div className="h-full w-[94%] rounded-full bg-white" />
+                      <div className="h-full w-[94%] rounded-full bg-[var(--accent)]" />
                     </div>
                   </div>
                   <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-4 backdrop-blur-md">
@@ -493,14 +496,14 @@ function ResumeMockup() {
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-black text-white selection:bg-white selection:text-black">
-      <nav className="fixed inset-x-0 top-0 z-50 border-b border-white/10 bg-black/55 backdrop-blur-xl">
+    <div className="theme-adaptive min-h-screen bg-background text-foreground selection:bg-foreground selection:text-background">
+      <nav className="fixed inset-x-0 top-0 z-50 border-b border-border bg-surface/75 backdrop-blur-xl">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
           <Link href="/" className="flex items-center gap-2">
-            <span className="flex h-6 w-6 items-center justify-center rounded-md border border-white/10 bg-white text-xs font-bold text-black">
+            <span className="flex h-6 w-6 items-center justify-center rounded-md border border-border bg-[var(--accent)] text-xs font-bold text-[var(--accent-contrast)]">
               R
             </span>
-            <span className="text-sm font-semibold tracking-tight text-white">ResumeAI</span>
+            <span className="text-sm font-semibold tracking-tight text-foreground">ResumeAI</span>
           </Link>
           <div className="hidden items-center gap-7 md:flex">
             {navLinks.map((link) => (
@@ -524,6 +527,7 @@ export default function Home() {
             ))}
           </div>
           <div className="flex items-center gap-3">
+            <ThemeToggle />
             <Link href="/dashboard" className="hidden text-sm font-medium text-zinc-400 transition hover:text-white sm:block">
               Sign in
             </Link>
@@ -533,10 +537,10 @@ export default function Home() {
       </nav>
 
       <main className="relative overflow-hidden">
-        <section className="relative min-h-screen overflow-hidden bg-black pt-32">
+        <section className="relative min-h-screen overflow-hidden bg-background pt-32">
           <GridOverlay />
           <div className="pointer-events-none absolute left-1/2 top-0 h-[360px] w-[720px] -translate-x-1/2 rounded-full bg-white/5 blur-[120px]" />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-black to-transparent" />
+          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-background to-transparent" />
 
           <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-14 px-6 pb-24 lg:grid-cols-[0.95fr_1.05fr] lg:pb-32">
             <motion.div variants={stagger} initial="hidden" animate="visible" className="max-w-3xl">
@@ -544,7 +548,7 @@ export default function Home() {
                 variants={fadeUp}
                 className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-zinc-300 backdrop-blur-md"
               >
-                <span className="h-1.5 w-1.5 rounded-full bg-white" />
+                <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
                 Resume intelligence for software engineers
               </motion.div>
 
@@ -570,8 +574,8 @@ export default function Home() {
 
               <motion.div variants={fadeUp} className="mt-10 grid max-w-xl grid-cols-3 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10">
                 {proofPoints.map((point) => (
-                  <div key={point.value} className="bg-black/70 p-4 backdrop-blur-md">
-                    <div className="text-2xl font-semibold tracking-tighter text-white">{point.value}</div>
+                  <div key={point.value} className="bg-background/70 p-4 backdrop-blur-md">
+                    <div className="text-2xl font-bold tracking-tighter text-[var(--accent)]">{point.value}</div>
                     <div className="mt-1 text-xs leading-5 text-zinc-500">{point.label}</div>
                   </div>
                 ))}
@@ -582,7 +586,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="product" className="relative border-y border-white/10 bg-zinc-950 py-20">
+        <section id="product" className="relative border-y border-white/10 bg-surface py-20">
           <div className="mx-auto max-w-7xl px-6">
             <div className="mb-10 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
               <div>
@@ -603,7 +607,7 @@ export default function Home() {
                   whileHover={{ y: -3 }}
                   className="rounded-2xl border border-white/10 bg-white/[0.05] p-5 backdrop-blur-md transition hover:bg-white/[0.08]"
                 >
-                  <div className="mb-8 h-8 w-8 rounded-lg border border-white/10 bg-white/[0.06]" />
+                  <div className="mb-8 h-8 w-8 rounded-lg border border-border bg-[var(--accent)]" />
                   <div className="text-sm font-medium text-white">{item}</div>
                   <div className="mt-2 text-xs leading-5 text-zinc-500">Parsed, scored, and deduped.</div>
                 </motion.div>
@@ -614,7 +618,7 @@ export default function Home() {
 
         <InteractiveFeatureWindow />
 
-        <section id="workflow" className="relative bg-black py-28">
+        <section id="workflow" className="relative bg-background py-28">
           <div className="mx-auto max-w-7xl px-6">
             <div className="mx-auto max-w-3xl text-center">
               <p className="text-xs font-medium uppercase tracking-[0.22em] text-zinc-500">Workflow</p>
@@ -645,7 +649,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="proof" className="relative overflow-hidden border-y border-white/10 bg-zinc-950 py-28">
+        <section id="proof" className="relative overflow-hidden border-y border-white/10 bg-surface py-28">
           <GridOverlay />
           <div className="relative z-10 mx-auto grid max-w-7xl gap-12 px-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
             <div>
@@ -665,7 +669,7 @@ export default function Home() {
                   key={feature}
                   className="rounded-2xl border border-white/10 bg-white/[0.05] p-5 text-sm font-medium text-zinc-200 backdrop-blur-md"
                 >
-                  <div className="mb-7 h-1 w-10 rounded-full bg-white" />
+                  <div className="mb-7 h-1 w-10 rounded-full bg-[var(--accent)]" />
                   {feature}
                 </div>
               ))}
@@ -673,7 +677,7 @@ export default function Home() {
           </div>
         </section>
 
-        <section id="pricing" className="bg-black py-28">
+        <section id="pricing" className="bg-background py-28">
           <div className="mx-auto max-w-4xl px-6 text-center">
             <p className="text-xs font-medium uppercase tracking-[0.22em] text-zinc-500">Start</p>
             <h2 className="mt-4 text-4xl font-semibold tracking-tighter text-white sm:text-6xl">
@@ -689,7 +693,7 @@ export default function Home() {
         </section>
       </main>
 
-      <footer className="border-t border-white/10 bg-black px-6 py-8">
+      <footer className="border-t border-white/10 bg-background px-6 py-8">
         <div className="mx-auto flex max-w-7xl flex-col justify-between gap-4 text-sm text-zinc-500 sm:flex-row">
           <span>ResumeAI</span>
           <span>Built for engineers who need signal, not decoration.</span>

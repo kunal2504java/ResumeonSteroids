@@ -9,6 +9,9 @@ const categories = [
   { key: "databases", label: "Databases", placeholder: "PostgreSQL, MongoDB, Redis" },
 ];
 
+const inputClass =
+  "w-full rounded-xl border border-white/10 bg-white/[0.045] px-3 py-2 text-sm text-white shadow-inner shadow-black/40 outline-none backdrop-blur-md transition placeholder:text-zinc-600 focus:border-white/25 focus:bg-white/[0.07]";
+
 export default function SkillsEditor() {
   const skills = useResumeStore((s) => s.resume?.skills);
   const updateSkills = useResumeStore((s) => s.updateSkills);
@@ -18,14 +21,14 @@ export default function SkillsEditor() {
   if (!skills) return null;
 
   return (
-    <div className="px-6 py-6 space-y-5">
-      <h3 className="text-xs font-semibold text-zinc-300 uppercase tracking-wide">
+    <div className="space-y-5 px-6 py-6">
+      <h3 className="text-xs font-semibold uppercase tracking-[0.22em] text-zinc-400">
         Technical Skills
       </h3>
 
       {categories.map((cat) => (
         <div key={cat.key}>
-          <label className="block text-[10px] text-zinc-300 mb-1 font-semibold uppercase tracking-wide">
+          <label className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
             {cat.label}
           </label>
           <input
@@ -39,7 +42,7 @@ export default function SkillsEditor() {
               updateSkills(cat.key, values);
             }}
             placeholder={cat.placeholder}
-            className="w-full bg-zinc-800 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-600 outline-none focus:border-[#6366f1]/50 transition-colors"
+            className={inputClass}
           />
           <div className="flex flex-wrap gap-1 mt-1.5">
             {(skills as unknown as Record<string, string[]>)[cat.key]?.map(
@@ -47,7 +50,7 @@ export default function SkillsEditor() {
                 skill && (
                   <span
                     key={i}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] bg-[#6366f1]/10 text-[#818cf8] border border-[#6366f1]/20 rounded"
+                    className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.06] px-2 py-0.5 text-[10px] text-zinc-300"
                   >
                     {skill}
                   </span>
@@ -58,8 +61,8 @@ export default function SkillsEditor() {
       ))}
 
       {/* Achievements inline */}
-      <div className="pt-4 border-t border-white/10">
-        <h3 className="text-xs font-semibold text-zinc-300 uppercase tracking-wide mb-3">
+      <div className="border-t border-white/10 pt-4">
+        <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-zinc-400">
           Achievements
         </h3>
         <div className="space-y-2">
@@ -74,7 +77,7 @@ export default function SkillsEditor() {
                   updateAchievements(next);
                 }}
                 placeholder="Achievement..."
-                className="flex-1 bg-zinc-800 border border-white/10 rounded-lg px-3 py-2 text-sm text-white placeholder:text-zinc-600 outline-none focus:border-[#6366f1]/50 transition-colors"
+                className={`${inputClass} flex-1`}
               />
               <button
                 onClick={() => {
@@ -88,7 +91,7 @@ export default function SkillsEditor() {
           ))}
           <button
             onClick={() => updateAchievements([...achievements, ""])}
-            className="text-xs text-[#6366f1] hover:text-[#818cf8] transition-colors cursor-pointer"
+            className="cursor-pointer rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs text-zinc-300 transition hover:border-white/20 hover:text-white"
           >
             + Add achievement
           </button>

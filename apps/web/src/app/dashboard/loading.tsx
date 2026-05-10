@@ -1,42 +1,46 @@
 export default function DashboardLoading() {
   return (
-    <div className="min-h-screen bg-[#0D1117]">
-      {/* Navbar skeleton */}
-      <header className="border-b border-[#1E2535]">
-        <div className="max-w-[1180px] mx-auto px-6 md:px-12 h-14 flex items-center justify-between">
+    <div className="relative min-h-screen overflow-hidden bg-black">
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 opacity-60"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px)",
+          backgroundSize: "44px 44px",
+        }}
+      />
+      <div className="pointer-events-none absolute left-1/2 top-[-12rem] h-96 w-[48rem] -translate-x-1/2 rounded-full bg-white/5 blur-[120px]" />
+      <header className="relative z-10 border-b border-white/10 bg-black/55 backdrop-blur-xl">
+        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-10">
           <div className="flex items-center gap-2">
-            <div className="w-[18px] h-[18px] bg-[#6366f1]/20 animate-pulse" />
-            <div className="h-3.5 w-20 bg-white/5 animate-pulse rounded-sm" />
+            <div className="h-[18px] w-[18px] animate-pulse rounded bg-white/10" />
+            <div className="h-3.5 w-20 animate-pulse rounded bg-white/10" />
           </div>
-          <div className="w-8 h-8 rounded-full bg-white/5 animate-pulse" />
+          <div className="h-8 w-8 animate-pulse rounded-full bg-white/10" />
         </div>
       </header>
 
-      <div className="max-w-[1180px] mx-auto px-6 md:px-12 py-12">
-        {/* Header skeleton */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-10">
+      <div className="relative z-10 mx-auto max-w-7xl px-6 py-14 lg:px-10">
+        <div className="mb-10 flex flex-col items-start justify-between gap-5 sm:flex-row sm:items-end">
           <div>
-            <div className="h-8 w-48 bg-white/5 animate-pulse rounded-sm mb-2" />
-            <div className="h-4 w-24 bg-white/5 animate-pulse rounded-sm" />
+            <div className="mb-3 h-3 w-24 animate-pulse rounded bg-white/10" />
+            <div className="mb-2 h-10 w-56 animate-pulse rounded bg-white/10" />
+            <div className="h-4 w-28 animate-pulse rounded bg-white/10" />
           </div>
-          <div className="h-10 w-36 bg-[#6366f1]/20 animate-pulse" />
+          <div className="h-10 w-36 animate-pulse rounded-full bg-white/15" />
         </div>
 
-        {/* Card grid skeleton */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {Array.from({ length: 6 }).map((_, i) => (
             <div
               key={i}
-              className="bg-[#111118] border border-white/5 overflow-hidden"
+              className="aspect-[3/4] overflow-hidden rounded-[1.75rem] border border-white/10 bg-white/[0.04] backdrop-blur-xl"
             >
-              <div className="h-40 bg-white/[0.02] animate-pulse" />
-              <div className="p-4 space-y-2">
-                <div className="h-4 w-3/4 bg-white/5 animate-pulse rounded-sm" />
-                <div className="h-3 w-1/2 bg-white/5 animate-pulse rounded-sm" />
-              </div>
-              <div className="border-t border-white/5 px-4 py-3 flex gap-2">
-                <div className="h-7 w-14 bg-white/5 animate-pulse rounded-sm" />
-                <div className="h-7 w-14 bg-white/5 animate-pulse rounded-sm" />
+              <div className="h-1/2 animate-pulse bg-white/[0.03]" />
+              <div className="space-y-2 p-5">
+                <div className="h-4 w-3/4 animate-pulse rounded bg-white/10" />
+                <div className="h-3 w-1/2 animate-pulse rounded bg-white/10" />
               </div>
             </div>
           ))}

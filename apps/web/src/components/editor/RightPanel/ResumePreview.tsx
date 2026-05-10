@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { Resume } from "@resumeai/shared";
 import { useResumeStore } from "@/lib/store/resumeStore";
 import { prepareResumeForOutput } from "@/lib/resume/output";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import JakeTemplate from "./JakeTemplate";
 
 interface ResumePreviewProps {
@@ -100,7 +101,7 @@ export default function ResumePreview({
     return (
       <div
         ref={containerRef}
-        className="h-full flex items-center justify-center p-4 bg-zinc-900"
+        className="flex h-full items-center justify-center bg-black/50 p-4"
       >
         <div className="text-sm text-zinc-500">Loading preview...</div>
       </div>
@@ -108,49 +109,34 @@ export default function ResumePreview({
   }
 
   const forceHtmlPreview = Boolean(highlightedSection);
-  const showFallback = status === "error" || !pdfUrl || forceHtmlPreview;
-
   return (
-    <div ref={containerRef} className="relative h-full overflow-hidden bg-zinc-900">
-      <div className="absolute inset-0 overflow-auto p-4">
-        {pdfUrl && (
-          <iframe
-            key={pdfUrl}
-            src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH`}
-            title="Compiled resume preview"
-            className={`h-full w-full rounded-sm border border-white/10 bg-white shadow-2xl shadow-black/50 ${
-              showFallback ? "hidden" : "block"
-            }`}
-          />
-        )}
-
-        {showFallback && (
-          <div className="flex min-h-full items-start justify-center">
-            <div className="shadow-2xl shadow-black/50">
-              <JakeTemplate
-                highlightedSection={highlightedSection}
-                resumeOverride={resume}
-              />
-            </div>
+    <div ref={containerRef} className="relative h-full overflow-hidden bg-black/50">
+      <ScrollArea className="absolute inset-0">
+        <div className="flex min-h-full items-start justify-center p-4">
+          <div className="shadow-2xl shadow-black/50">
+            <JakeTemplate
+              highlightedSection={highlightedSection}
+              resumeOverride={resume}
+            />
           </div>
-        )}
-      </div>
+        </div>
+      </ScrollArea>
 
       {status === "loading" && (
-        <div className="pointer-events-none absolute right-6 top-6 rounded-full border border-indigo-400/20 bg-[#161B27]/90 px-3 py-1.5 text-xs text-indigo-200 backdrop-blur-sm">
+        <div className="pointer-events-none absolute right-6 top-6 rounded-full border border-white/10 bg-black/75 px-3 py-1.5 text-xs text-zinc-300 backdrop-blur-xl">
           Rendering LaTeX preview...
         </div>
       )}
 
       {status === "error" && (
-        <div className="absolute bottom-6 left-6 right-6 rounded-xl border border-amber-500/20 bg-[#161B27]/95 p-3 text-xs text-amber-100 shadow-lg shadow-black/30">
+        <div className="absolute bottom-6 left-6 right-6 rounded-2xl border border-amber-400/20 bg-amber-500/10 p-3 text-xs text-amber-100 shadow-lg shadow-black/30 backdrop-blur-xl">
           Showing HTML fallback because the real LaTeX preview failed.
           {errorMessage ? ` ${errorMessage}` : ""}
         </div>
       )}
 
       {forceHtmlPreview && status !== "error" && (
-        <div className="absolute bottom-6 left-6 right-6 rounded-xl border border-indigo-500/20 bg-[#161B27]/95 p-3 text-xs text-indigo-100 shadow-lg shadow-black/30">
+        <div className="absolute bottom-6 left-6 right-6 rounded-2xl border border-white/10 bg-black/75 p-3 text-xs text-zinc-200 shadow-lg shadow-black/30 backdrop-blur-xl">
           HTML preview enabled to highlight the affected ATS section.
         </div>
       )}
