@@ -12,6 +12,7 @@ import ProjectEditor from "./LeftPanel/ProjectEditor";
 import SkillsEditor from "./LeftPanel/SkillsEditor";
 import Toolbar from "./Toolbar";
 import TailorDrawer from "./TailorDrawer";
+import AIAssistantModal from "./AIAssistantModal";
 import CommandPalette from "@/components/ui/CommandPalette";
 import ToastContainer from "@/components/ui/Toast";
 import { ATSReportPanel } from "@/components/ats/ATSReportPanel";
@@ -29,6 +30,7 @@ export default function EditorLayout() {
   const addToast = useResumeStore((s) => s.addToast);
   const save = useResumeStore((s) => s.save);
   const isDirty = useResumeStore((s) => s.isDirty);
+  const setResume = useResumeStore((s) => s.setResume);
   const setActiveSection = useResumeStore((s) => s.setActiveSection);
   const addExperience = useResumeStore((s) => s.addExperience);
   const addProject = useResumeStore((s) => s.addProject);
@@ -40,6 +42,7 @@ export default function EditorLayout() {
   const [highlightedSection, setHighlightedSection] = useState<string | undefined>();
   const [mobileTab, setMobileTab] = useState<"resume" | "ats">("resume");
   const [pagePreference, setPagePreference] = useState<1 | 2 | null>(null);
+  const [assistantOpen, setAssistantOpen] = useState(false);
   const dragging = useRef(false);
   const resumeId = resume?.id ?? null;
   const atsRunId = resumeId ? `ats-${resumeId}` : null;
@@ -137,6 +140,7 @@ export default function EditorLayout() {
     { id: "pdf-quick", label: "Download PDF (Quick)", shortcut: "", action: handleDownloadPDF },
     { id: "latex", label: "Copy LaTeX", shortcut: "", action: handleCopyLaTeX },
     { id: "tailor", label: "Tailor to Job", shortcut: "", action: () => setTailorOpen(true) },
+    { id: "assistant", label: "Open AI Assistant", shortcut: "", action: () => setAssistantOpen(true) },
     { id: "add-exp", label: "Add Experience", shortcut: "", action: () => { addExperience(); setActiveSection("experience"); } },
     { id: "add-proj", label: "Add Project", shortcut: "", action: () => { addProject(); setActiveSection("projects"); } },
     { id: "personal", label: "Edit Personal Info", shortcut: "", action: () => setActiveSection("personal") },
@@ -236,7 +240,7 @@ export default function EditorLayout() {
   };
 
   return (
-    <div className="theme-adaptive relative flex h-screen flex-col overflow-hidden bg-background text-foreground">
+    <div className="theme-adaptive relative flex h-screen flex-col overflow-hidden bg-[#0f0f0f] text-foreground">
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 opacity-50"
@@ -251,13 +255,14 @@ export default function EditorLayout() {
         onDownloadPDF={handleDownloadLatexPDF}
         onCopyLaTeX={handleCopyLaTeX}
         onTailor={() => setTailorOpen(true)}
+        onAIAssistant={() => setAssistantOpen(true)}
         onCommandPalette={() => setCmdOpen(true)}
       />
 
       <div className="relative z-10 flex flex-1 overflow-hidden">
         {/* Left Panel */}
         <div
-          className="flex flex-col overflow-hidden border-r border-white/10 bg-black/45 backdrop-blur-xl"
+          className="flex flex-col overflow-hidden border-r border-white/10 bg-zinc-950/55 backdrop-blur-xl"
           style={{ width: dividerX }}
         >
           <SectionTabs />
@@ -268,7 +273,7 @@ export default function EditorLayout() {
 
         {/* Divider */}
         <div
-          className="w-1 shrink-0 cursor-col-resize bg-white/10 transition-colors hover:bg-white/25"
+          className="w-px shrink-0 cursor-col-resize bg-white/10 transition-colors hover:bg-white/20"
           onMouseDown={() => {
             dragging.current = true;
             document.body.style.cursor = "col-resize";
@@ -277,7 +282,7 @@ export default function EditorLayout() {
         />
 
         {/* Right Panel */}
-        <div className="flex-1 overflow-hidden" data-resume-preview-container>
+        <div className="flex-1 overflow-hidden bg-[#0f0f0f]" data-resume-preview-container>
           <div className="flex h-full flex-col gap-4 p-4">
             {canOfferTwoPages && (
               <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4 shadow-[0_18px_60px_rgba(0,0,0,0.25)] backdrop-blur-xl">
@@ -391,6 +396,14 @@ export default function EditorLayout() {
         onClose={() => setTailorOpen(false)}
         jobDescription={jobDescription}
         onJobDescriptionChange={setJobDescription}
+      />
+      <AIAssistantModal
+        isOpen={assistantOpen}
+        onClose={() => setAssistantOpen(false)}
+        resume={resume}
+        jobDescription={jobDescription}
+        onApplyResume={(fixedResume) => setResume(fixedResume, { markDirty: true })}
+        onToast={addToast}
       />
       <CommandPalette
         commands={commands}

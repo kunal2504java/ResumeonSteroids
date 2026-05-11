@@ -7,6 +7,7 @@ interface ToolbarProps {
   onDownloadPDF: () => void;
   onCopyLaTeX: () => void;
   onTailor: () => void;
+  onAIAssistant: () => void;
   onCommandPalette: () => void;
 }
 
@@ -14,6 +15,7 @@ export default function Toolbar({
   onDownloadPDF,
   onCopyLaTeX,
   onTailor,
+  onAIAssistant,
   onCommandPalette,
 }: ToolbarProps) {
   const isDirty = useResumeStore((s) => s.isDirty);
@@ -22,11 +24,11 @@ export default function Toolbar({
   const resumeName = useResumeStore((s) => s.resume?.name) || "Untitled";
 
   return (
-    <header className="relative z-20 flex h-14 shrink-0 items-center justify-between border-b border-white/10 bg-black/55 px-4 text-white backdrop-blur-xl">
+    <header className="relative z-20 flex h-14 shrink-0 items-center justify-between border-b border-white/10 bg-[#0f0f0f]/85 px-4 text-white backdrop-blur-xl">
       <div className="flex min-w-0 items-center gap-3">
         <a
           href="/dashboard"
-          className="rounded-full border border-white/10 bg-white/[0.04] p-2 text-zinc-400 transition-colors hover:border-white/20 hover:text-white"
+          className="rounded-lg border border-zinc-800 bg-zinc-900/30 p-2 text-zinc-400 transition-colors hover:border-zinc-700 hover:text-white"
         >
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
@@ -47,28 +49,35 @@ export default function Toolbar({
       <div className="flex items-center gap-2">
         <button
           onClick={onCommandPalette}
-          className="flex cursor-pointer items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1.5 text-[11px] text-zinc-400 backdrop-blur-md transition-colors hover:border-white/20 hover:text-white"
+          className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900/30 px-2.5 py-1.5 text-[11px] text-zinc-500 backdrop-blur-md transition-colors hover:border-zinc-700 hover:text-white"
         >
           <kbd className="text-[10px]">⌘K</kbd>
         </button>
 
         <button
           onClick={onTailor}
-          className="flex cursor-pointer items-center gap-1.5 rounded-full bg-white px-3 py-1.5 text-[11px] font-medium text-black shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] transition hover:bg-zinc-200"
+          className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900/30 px-3 py-1.5 text-[11px] font-medium text-zinc-400 transition-colors hover:border-zinc-700 hover:text-white"
         >
           Tailor to Job
         </button>
 
         <button
+          onClick={onAIAssistant}
+          className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900/30 px-3 py-1.5 text-[11px] font-medium text-zinc-400 transition-colors hover:border-zinc-700 hover:text-white"
+        >
+          AI Assistant
+        </button>
+
+        <button
           onClick={onCopyLaTeX}
-          className="cursor-pointer rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] text-zinc-400 backdrop-blur-md transition-colors hover:border-white/20 hover:text-white"
+          className="cursor-pointer rounded-lg border border-zinc-800 bg-zinc-900/30 px-3 py-1.5 text-[11px] text-zinc-500 backdrop-blur-md transition-colors hover:border-zinc-700 hover:text-white"
         >
           Copy LaTeX
         </button>
 
         <button
           onClick={onDownloadPDF}
-          className="cursor-pointer rounded-full bg-white px-3 py-1.5 text-[11px] font-medium text-black shadow-[inset_0_1px_0_rgba(255,255,255,0.65)] transition hover:bg-zinc-200"
+          className="cursor-pointer rounded-lg bg-[var(--accent)] px-3 py-1.5 text-[11px] font-semibold text-black shadow-[0_0_26px_rgba(250,255,105,0.16),inset_0_1px_0_rgba(255,255,255,0.45)] transition hover:brightness-95"
         >
           Download PDF
         </button>
@@ -76,7 +85,7 @@ export default function Toolbar({
         <button
           onClick={() => save()}
           disabled={!isDirty || isSaving}
-          className="cursor-pointer rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-[11px] text-zinc-400 backdrop-blur-md transition-colors hover:border-white/20 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+          className="cursor-pointer rounded-lg border border-zinc-800 bg-zinc-900/30 px-3 py-1.5 text-[11px] text-zinc-500 backdrop-blur-md transition-colors hover:border-zinc-700 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
         >
           Save
         </button>

@@ -33,7 +33,7 @@ interface ResumeStore {
   undoStack: Resume[];
   toasts: { id: string; message: string; type: "success" | "error" | "info" }[];
 
-  setResume: (r: Resume) => void;
+  setResume: (r: Resume, options?: { markDirty?: boolean }) => void;
   updatePersonalInfo: (field: string, value: string) => void;
   updateSummary: (value: string) => void;
   updateSection: <K extends keyof Resume>(section: K, data: Resume[K]) => void;
@@ -82,10 +82,10 @@ export const useResumeStore = create<ResumeStore>()(
     undoStack: [],
     toasts: [],
 
-    setResume: (r) =>
+    setResume: (r, options) =>
       set((state) => {
         state.resume = r;
-        state.isDirty = false;
+        state.isDirty = Boolean(options?.markDirty);
       }),
 
     updatePersonalInfo: (field, value) =>

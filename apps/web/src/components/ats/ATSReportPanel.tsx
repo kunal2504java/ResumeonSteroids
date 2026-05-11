@@ -79,7 +79,7 @@ export function ATSReportPanel({
       };
 
   return (
-    <div className="relative h-full overflow-hidden rounded-[28px] border border-white/10 bg-black/45 shadow-[0_30px_120px_rgba(0,0,0,0.38)] backdrop-blur-xl">
+    <div className="relative h-full overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/30 shadow-[0_0_60px_rgba(0,0,0,0.45)] backdrop-blur-md">
       <div className="h-full overflow-y-auto p-4 sm:p-5">
         <div className="space-y-4">
           <ATSScoreGauge
@@ -95,7 +95,7 @@ export function ATSReportPanel({
               loading={loading}
             />
           ) : report ? (
-            <div className="rounded-2xl border border-emerald-400/20 bg-emerald-500/10 p-4 text-sm text-emerald-100">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 text-sm text-zinc-300">
               Your resume is ATS-ready. No critical parser failures were detected.
             </div>
           ) : null}
@@ -112,7 +112,7 @@ export function ATSReportPanel({
               <KeywordCoverage coverage={report.keyword_coverage} onFix={onFix} loading={loading} />
 
               {error && (
-                <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4 text-sm text-amber-100">
+                <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 text-sm text-zinc-300">
                   {error}
                 </div>
               )}
@@ -122,9 +122,9 @@ export function ATSReportPanel({
                   <details
                     key={category}
                     open={category === "parsing"}
-                    className="rounded-3xl border border-white/10 bg-white/[0.04] p-5 backdrop-blur-md"
+                    className="rounded-2xl border border-white/10 bg-zinc-900/30 p-4 backdrop-blur-md"
                   >
-                    <summary className="cursor-pointer list-none text-sm font-semibold text-white">
+                    <summary className="cursor-pointer list-none text-sm font-medium text-white">
                       {CATEGORY_LABELS[category]}
                     </summary>
                     <div className="mt-4 space-y-3">
@@ -143,13 +143,13 @@ export function ATSReportPanel({
           )}
 
           {!report && error && (
-            <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4 text-sm text-amber-100">
+            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 text-sm text-zinc-300">
               ATS report unavailable. Resume preview is still available. {error}
             </div>
           )}
 
           {!report && !loading && (
-            <div className="rounded-2xl border border-dashed border-white/12 bg-white/[0.02] p-6 text-sm text-white/55">
+            <div className="rounded-2xl border border-dashed border-white/12 bg-zinc-900/30 p-6 text-sm text-white/55 backdrop-blur-md">
               <div className="text-sm font-semibold text-white">Run ATS simulation</div>
               <p className="mt-2 leading-6">
                 Paste a job description to check parser compatibility, keyword placement,
@@ -159,7 +159,7 @@ export function ATSReportPanel({
                 <button
                   type="button"
                   onClick={onRequestAnalysis}
-                  className="mt-5 inline-flex h-10 items-center justify-center rounded-lg bg-[var(--accent)] px-4 text-sm font-semibold text-[var(--accent-contrast)] transition hover:bg-[var(--accent-hover)]"
+                  className="mt-5 inline-flex h-10 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900/40 px-4 text-sm font-medium text-zinc-300 transition hover:border-zinc-700 hover:text-white"
                 >
                   Check ATS score
                 </button>

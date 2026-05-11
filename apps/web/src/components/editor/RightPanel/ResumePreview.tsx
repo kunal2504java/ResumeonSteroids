@@ -7,6 +7,10 @@ import { prepareResumeForOutput } from "@/lib/resume/output";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import JakeTemplate from "./JakeTemplate";
 
+const PAGE_WIDTH = 816;
+const PAGE_HEIGHT = 1056;
+const PREVIEW_PADDING = 32;
+
 interface ResumePreviewProps {
   highlightedSection?: string;
   resumeOverride?: Resume | null;
@@ -30,6 +34,24 @@ export default function ResumePreview({
     "idle"
   );
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [previewScale, setPreviewScale] = useState(1);
+
+  useEffect(() => {
+    const node = containerRef.current;
+    if (!node) return;
+
+    const updateScale = () => {
+      const rect = node.getBoundingClientRect();
+      const availableWidth = Math.max(320, rect.width - PREVIEW_PADDING);
+      const scale = Math.min(1, availableWidth / PAGE_WIDTH);
+      setPreviewScale(Number(scale.toFixed(3)));
+    };
+
+    updateScale();
+    const observer = new ResizeObserver(updateScale);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     if (!resume) return;
@@ -101,7 +123,7 @@ export default function ResumePreview({
     return (
       <div
         ref={containerRef}
-        className="flex h-full items-center justify-center bg-black/50 p-4"
+        className="flex h-full items-center justify-center bg-[#0f0f0f] p-4"
       >
         <div className="text-sm text-zinc-500">Loading preview...</div>
       </div>
@@ -109,18 +131,44 @@ export default function ResumePreview({
   }
 
   const forceHtmlPreview = Boolean(highlightedSection);
+  const shouldShowPdfPreview = Boolean(pdfUrl && status === "ready" && !forceHtmlPreview);
   return (
-    <div ref={containerRef} className="relative h-full overflow-hidden bg-black/50">
-      <ScrollArea className="absolute inset-0">
-        <div className="flex min-h-full items-start justify-center p-4">
-          <div className="shadow-2xl shadow-black/50">
-            <JakeTemplate
-              highlightedSection={highlightedSection}
-              resumeOverride={resume}
-            />
-          </div>
+    <div ref={containerRef} className="relative h-full overflow-hidden bg-[#0f0f0f]">
+      {shouldShowPdfPreview ? (
+        <div className="absolute inset-0 bg-[#0f0f0f] p-3">
+          <iframe
+            title="Compiled LaTeX resume preview"
+            src={`${pdfUrl}#toolbar=0&navpanes=0&scrollbar=0&view=FitH&zoom=page-width`}
+            className="h-full w-full border-0 bg-[#0f0f0f] shadow-[0_0_60px_rgba(0,0,0,0.6)] ring-1 ring-white/5"
+          />
         </div>
-      </ScrollArea>
+      ) : (
+        <ScrollArea className="absolute inset-0">
+          <div className="flex min-h-full items-start justify-center p-4">
+            <div
+              className="relative shrink-0"
+              style={{
+                width: PAGE_WIDTH * previewScale,
+                height: PAGE_HEIGHT * previewScale,
+              }}
+            >
+              <div
+                className="origin-top-left shadow-[0_0_60px_rgba(0,0,0,0.6)] ring-1 ring-white/5"
+                style={{
+                  width: PAGE_WIDTH,
+                  height: PAGE_HEIGHT,
+                  transform: `scale(${previewScale})`,
+                }}
+              >
+                <JakeTemplate
+                  highlightedSection={highlightedSection}
+                  resumeOverride={resume}
+                />
+              </div>
+            </div>
+          </div>
+        </ScrollArea>
+      )}
 
       {status === "loading" && (
         <div className="pointer-events-none absolute right-6 top-6 rounded-full border border-white/10 bg-black/75 px-3 py-1.5 text-xs text-zinc-300 backdrop-blur-xl">
