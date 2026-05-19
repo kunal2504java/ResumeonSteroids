@@ -94,6 +94,36 @@ export interface ApplicationDetail {
   prep?: InterviewPrep | null;
 }
 
+export interface JobOpportunity {
+  id: string;
+  company_name: string;
+  role_title: string;
+  location?: string | null;
+  source: string;
+  source_url?: string | null;
+  raw_text?: string | null;
+  normalized_jd?: string | null;
+  status: "new" | "saved" | "applied" | "archived";
+  provider_metadata?: Record<string, unknown> | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ResumeCommandRunResponse {
+  run_id: string | null;
+  status: "completed";
+  delivery: {
+    channel: "email";
+    recipient: string;
+    status: "sent";
+    provider: string;
+    provider_message_id?: string | null;
+  };
+  resume: import("@resumeai/shared").Resume;
+  changes: string[];
+  assistant_message: string;
+}
+
 export interface InterviewPrep {
   questions: PrepQuestion[];
   company_questions: PrepQuestion[];
@@ -114,4 +144,3 @@ export interface StarAnswer {
   action: string;
   result: string;
 }
-

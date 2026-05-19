@@ -6,18 +6,18 @@ import { rateLimitMiddleware } from "../../middleware/rateLimit";
 
 const route = new Hono();
 
-interface FixResumeResponse {
+export interface FixResumeResponse {
   resume: Resume;
   changes: string[];
   assistant_message: string;
 }
 
-interface ChatMessage {
+export interface ChatMessage {
   role: "user" | "assistant";
   content: string;
 }
 
-function buildFixPrompt(
+export function buildFixPrompt(
   resume: Resume,
   jobDescription?: string,
   instruction?: string,
@@ -76,7 +76,7 @@ Resume JSON:
 ${JSON.stringify(resume, null, 2)}`;
 }
 
-function parseJsonObject(text: string): FixResumeResponse {
+export function parseJsonObject(text: string): FixResumeResponse {
   const trimmed = text.trim();
   const fenced = trimmed.match(/```(?:json)?\s*([\s\S]*?)```/i);
   const source = fenced?.[1]?.trim() ?? trimmed;

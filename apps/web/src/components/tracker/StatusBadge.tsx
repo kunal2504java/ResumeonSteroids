@@ -16,9 +16,8 @@ const STATUS_STYLES: Record<ApplicationStatus, string> = {
 
 export function StatusBadge({ status }: { status: ApplicationStatus }) {
   return (
-    <span className={`border px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${STATUS_STYLES[status]}`}>
+    <span className={`rounded-full border bg-white/[0.025] px-2 py-1 text-[10px] font-semibold uppercase tracking-[0.14em] ${STATUS_STYLES[status]}`}>
       {status.replace("_", " ")}
     </span>
   );
 }
-

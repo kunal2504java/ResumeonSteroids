@@ -10,6 +10,10 @@ import ThemeToggle from "@/components/theme/ThemeToggle";
 import { trackerApi } from "@/lib/trackerApi";
 import type { Application, ApplicationStatus, Nudge } from "@/types/tracker";
 
+const LOCAL_MODE =
+  !process.env.NEXT_PUBLIC_SUPABASE_URL ||
+  !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
 export default function TrackerPage() {
   const [applications, setApplications] = useState<Application[]>([]);
   const [nudges, setNudges] = useState<Nudge[]>([]);
@@ -76,21 +80,43 @@ export default function TrackerPage() {
   }
 
   return (
-    <main className="theme-adaptive min-h-screen bg-background text-foreground">
-      <header className="border-b border-border bg-surface/70 backdrop-blur">
+    <main className="theme-adaptive min-h-screen overflow-hidden bg-[#0f0f0f] text-white">
+      <div
+        aria-hidden
+        className="pointer-events-none fixed inset-0 opacity-45"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px)",
+          backgroundSize: "44px 44px",
+        }}
+      />
+      <div className="pointer-events-none fixed left-1/2 top-[-18rem] h-[34rem] w-[62rem] -translate-x-1/2 rounded-full bg-white/[0.045] blur-[130px]" />
+
+      <header className="relative z-10 border-b border-white/10 bg-[#0f0f0f]/85 backdrop-blur-xl">
         <div className="mx-auto flex max-w-[1500px] items-center justify-between px-6 py-4">
           <div className="flex items-center gap-4">
             <Link href="/dashboard" className="text-sm font-semibold text-foreground">
               ResumeAI
             </Link>
-            <span className="text-xs text-muted">/</span>
-            <span className="text-sm text-muted">Application tracker</span>
+            <span className="text-xs text-zinc-700">/</span>
+            <span className="text-sm text-zinc-500">Application tracker</span>
+            {LOCAL_MODE && (
+              <span className="rounded-full border border-white/10 bg-zinc-900/40 px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-zinc-500">
+                Local mode
+              </span>
+            )}
           </div>
           <div className="flex items-center gap-3">
+            <Link
+              href="/tracker/opportunities"
+              className="rounded-lg border border-zinc-800 bg-zinc-900/30 px-4 py-2 text-sm font-medium text-zinc-400 transition hover:border-zinc-700 hover:text-white"
+            >
+              Opportunity feed
+            </Link>
             <ThemeToggle />
             <button
               onClick={() => setModalOpen(true)}
-              className="bg-indigo px-4 py-2 text-sm font-semibold text-[var(--accent-contrast)] transition hover:bg-indigo-light"
+              className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-black shadow-[0_0_26px_rgba(250,255,105,0.16)] transition hover:brightness-95"
             >
               Add application
             </button>
@@ -98,32 +124,39 @@ export default function TrackerPage() {
         </div>
       </header>
 
-      <div className="mx-auto max-w-[1500px] px-6 py-8">
+      <div className="relative z-10 mx-auto max-w-[1500px] px-6 py-8">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-8 flex flex-col justify-between gap-4 lg:flex-row lg:items-end"
+          className="mb-6 flex flex-col justify-between gap-4 lg:flex-row lg:items-end"
         >
           <div>
-            <h1 className="text-3xl font-semibold tracking-tight">Pipeline</h1>
-            <p className="mt-2 text-sm text-muted">
+            <p className="mb-3 text-xs uppercase tracking-[0.28em] text-zinc-600">Pipeline</p>
+            <h1 className="text-4xl font-semibold tracking-tight">Application board</h1>
+            <p className="mt-2 text-sm text-zinc-500">
               Track applications, outreach, interviews, and next actions from one board.
             </p>
           </div>
-          <div className="flex gap-6 text-sm">
-            <span className="text-muted">{applications.length} applications</span>
-            <span className="text-muted">{nudges.length} nudges</span>
+          <div className="grid grid-cols-2 overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/30 backdrop-blur-md">
+            <div className="border-r border-white/10 px-5 py-3">
+              <div className="text-2xl font-light tracking-tight text-white">{applications.length}</div>
+              <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-600">Applications</div>
+            </div>
+            <div className="px-5 py-3">
+              <div className="text-2xl font-light tracking-tight text-white">{nudges.length}</div>
+              <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-600">Nudges</div>
+            </div>
           </div>
         </motion.div>
 
         {error && (
-          <div className="mb-5 border border-[#7F1D1D] bg-[#1F1111] px-4 py-3 text-sm text-[#FCA5A5]">
+          <div className="mb-5 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
             {error}
           </div>
         )}
 
         {loading ? (
-          <div className="border border-border bg-surface p-8 text-sm text-muted">
+          <div className="rounded-2xl border border-white/10 bg-zinc-900/30 p-8 text-sm text-zinc-500 backdrop-blur-md">
             Loading tracker...
           </div>
         ) : (

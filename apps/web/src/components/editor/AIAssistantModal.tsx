@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import type { Resume } from "@resumeai/shared";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { sendResumeCommand } from "@/lib/trackerApi";
 
 type ChatRole = "user" | "assistant";
 
@@ -69,14 +70,16 @@ export default function AIAssistantModal({
 }: AIAssistantModalProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([INITIAL_MESSAGE]);
   const [input, setInput] = useState("");
+  const [deliveryEmail, setDeliveryEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   useEffect(() => {
     if (!isOpen) return;
     const timeout = window.setTimeout(() => inputRef.current?.focus(), 80);
+    setDeliveryEmail(resume?.personalInfo.email ?? "");
     return () => window.clearTimeout(timeout);
-  }, [isOpen]);
+  }, [isOpen, resume?.personalInfo.email]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -171,6 +174,60 @@ export default function AIAssistantModal({
     }
   }
 
+  async function emailUpdatedPdf() {
+    const prompt =
+      input.trim() ||
+      "Fix everything important, tighten the resume to one page, and email me the updated PDF.";
+    const recipient = deliveryEmail.trim();
+    if (!prompt || !resume || !recipient || loading) return;
+
+    const userMessage: ChatMessage = {
+      id: makeId("user-email"),
+      role: "user",
+      content: `${prompt}\n\nDeliver PDF to: ${recipient}`,
+    };
+    const nextMessages = [...messages, userMessage];
+    setMessages(nextMessages);
+    setInput("");
+    setLoading(true);
+
+    try {
+      const data = await sendResumeCommand({
+        resume,
+        instruction: prompt,
+        job_description: jobDescription,
+        recipient_email: recipient,
+        messages: nextMessages.map(({ role, content }) => ({ role, content })),
+      });
+      onApplyResume(data.resume);
+      setMessages((current) => [
+        ...current,
+        {
+          id: makeId("assistant-email"),
+          role: "assistant",
+          content:
+            data.assistant_message ||
+            `Updated the resume and emailed the PDF to ${data.delivery.recipient}.`,
+        },
+      ]);
+      onToast(`Updated PDF sent to ${data.delivery.recipient}`, "success");
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : "Failed to email updated PDF";
+      setMessages((current) => [
+        ...current,
+        {
+          id: makeId("assistant-email-error"),
+          role: "assistant",
+          content: `I could not email the PDF: ${message}`,
+        },
+      ]);
+      onToast(message, "error");
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <div className="fixed inset-0 z-50 bg-black/45 backdrop-blur-sm">
       <button
@@ -221,6 +278,17 @@ export default function AIAssistantModal({
             <p className="text-[11px] leading-4 text-zinc-500">
               Type an instruction. If the edit is safe, it is applied to the resume immediately.
             </p>
+            <div className="mt-2 flex items-center gap-2 border-l border-white/10 pl-3">
+              <span className="font-mono text-[10px] uppercase tracking-[0.16em] text-zinc-600">
+                email
+              </span>
+              <input
+                value={deliveryEmail}
+                onChange={(event) => setDeliveryEmail(event.target.value)}
+                placeholder="you@example.com"
+                className="min-w-0 flex-1 bg-transparent text-[11px] text-zinc-300 outline-none placeholder:text-zinc-700"
+              />
+            </div>
           </div>
         </div>
 
@@ -322,9 +390,17 @@ export default function AIAssistantModal({
             <button
               type="submit"
               disabled={loading || !input.trim() || !resume}
-              className="h-10 rounded-lg bg-[var(--accent)] px-4 text-xs font-semibold text-black transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50"
+              className="h-10 rounded-lg border border-zinc-800 bg-zinc-900/40 px-4 text-xs font-medium text-zinc-300 transition hover:border-zinc-700 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
             >
               Run
+            </button>
+            <button
+              type="button"
+              onClick={() => void emailUpdatedPdf()}
+              disabled={loading || !deliveryEmail.trim() || !resume}
+              className="h-10 rounded-lg bg-[var(--accent)] px-4 text-xs font-semibold text-black transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Email PDF
             </button>
           </div>
         </form>

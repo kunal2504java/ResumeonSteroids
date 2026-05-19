@@ -18,9 +18,9 @@ function priorityClass(priority: Nudge["priority"]) {
 export function NudgeList({ nudges, onDismiss, onComplete }: Props) {
   if (nudges.length === 0) {
     return (
-      <aside className="border border-[#1E2535] bg-[#101620] p-5">
+      <aside className="rounded-2xl border border-white/10 bg-zinc-900/30 p-5 shadow-[0_18px_60px_rgba(0,0,0,0.22)] backdrop-blur-md">
         <h2 className="text-sm font-semibold text-white">Next actions</h2>
-        <p className="mt-3 text-sm leading-6 text-[#71717A]">
+        <p className="mt-3 text-sm leading-6 text-zinc-500">
           You are on top of everything. Check back after the next tracker update.
         </p>
       </aside>
@@ -28,12 +28,12 @@ export function NudgeList({ nudges, onDismiss, onComplete }: Props) {
   }
 
   return (
-    <aside className="border border-[#1E2535] bg-[#101620]">
-      <div className="border-b border-[#1E2535] p-5">
+    <aside className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/30 shadow-[0_18px_60px_rgba(0,0,0,0.22)] backdrop-blur-md">
+      <div className="border-b border-white/10 p-5">
         <h2 className="text-sm font-semibold text-white">Next actions</h2>
-        <p className="mt-1 text-xs text-[#71717A]">{nudges.length} active nudges</p>
+        <p className="mt-1 text-xs text-zinc-500">{nudges.length} active nudges</p>
       </div>
-      <div className="divide-y divide-[#1E2535]">
+      <div className="divide-y divide-white/10">
         {nudges.map((nudge) => (
           <div key={nudge.id} className="p-5">
             <div className="flex items-start justify-between gap-3">
@@ -42,26 +42,26 @@ export function NudgeList({ nudges, onDismiss, onComplete }: Props) {
               </span>
               <button
                 onClick={() => onDismiss(nudge.id)}
-                className="text-xs text-[#71717A] transition hover:text-white"
+                className="text-xs text-zinc-500 transition hover:text-white"
               >
                 Dismiss
               </button>
             </div>
             <h3 className="mt-3 text-sm font-medium text-white">{nudge.title}</h3>
-            <p className="mt-2 text-xs leading-5 text-[#A1A1AA]">{nudge.body}</p>
+            <p className="mt-2 text-xs leading-5 text-zinc-500">{nudge.body}</p>
             {nudge.due_date && (
-              <p className="mt-3 text-[11px] text-[#71717A]">Due {new Date(nudge.due_date).toLocaleDateString()}</p>
+              <p className="mt-3 text-[11px] text-zinc-600">Due {new Date(nudge.due_date).toLocaleDateString()}</p>
             )}
             <div className="mt-4 flex gap-2">
               <Link
                 href={`/tracker/${nudge.application_id}`}
-                className="flex-1 bg-white px-3 py-2 text-center text-xs font-semibold text-[#0D1117] transition hover:bg-[#E5E7EB]"
+                className="flex-1 rounded-lg bg-[var(--accent)] px-3 py-2 text-center text-xs font-semibold text-black transition hover:brightness-95"
               >
                 {nudge.action_label || "Open"}
               </Link>
               <button
                 onClick={() => onComplete(nudge.id)}
-                className="border border-[#273244] px-3 py-2 text-xs text-white transition hover:bg-[#172033]"
+                className="rounded-lg border border-zinc-800 bg-zinc-900/30 px-3 py-2 text-xs text-zinc-300 transition hover:border-zinc-700 hover:text-white"
               >
                 Done
               </button>
@@ -72,4 +72,3 @@ export function NudgeList({ nudges, onDismiss, onComplete }: Props) {
     </aside>
   );
 }
-
