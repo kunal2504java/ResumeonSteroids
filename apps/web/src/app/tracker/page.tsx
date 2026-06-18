@@ -6,7 +6,8 @@ import { motion } from "framer-motion";
 import { AddApplicationModal } from "@/components/tracker/AddApplicationModal";
 import { ApplicationBoard } from "@/components/tracker/ApplicationBoard";
 import { NudgeList } from "@/components/tracker/NudgeList";
-import ThemeToggle from "@/components/theme/ThemeToggle";
+import AppHeader from "@/components/layout/AppHeader";
+import InkLayer from "@/components/ink/InkLayer";
 import { trackerApi } from "@/lib/trackerApi";
 import type { Application, ApplicationStatus, Nudge } from "@/types/tracker";
 
@@ -80,92 +81,58 @@ export default function TrackerPage() {
   }
 
   return (
-    <main className="theme-adaptive min-h-screen overflow-hidden bg-[#0f0f0f] text-white">
-      <div
-        aria-hidden
-        className="pointer-events-none fixed inset-0 opacity-45"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px)",
-          backgroundSize: "44px 44px",
-        }}
-      />
-      <div className="pointer-events-none fixed left-1/2 top-[-18rem] h-[34rem] w-[62rem] -translate-x-1/2 rounded-full bg-white/[0.045] blur-[130px]" />
+    <div style={{ minHeight: "100vh", position: "relative" }}>
+      <InkLayer />
+      <AppHeader active="tracker" />
 
-      <header className="relative z-10 border-b border-white/10 bg-[#0f0f0f]/85 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-[1500px] items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="text-sm font-semibold text-foreground">
-              ResumeAI
-            </Link>
-            <span className="text-xs text-zinc-700">/</span>
-            <span className="text-sm text-zinc-500">Application tracker</span>
-            {LOCAL_MODE && (
-              <span className="rounded-full border border-white/10 bg-zinc-900/40 px-2.5 py-1 text-[10px] uppercase tracking-[0.14em] text-zinc-500">
-                Local mode
-              </span>
-            )}
-          </div>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/tracker/opportunities"
-              className="rounded-lg border border-zinc-800 bg-zinc-900/30 px-4 py-2 text-sm font-medium text-zinc-400 transition hover:border-zinc-700 hover:text-white"
-            >
-              Opportunity feed
-            </Link>
-            <ThemeToggle />
-            <button
-              onClick={() => setModalOpen(true)}
-              className="rounded-lg bg-[var(--accent)] px-4 py-2 text-sm font-semibold text-black shadow-[0_0_26px_rgba(250,255,105,0.16)] transition hover:brightness-95"
-            >
-              Add application
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <div className="relative z-10 mx-auto max-w-[1500px] px-6 py-8">
+      <main className="page-wrap" style={{ maxWidth: 1500, paddingTop: 36, paddingBottom: 70, position: "relative", zIndex: 1 }}>
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-6 flex flex-col justify-between gap-4 lg:flex-row lg:items-end"
+          className="tk-page-head"
         >
           <div>
-            <p className="mb-3 text-xs uppercase tracking-[0.28em] text-zinc-600">Pipeline</p>
-            <h1 className="text-4xl font-semibold tracking-tight">Application board</h1>
-            <p className="mt-2 text-sm text-zinc-500">
-              Track applications, outreach, interviews, and next actions from one board.
+            <span className="eyebrow">your pipeline {LOCAL_MODE && "· local mode"}</span>
+            <h1 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(32px,4.4vw,48px)", letterSpacing: "-0.03em", lineHeight: 1, marginTop: 12 }}>
+              The <span data-mark="underline" data-color="pen" style={{ position: "relative" }}>board</span>
+            </h1>
+            <p className="hand hand-ink" style={{ fontSize: 17, marginTop: 6 }}>
+              everything you&apos;ve sent, pinned where you can see it
             </p>
           </div>
-          <div className="grid grid-cols-2 overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/30 backdrop-blur-md">
-            <div className="border-r border-white/10 px-5 py-3">
-              <div className="text-2xl font-light tracking-tight text-white">{applications.length}</div>
-              <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-600">Applications</div>
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <div className="tk-tally">
+              <div className="ink-card" style={{ padding: "12px 18px" }}>
+                <div style={{ fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: 26, lineHeight: 1 }}>{applications.length}</div>
+                <div className="mono" style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.16em", color: "var(--ink-soft)", marginTop: 5 }}>applied</div>
+              </div>
+              <div className="ink-card" style={{ padding: "12px 18px" }}>
+                <div style={{ fontFamily: "var(--font-bricolage)", fontWeight: 800, fontSize: 26, lineHeight: 1, color: "var(--pen)" }}>{nudges.length}</div>
+                <div className="mono" style={{ fontSize: 10, textTransform: "uppercase", letterSpacing: "0.16em", color: "var(--ink-soft)", marginTop: 5 }}>nudges</div>
+              </div>
             </div>
-            <div className="px-5 py-3">
-              <div className="text-2xl font-light tracking-tight text-white">{nudges.length}</div>
-              <div className="text-[11px] uppercase tracking-[0.18em] text-zinc-600">Nudges</div>
-            </div>
+            <Link href="/tracker/opportunities" className="tk-mini" style={{ flex: "0 0 auto", padding: "10px 16px" }}>Opportunity feed</Link>
+            <button onClick={() => setModalOpen(true)} className="btn btn-pen btn-sm">
+              <span aria-hidden="true">+</span> Add application
+            </button>
           </div>
         </motion.div>
 
         {error && (
-          <div className="mb-5 rounded-2xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+          <div style={{ marginBottom: 20, border: "1.5px solid var(--pen)", background: "rgba(226,59,23,0.08)", padding: "12px 16px", fontSize: 14, color: "var(--pen-deep)" }}>
             {error}
           </div>
         )}
 
         {loading ? (
-          <div className="rounded-2xl border border-white/10 bg-zinc-900/30 p-8 text-sm text-zinc-500 backdrop-blur-md">
-            Loading tracker...
-          </div>
+          <div className="surf hand" style={{ fontSize: 18 }}>laying out the board…</div>
         ) : (
           <div className="grid gap-6 xl:grid-cols-[1fr_360px]">
             <ApplicationBoard applications={applications} onStatusChange={changeStatus} />
             <NudgeList nudges={nudges} onDismiss={dismissNudge} onComplete={completeNudge} />
           </div>
         )}
-      </div>
+      </main>
 
       <AddApplicationModal
         open={modalOpen}
@@ -173,6 +140,12 @@ export default function TrackerPage() {
         onClose={() => setModalOpen(false)}
         onCreate={createApplication}
       />
-    </main>
+
+      <style>{`
+        .tk-page-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; margin-bottom: 26px; flex-wrap: wrap; }
+        .tk-tally { display: flex; gap: 12px; }
+        @media (max-width: 720px) { .tk-tally { display: none; } }
+      `}</style>
+    </div>
   );
 }

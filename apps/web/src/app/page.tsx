@@ -1,704 +1,348 @@
-"use client";
-
-import { useState } from "react";
-import { AnimatePresence, motion, type Variants } from "framer-motion";
 import Link from "next/link";
-import ThemeToggle from "@/components/theme/ThemeToggle";
+import InkLayer from "@/components/ink/InkLayer";
+import InkGauge from "@/components/ink/InkGauge";
 
-const navLinks = [
-  { label: "Product", href: "#features" },
-  { label: "Workflow", href: "#workflow" },
-  { label: "Proof", href: "#proof" },
-  { label: "Pricing", href: "#pricing" },
-  { label: "Tracker", href: "/tracker" },
-];
-
-const integrations = ["GitHub", "LinkedIn", "Resume PDF", "LeetCode", "Codeforces", "Job Description"];
-
-const proofPoints = [
-  { value: "94%", label: "average ATS compatibility after tailoring" },
-  { value: "11 min", label: "from raw profiles to polished resume" },
-  { value: "3.8x", label: "more role-specific keywords in experience bullets" },
-];
-
-const workflow = [
-  {
-    eyebrow: "01",
-    title: "Ingest actual proof",
-    body: "Pulls public repos, profile history, old resume content, and competitive programming signals without making you rewrite everything manually.",
-  },
-  {
-    eyebrow: "02",
-    title: "Score against the role",
-    body: "Compares the job description against projects, experience, tools, seniority, and gaps before deciding what deserves resume space.",
-  },
-  {
-    eyebrow: "03",
-    title: "Ship a tight resume",
-    body: "Writes quantified bullets, trims duplicate projects, and keeps the final output structured for ATS parsing and recruiter scanning.",
-  },
-];
-
-const features = [
-  "Role-specific experience bullets",
-  "GitHub project evidence extraction",
-  "ATS simulation with parser checks",
-  "One-page resume trimming",
-  "Application tracker and nudges",
-  "Interview prep from job context",
-];
-
-const featureTabs = [
-  {
-    title: "AI bullet writer",
-    description:
-      "Turns raw experience into specific, quantified bullets that read like real engineering work.",
-    preview: "bullets",
-  },
-  {
-    title: "GitHub project importer",
-    description:
-      "Finds strong repos, languages, stars, READMEs, and project evidence instead of dumping everything.",
-    preview: "github",
-  },
-  {
-    title: "LeetCode stats sync",
-    description:
-      "Adds competitive programming signal only when it helps the role and page budget.",
-    preview: "leetcode",
-  },
-  {
-    title: "JD tailor",
-    description:
-      "Maps keywords and required skills into experience bullets without keyword stuffing.",
-    preview: "jd",
-  },
-  {
-    title: "ATS score checker",
-    description:
-      "Runs parser, keyword, date, section, and formatting checks before download.",
-    preview: "ats",
-  },
-] as const;
-
-const fadeUp: Variants = {
-  hidden: { opacity: 0, y: 22 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.55, ease: "easeOut" },
-  },
-};
-
-const stagger: Variants = {
-  hidden: {},
-  visible: {
-    transition: { staggerChildren: 0.08 },
-  },
-};
-
-function PrimaryCTA({ children, href }: { children: React.ReactNode; href: string }) {
-  const className =
-    "inline-flex h-10 items-center justify-center rounded-lg bg-[var(--accent)] px-5 text-sm font-semibold text-[var(--accent-contrast)] transition hover:bg-[var(--accent-hover)]";
-
-  if (href.startsWith("/")) {
-    return (
-      <Link href={href} className={className}>
-        {children}
-      </Link>
-    );
-  }
-
+export default function LandingPage() {
   return (
-    <a
-      href={href}
-      className={className}
-    >
-      {children}
-    </a>
-  );
-}
+    <>
+      <style>{LANDING_CSS}</style>
+      <InkLayer />
 
-function SecondaryCTA({ children, href }: { children: React.ReactNode; href: string }) {
-  const className =
-    "inline-flex h-10 items-center justify-center rounded-lg border border-border bg-surface-raised px-5 text-sm font-semibold text-foreground transition hover:border-[var(--border-strong)] hover:bg-surface-muted";
-
-  if (href.startsWith("/")) {
-    return (
-      <Link href={href} className={className}>
-        {children}
-      </Link>
-    );
-  }
-
-  return (
-    <a
-      href={href}
-      className={className}
-    >
-      {children}
-    </a>
-  );
-}
-
-function GridOverlay() {
-  const gridColor = "color-mix(in srgb, var(--foreground) 8%, transparent)";
-
-  return (
-    <div
-      aria-hidden="true"
-      className="pointer-events-none absolute inset-0 opacity-70"
-      style={{
-        backgroundImage:
-          `linear-gradient(to right, ${gridColor} 1px, transparent 1px), linear-gradient(to bottom, ${gridColor} 1px, transparent 1px)`,
-        backgroundSize: "64px 64px",
-        maskImage: "linear-gradient(to bottom, black, transparent 72%)",
-      }}
-    />
-  );
-}
-
-function FeaturePreview({ preview }: { preview: (typeof featureTabs)[number]["preview"] }) {
-  if (preview === "github") {
-    const repos = [
-      { repo: "resume-agent", lang: "TypeScript", stars: 128 },
-      { repo: "ats-simulator", lang: "Python", stars: 74 },
-      { repo: "latex-renderer", lang: "Go", stars: 39 },
-    ];
-
-    return (
-      <div className="space-y-3 text-xs">
-        <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-zinc-500">
-          Imported from GitHub
-        </div>
-        {repos.map((item, index) => (
-          <motion.div
-            key={item.repo}
-            initial={{ opacity: 0, x: -10 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: index * 0.08 }}
-            className="flex items-center justify-between rounded-xl border border-white/10 bg-white/[0.04] p-3"
-          >
-            <div>
-              <div className="font-medium text-white">/{item.repo}</div>
-              <div className="mt-1 text-zinc-500">{item.lang}</div>
-            </div>
-            <div className="rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-zinc-300">
-              {item.stars} stars
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    );
-  }
-
-  if (preview === "leetcode") {
-    const bars = [42, 68, 54, 76, 88, 61, 94, 72, 84, 58, 91, 79];
-
-    return (
-      <div className="space-y-5 text-xs">
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { label: "Solved", value: "847" },
-            { label: "Rating", value: "1,923" },
-            { label: "Hard", value: "112" },
-          ].map((stat) => (
-            <div key={stat.label} className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-center">
-              <div className="text-2xl font-bold tracking-tighter text-[var(--accent)]">{stat.value}</div>
-              <div className="mt-1 text-zinc-500">{stat.label}</div>
-            </div>
-          ))}
-        </div>
-        <div className="flex h-28 items-end gap-1.5 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
-          {bars.map((height, index) => (
-            <motion.div
-              key={`${height}-${index}`}
-              initial={{ height: 0 }}
-              animate={{ height: `${height}%` }}
-              transition={{ delay: index * 0.04, duration: 0.45 }}
-              className="flex-1 rounded-t-sm bg-[var(--accent)]"
-            />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (preview === "jd") {
-    return (
-      <div className="space-y-4 text-xs">
-        <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-          <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-zinc-500">
-            Job description
+      {/* ---------- NAV ---------- */}
+      <nav className="lp-nav">
+        <div className="lp-nav-inner">
+          <div className="lp-brand">
+            <b>ResumeAI<span className="lp-dot">.</span></b>
+            <small>resume studio</small>
           </div>
-          <p className="mt-3 leading-6 text-zinc-300">
-            Senior backend engineer with Python, PostgreSQL, AWS, distributed systems, and
-            production ownership.
-          </p>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {["Python", "PostgreSQL", "AWS", "Redis", "distributed systems"].map((keyword) => (
-            <span key={keyword} className="rounded-full border border-white/10 bg-white/[0.05] px-3 py-1.5 text-zinc-200">
-              {keyword}
-            </span>
-          ))}
-        </div>
-        <div className="rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-zinc-400">
-          Rewrites experience bullets first. Skills-only keyword matches are deprioritized.
-        </div>
-      </div>
-    );
-  }
-
-  if (preview === "ats") {
-    const checks = [
-      { label: "Parser compatibility", score: 96 },
-      { label: "Keyword location", score: 91 },
-      { label: "Section headings", score: 100 },
-      { label: "Page length", score: 88 },
-    ];
-
-    return (
-      <div className="space-y-4 text-xs">
-        <div className="flex items-end justify-between">
-          <div>
-            <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-zinc-500">
-              ATS score
-            </div>
-            <div className="mt-2 text-zinc-400">Workday, Greenhouse, Lever, iCIMS</div>
-          </div>
-          <div className="text-5xl font-bold tracking-tighter text-[var(--accent)]">94</div>
-        </div>
-        <div className="space-y-3">
-          {checks.map((check) => (
-            <div key={check.label}>
-              <div className="mb-1.5 flex justify-between text-zinc-400">
-                <span>{check.label}</span>
-                <span className="text-zinc-200">{check.score}%</span>
-              </div>
-              <div className="h-1.5 overflow-hidden rounded-full bg-white/10">
-                <motion.div
-                  initial={{ width: 0 }}
-                  animate={{ width: `${check.score}%` }}
-                  transition={{ duration: 0.6, ease: "easeOut" }}
-                  className="h-full rounded-full bg-[var(--accent)]"
-                />
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  const bullets = [
-    "Architected Redis-backed search cache reducing API latency 42% across 1.8M monthly requests.",
-    "Shipped AWS deployment pipeline cutting release time from 2 hours to 18 minutes.",
-    "Migrated PostgreSQL reporting jobs to async workers, improving dashboard freshness by 61%.",
-  ];
-
-  return (
-    <div className="space-y-4 text-xs">
-      <div className="font-mono text-[11px] uppercase tracking-[0.22em] text-zinc-500">
-        Writing experience bullets
-      </div>
-      {bullets.map((bullet, index) => (
-        <motion.div
-          key={bullet}
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ delay: index * 0.1 }}
-          className="flex gap-3 rounded-2xl border border-white/10 bg-white/[0.04] p-4 text-zinc-300"
-        >
-          <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-[var(--accent)]" />
-          <span className="leading-5">{bullet}</span>
-        </motion.div>
-      ))}
-    </div>
-  );
-}
-
-function InteractiveFeatureWindow() {
-  const [active, setActive] = useState(0);
-  const current = featureTabs[active];
-
-  return (
-    <section id="features" className="relative border-y border-white/10 bg-background py-28">
-      <GridOverlay />
-      <div className="relative z-10 mx-auto max-w-7xl px-6">
-        <div className="mx-auto max-w-3xl text-center">
-          <p className="text-xs font-medium uppercase tracking-[0.22em] text-zinc-500">
-            Product
-          </p>
-          <h2 className="mt-4 text-4xl font-semibold tracking-tighter text-white sm:text-6xl">
-            Explore the engine behind each resume.
-          </h2>
-          <p className="mt-5 text-base leading-7 text-zinc-400">
-            Pick a capability on the left. The preview window changes on the right with live product signals.
-          </p>
-        </div>
-
-        <div className="mt-16 grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
-          <div className="space-y-2">
-            {featureTabs.map((feature, index) => (
-              <button
-                key={feature.title}
-                type="button"
-                onClick={() => setActive(index)}
-                className={`group w-full rounded-2xl border p-5 text-left transition ${
-                  active === index
-                    ? "border-white/20 bg-white/[0.07] text-white"
-                    : "border-transparent bg-transparent text-zinc-500 hover:border-white/10 hover:bg-white/[0.03] hover:text-zinc-300"
-                }`}
-              >
-                <div className="flex items-start gap-4">
-                  <span className={`mt-1 font-mono text-xs ${active === index ? "text-white" : "text-zinc-600"}`}>
-                    0{index + 1}
-                  </span>
-                  <span>
-                    <span className="block text-base font-medium tracking-tight">{feature.title}</span>
-                    <span className={`mt-2 block text-sm leading-6 ${active === index ? "text-zinc-400" : "text-zinc-600"}`}>
-                      {feature.description}
-                    </span>
-                  </span>
-                </div>
-              </button>
-            ))}
-          </div>
-
-          <motion.div
-            layout
-            className="sticky top-28 overflow-hidden rounded-[2rem] border border-white/10 bg-white/[0.04] shadow-[0_40px_120px_rgba(0,0,0,0.65)] backdrop-blur-xl"
-          >
-            <div className="flex items-center justify-between border-b border-white/10 bg-white/[0.03] px-5 py-4">
-              <div className="flex items-center gap-2">
-                <span className="h-2.5 w-2.5 rounded-full bg-zinc-500" />
-                <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
-                <span className="h-2.5 w-2.5 rounded-full bg-zinc-800" />
-              </div>
-              <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
-                {current.title}
-              </span>
-            </div>
-            <div className="min-h-[360px] p-6 sm:p-8">
-              <AnimatePresence mode="wait">
-                <motion.div
-                  key={current.preview}
-                  initial={{ opacity: 0, y: 14 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -14 }}
-                  transition={{ duration: 0.24, ease: "easeOut" }}
-                >
-                  <FeaturePreview preview={current.preview} />
-                </motion.div>
-              </AnimatePresence>
-            </div>
-          </motion.div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function ResumeMockup() {
-  const bullets = [
-    "Reduced API latency 42% by redesigning Redis-backed request caching for high-volume search endpoints.",
-    "Shipped Docker and AWS deployment flow cutting release time from 2 hours to 18 minutes.",
-    "Built PostgreSQL analytics layer processing 1.8M events with role-specific ATS keywords.",
-  ];
-
-  return (
-    <motion.div
-      variants={fadeUp}
-      className="relative mx-auto mt-16 w-full max-w-[560px] lg:mt-0"
-    >
-      <div className="absolute -inset-12 rounded-full bg-white/10 blur-[120px]" />
-      <div className="relative [perspective:1000px]">
-        <motion.div
-          animate={{ y: [0, -10, 0] }}
-          transition={{ duration: 6, ease: "easeInOut", repeat: Infinity }}
-          className="transform-gpu [transform:rotateX(10deg)_rotateY(-12deg)]"
-        >
-          <div className="rounded-[2rem] border border-white/10 bg-white/[0.04] p-3 shadow-[0_50px_160px_rgba(0,0,0,0.75)] backdrop-blur-xl">
-            <div className="overflow-hidden rounded-[1.5rem] border border-white/10 bg-zinc-950">
-              <div className="flex items-center justify-between border-b border-white/10 bg-white/[0.03] px-4 py-3">
-                <div className="flex items-center gap-2">
-                  <span className="h-2.5 w-2.5 rounded-full bg-zinc-600" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-zinc-700" />
-                  <span className="h-2.5 w-2.5 rounded-full bg-zinc-800" />
-                </div>
-                <span className="font-mono text-[10px] uppercase tracking-[0.22em] text-zinc-500">
-                  tailored_resume.pdf
-                </span>
-              </div>
-
-              <div className="grid gap-3 p-4 md:grid-cols-[1fr_170px]">
-                <div className="rounded-2xl bg-zinc-100 p-7 text-zinc-950 shadow-2xl">
-                  <div className="border-b border-zinc-300 pb-4 text-center">
-                    <div className="text-xl font-bold tracking-tight">Kunal Pratap Singh</div>
-                    <div className="mt-1 text-[10px] text-zinc-600">
-                      Backend Engineer | GitHub | LinkedIn | Bengaluru
-                    </div>
-                  </div>
-                  <div className="mt-5 space-y-4">
-                    <div>
-                      <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-900">
-                        Experience
-                      </div>
-                      <div className="mt-2 space-y-2">
-                        {bullets.map((bullet) => (
-                          <div key={bullet} className="flex gap-2 text-[10px] leading-4 text-zinc-700">
-                            <span className="mt-1 h-1 w-1 shrink-0 rounded-full bg-zinc-900" />
-                            <span>{bullet}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    <div>
-                      <div className="text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-900">
-                        Projects
-                      </div>
-                      <div className="mt-2 h-2 w-full rounded bg-zinc-300" />
-                      <div className="mt-2 h-2 w-4/5 rounded bg-zinc-300" />
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-3">
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-4 backdrop-blur-md">
-                    <div className="text-[10px] uppercase tracking-[0.22em] text-zinc-500">ATS score</div>
-                    <div className="mt-3 text-4xl font-bold tracking-tighter text-[var(--accent)]">94</div>
-                    <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-white/10">
-                      <div className="h-full w-[94%] rounded-full bg-[var(--accent)]" />
-                    </div>
-                  </div>
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-4 backdrop-blur-md">
-                    <div className="text-[10px] uppercase tracking-[0.22em] text-zinc-500">Evidence used</div>
-                    <div className="mt-3 space-y-2 text-xs text-zinc-300">
-                      <div>GitHub repos</div>
-                      <div>LinkedIn roles</div>
-                      <div>Existing resume</div>
-                    </div>
-                  </div>
-                  <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-4 backdrop-blur-md">
-                    <div className="text-[10px] uppercase tracking-[0.22em] text-zinc-500">Page fit</div>
-                    <div className="mt-3 text-sm font-medium text-white">1 page locked</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-      </div>
-    </motion.div>
-  );
-}
-
-export default function Home() {
-  return (
-    <div className="theme-adaptive min-h-screen bg-background text-foreground selection:bg-foreground selection:text-background">
-      <nav className="fixed inset-x-0 top-0 z-50 border-b border-border bg-surface/75 backdrop-blur-xl">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="flex h-6 w-6 items-center justify-center rounded-md border border-border bg-[var(--accent)] text-xs font-bold text-[var(--accent-contrast)]">
-              R
-            </span>
-            <span className="text-sm font-semibold tracking-tight text-foreground">ResumeAI</span>
-          </Link>
-          <div className="hidden items-center gap-7 md:flex">
-            {navLinks.map((link) => (
-              link.href.startsWith("/") ? (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  className="text-sm text-zinc-400 transition hover:text-white"
-                >
-                  {link.label}
-                </Link>
-              ) : (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  className="text-sm text-zinc-400 transition hover:text-white"
-                >
-                  {link.label}
-                </a>
-              )
-            ))}
-          </div>
-          <div className="flex items-center gap-3">
-            <ThemeToggle />
-            <Link href="/dashboard" className="hidden text-sm font-medium text-zinc-400 transition hover:text-white sm:block">
-              Sign in
-            </Link>
-            <PrimaryCTA href="/dashboard">Get started</PrimaryCTA>
+          <div className="lp-nav-links">
+            <a href="#how">How it works</a>
+            <a href="#sources">Sources</a>
+            <a href="#inside">Inside</a>
+            <Link href="/dashboard" className="btn btn-pen btn-sm">Start a draft</Link>
           </div>
         </div>
       </nav>
 
-      <main className="relative overflow-hidden">
-        <section className="relative min-h-screen overflow-hidden bg-background pt-32">
-          <GridOverlay />
-          <div className="pointer-events-none absolute left-1/2 top-0 h-[360px] w-[720px] -translate-x-1/2 rounded-full bg-white/5 blur-[120px]" />
-          <div className="pointer-events-none absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-background to-transparent" />
-
-          <div className="relative z-10 mx-auto grid max-w-7xl items-center gap-14 px-6 pb-24 lg:grid-cols-[0.95fr_1.05fr] lg:pb-32">
-            <motion.div variants={stagger} initial="hidden" animate="visible" className="max-w-3xl">
-              <motion.div
-                variants={fadeUp}
-                className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs font-medium text-zinc-300 backdrop-blur-md"
-              >
-                <span className="h-1.5 w-1.5 rounded-full bg-[var(--accent)]" />
-                Resume intelligence for software engineers
-              </motion.div>
-
-              <motion.h1
-                variants={fadeUp}
-                className="max-w-4xl text-5xl font-semibold tracking-tighter text-white sm:text-6xl lg:text-[82px] lg:leading-[0.9]"
-              >
-                Turn scattered proof into a resume that wins interviews.
-              </motion.h1>
-
-              <motion.p
-                variants={fadeUp}
-                className="mt-7 max-w-2xl text-base leading-7 text-zinc-400 sm:text-lg"
-              >
-                Connect GitHub, LinkedIn, LeetCode, and an existing resume. ResumeAI audits the evidence,
-                scores it against the job, and assembles a crisp ATS-ready resume without filler.
-              </motion.p>
-
-              <motion.div variants={fadeUp} className="mt-9 flex flex-col gap-3 sm:flex-row">
-                <PrimaryCTA href="/dashboard">Build my resume</PrimaryCTA>
-                <SecondaryCTA href="#product">See the product</SecondaryCTA>
-              </motion.div>
-
-              <motion.div variants={fadeUp} className="mt-10 grid max-w-xl grid-cols-3 gap-px overflow-hidden rounded-2xl border border-white/10 bg-white/10">
-                {proofPoints.map((point) => (
-                  <div key={point.value} className="bg-background/70 p-4 backdrop-blur-md">
-                    <div className="text-2xl font-bold tracking-tighter text-[var(--accent)]">{point.value}</div>
-                    <div className="mt-1 text-xs leading-5 text-zinc-500">{point.label}</div>
-                  </div>
-                ))}
-              </motion.div>
-            </motion.div>
-
-            <ResumeMockup />
-          </div>
-        </section>
-
-        <section id="product" className="relative border-y border-white/10 bg-surface py-20">
-          <div className="mx-auto max-w-7xl px-6">
-            <div className="mb-10 flex flex-col justify-between gap-6 lg:flex-row lg:items-end">
-              <div>
-                <p className="text-xs font-medium uppercase tracking-[0.22em] text-zinc-500">Integrations</p>
-                <h2 className="mt-3 max-w-2xl text-3xl font-semibold tracking-tighter text-white sm:text-5xl">
-                  Built around the evidence you already have.
-                </h2>
-              </div>
-              <p className="max-w-md text-sm leading-6 text-zinc-400">
-                No fake dashboards, no manual copy-paste maze. Every source becomes structured resume signal.
-              </p>
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
-              {integrations.map((item) => (
-                <motion.div
-                  key={item}
-                  whileHover={{ y: -3 }}
-                  className="rounded-2xl border border-white/10 bg-white/[0.05] p-5 backdrop-blur-md transition hover:bg-white/[0.08]"
-                >
-                  <div className="mb-8 h-8 w-8 rounded-lg border border-border bg-[var(--accent)]" />
-                  <div className="text-sm font-medium text-white">{item}</div>
-                  <div className="mt-2 text-xs leading-5 text-zinc-500">Parsed, scored, and deduped.</div>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <InteractiveFeatureWindow />
-
-        <section id="workflow" className="relative bg-background py-28">
-          <div className="mx-auto max-w-7xl px-6">
-            <div className="mx-auto max-w-3xl text-center">
-              <p className="text-xs font-medium uppercase tracking-[0.22em] text-zinc-500">Workflow</p>
-              <h2 className="mt-4 text-4xl font-semibold tracking-tighter text-white sm:text-6xl">
-                Agentic where it matters. Deterministic where it counts.
-              </h2>
-              <p className="mt-5 text-base leading-7 text-zinc-400">
-                The system separates judgment from formatting so your resume is specific, verifiable, and tight.
-              </p>
-            </div>
-
-            <div className="mt-16 grid gap-4 lg:grid-cols-3">
-              {workflow.map((step) => (
-                <motion.article
-                  key={step.title}
-                  variants={fadeUp}
-                  initial="hidden"
-                  whileInView="visible"
-                  viewport={{ once: true, margin: "-80px" }}
-                  className="rounded-[1.75rem] border border-white/10 bg-white/[0.04] p-7 backdrop-blur-md"
-                >
-                  <div className="text-xs font-medium text-zinc-500">{step.eyebrow}</div>
-                  <h3 className="mt-10 text-2xl font-semibold tracking-tight text-white">{step.title}</h3>
-                  <p className="mt-4 text-sm leading-6 text-zinc-400">{step.body}</p>
-                </motion.article>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        <section id="proof" className="relative overflow-hidden border-y border-white/10 bg-surface py-28">
-          <GridOverlay />
-          <div className="relative z-10 mx-auto grid max-w-7xl gap-12 px-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+      <main>
+        {/* ---------- HERO ---------- */}
+        <section className="lp-hero">
+          <div className="page-wrap lp-hero-grid">
             <div>
-              <p className="text-xs font-medium uppercase tracking-[0.22em] text-zinc-500">Quality bar</p>
-              <h2 className="mt-4 text-4xl font-semibold tracking-tighter text-white sm:text-6xl">
-                Designed to remove the generic resume smell.
-              </h2>
-              <p className="mt-5 max-w-xl text-base leading-7 text-zinc-400">
-                The output prioritizes experience, validates company context, removes duplicate projects,
-                and keeps the final resume within the page budget.
+              <span className="eyebrow">for students &amp; job seekers — not recruiters with budgets</span>
+              <h1 className="lp-h1">
+                Scattered wins, into a resume that{" "}
+                <span className="lp-u" data-mark="circle" data-color="pen">lands</span>.
+              </h1>
+              <p className="lp-lede">
+                Pull from GitHub, LeetCode, or your old PDF. We mark up every weak bullet,
+                flag what the ATS bots choke on, and hand you a clean draft — like a mentor
+                who actually picks up the red pen.
               </p>
+              <div className="lp-cta-row">
+                <Link href="/dashboard" className="btn btn-pen">Start a draft <span aria-hidden="true">→</span></Link>
+                <a href="#how" className="btn btn-ghost" data-mark="underline" data-color="ink">See how it reads</a>
+              </div>
+              <div className="lp-proof">
+                <div className="lp-stat"><div className="lp-n">3&nbsp;min</div><div className="lp-l">from messy notes to a first draft</div></div>
+                <div className="lp-stat"><div className="lp-n" style={{ color: "var(--pen)" }}>0</div><div className="lp-l">templates that look like everyone else&apos;s</div></div>
+                <div className="lp-stat"><div className="lp-n">92<span style={{ fontSize: 18 }}>/100</span></div><div className="lp-l">median ATS score after a pass</div></div>
+              </div>
             </div>
 
-            <div className="grid gap-3 sm:grid-cols-2">
-              {features.map((feature) => (
-                <div
-                  key={feature}
-                  className="rounded-2xl border border-white/10 bg-white/[0.05] p-5 text-sm font-medium text-zinc-200 backdrop-blur-md"
-                >
-                  <div className="mb-7 h-1 w-10 rounded-full bg-[var(--accent)]" />
-                  {feature}
+            {/* collage of pinned artifacts */}
+            <div className="lp-collage">
+              <div className="lp-piece lp-scrap">
+                <div className="eyebrow" style={{ marginBottom: 8 }}>your stuff, everywhere</div>
+                <div className="lp-src"><i style={{ background: "var(--ink)" }} />github.com/you · 41 repos</div>
+                <div className="lp-src"><i style={{ background: "var(--marigold)" }} />leetcode · 380 solved</div>
+                <div className="lp-src"><i style={{ background: "var(--pen)" }} />codeforces · 1640</div>
+                <div className="lp-src"><i style={{ background: "var(--ink-blue)" }} />resume_final_v7.pdf</div>
+              </div>
+
+              <div className="lp-piece ink-card lp-bullet-card" data-frame>
+                <span className="tab lp-bullet-tab">editor · bullet</span>
+                <div className="lp-bullet-old" data-mark="strike" data-color="pen">
+                  Worked on a website for a college club using React.
                 </div>
-              ))}
+                <div className="hand" style={{ fontSize: 15, marginTop: 8 }} data-mark="arrow" data-arrow-to="lp-bullet-new">
+                  weak — what changed?
+                </div>
+                <div className="lp-bullet-new" id="lp-bullet-new">
+                  Shipped a <b>club portal</b> in React used by <b>600+ members</b>, cutting event sign-up time by 70%.
+                </div>
+              </div>
+
+              <div className="lp-piece sticky lp-score">
+                <div className="tape" />
+                <div className="lp-score-big">92</div>
+                <div className="lp-score-lbl">ATS pass</div>
+              </div>
             </div>
           </div>
         </section>
 
-        <section id="pricing" className="bg-background py-28">
-          <div className="mx-auto max-w-4xl px-6 text-center">
-            <p className="text-xs font-medium uppercase tracking-[0.22em] text-zinc-500">Start</p>
-            <h2 className="mt-4 text-4xl font-semibold tracking-tighter text-white sm:text-6xl">
-              Build the resume before the opportunity gets cold.
-            </h2>
-            <p className="mx-auto mt-5 max-w-2xl text-base leading-7 text-zinc-400">
-              Start with your existing proof. Tailor for a role. Download a clean resume built for ATS and recruiters.
-            </p>
-            <div className="mt-9 flex justify-center">
-              <PrimaryCTA href="/dashboard">Create a resume</PrimaryCTA>
+        {/* ---------- SOURCES ---------- */}
+        <section className="section" id="sources">
+          <div className="page-wrap">
+            <div className="section-head">
+              <span className="eyebrow">connect what you&apos;ve already done</span>
+              <h2>You&apos;ve been building a resume for years.<br />It&apos;s just scattered across ten tabs.</h2>
+              <p>Point us at where your work already lives. We read it, pull the evidence,
+                and lay it out on one page so nothing good gets forgotten.</p>
+            </div>
+            <div className="lp-board">
+              <div className="ink-card lp-src-card r1"><span className="tab">code</span><h4>GitHub</h4><p>repos, stars, the languages you actually ship in</p></div>
+              <div className="ink-card lp-src-card r2"><span className="tab">practice</span><h4>LeetCode</h4><p>problems solved, contest rating, streaks</p></div>
+              <div className="ink-card--ink lp-src-card center"><h4>Your draft</h4><p>everything, on one page</p></div>
+              <div className="ink-card lp-src-card r3"><span className="tab">competitive</span><h4>Codeforces</h4><p>rating, divisions, rounds played</p></div>
+              <div className="ink-card lp-src-card r4"><span className="tab">history</span><h4>Old PDF / DOCX</h4><p>we read your last resume and keep what worked</p></div>
+              <div className="hand lp-board-note">all of it,<br />in one place ↑</div>
             </div>
           </div>
         </section>
+
+        {/* ---------- HOW IT WORKS ---------- */}
+        <section className="section" id="how">
+          <div className="page-wrap">
+            <div className="section-head">
+              <span className="eyebrow">three steps, in order</span>
+              <h2>Connect. Mark up. Send.</h2>
+            </div>
+            <div className="lp-flow">
+              <div className="lp-step">
+                <div className="lp-num" id="flow-1">01</div>
+                <h3>Connect</h3>
+                <p>Drop in a link or upload your old resume. We read your real work instead of asking you to type it all again.</p>
+                <div className="hand lp-note">drag your messy notes here →</div>
+              </div>
+              <div className="lp-step">
+                <div className="lp-num" id="flow-2">02</div>
+                <h3>Mark up</h3>
+                <p>We rewrite vague bullets into specifics, flag the lines ATS bots silently drop, and show you exactly what changed and why.</p>
+                <div className="hand hand-blue lp-note">this is the part a friend can&apos;t do at 2am</div>
+              </div>
+              <div className="lp-step">
+                <div className="lp-num" id="flow-3">03</div>
+                <h3>Send</h3>
+                <p>Export a clean, real-LaTeX PDF and track every application — so you follow up before the trail goes cold.</p>
+                <div className="hand lp-note">then go get it.</div>
+              </div>
+            </div>
+            <span data-flow="flow-1>flow-2" hidden />
+            <span data-flow="flow-2>flow-3" hidden />
+          </div>
+        </section>
+
+        {/* ---------- INSIDE THE APP ---------- */}
+        <section className="section" id="inside">
+          <div className="page-wrap">
+            <div className="section-head">
+              <span className="eyebrow">the same hand, on every screen</span>
+              <h2>It feels like working <span className="lp-u" data-mark="underline" data-color="pen">at a desk</span>, not in a dashboard.</h2>
+              <p>Here&apos;s the editor, the ATS check, and the tracker — the three places you&apos;ll actually spend time.</p>
+            </div>
+
+            <div className="lp-surfaces">
+              <div className="surf" data-frame>
+                <span className="surf-label">editor — rewrite a bullet</span>
+                <div className="lp-rw">
+                  <span className="lp-old" data-mark="strike" data-color="ink">Responsible for managing social media accounts.</span>
+                  <span className="lp-arrow-line">↓ tightened · added a number · active voice</span>
+                  <span className="lp-new">Grew the club&apos;s Instagram from <b>0 to 4.2k</b> in one semester with a weekly post calendar.</span>
+                  <div className="lp-tone">
+                    <span className="chip chip--on">concise</span>
+                    <span className="chip">impact</span>
+                    <span className="chip">tailor to JD</span>
+                    <span className="chip">soften</span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="surf" data-frame>
+                <span className="surf-label">ATS check — readability for the bots</span>
+                <div className="lp-gauge-wrap">
+                  <InkGauge value={92} size={120} />
+                  <div>
+                    <div className="lp-pct">92</div>
+                    <div className="lp-pl">of 100 · strong</div>
+                  </div>
+                </div>
+                <div className="lp-rules">
+                  <div className="lp-rule ok"><span className="m">✓</span> Single column — parses cleanly</div>
+                  <div className="lp-rule ok"><span className="m">✓</span> Standard section headings</div>
+                  <div className="lp-rule no"><span className="m">✕</span> Skill &quot;K8s&quot; not in job description</div>
+                  <div className="lp-rule ok"><span className="m">✓</span> No text trapped in images</div>
+                </div>
+              </div>
+            </div>
+
+            <div className="surf lp-tracker" data-frame>
+              <span className="surf-label">tracker — every application, pinned where you can see it</span>
+              <div className="lp-cork">
+                <div className="lp-col">
+                  <h5>Applied · 6</h5>
+                  <div className="lp-app s1"><span className="pin" /><div className="lp-co">Ramp</div><div className="lp-ro">New Grad SWE · 4d ago</div></div>
+                  <div className="lp-app s2"><span className="pin" /><div className="lp-co">Linear</div><div className="lp-ro">Frontend Intern · 6d ago</div><div className="hand hand-blue" style={{ fontSize: 16, marginTop: 6 }}>follow up today ↩</div></div>
+                </div>
+                <div className="lp-col">
+                  <h5>Interview · 2</h5>
+                  <div className="lp-app s3"><span className="pin" /><div className="lp-co">Vercel</div><div className="lp-ro">Phone screen · Fri 2pm</div></div>
+                  <div className="lp-app s1"><span className="pin" /><div className="lp-co">Notion</div><div className="lp-ro">Onsite · prep ready</div></div>
+                </div>
+                <div className="lp-col">
+                  <h5>Offer · 1</h5>
+                  <div className="lp-app offer s2"><span className="pin" /><div className="lp-co">Figma</div><div className="lp-ro">Product Eng · compare?</div></div>
+                  <div className="hand" style={{ marginTop: 10, fontSize: 18 }}>you did it 🎉</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ---------- CTA ---------- */}
+        <section className="section">
+          <div className="page-wrap">
+            <div className="lp-cta" data-frame data-frame-color="paper">
+              <h2>Stop formatting.<br />Start <span className="lp-u" data-mark="underline" data-color="marigold">applying</span>.</h2>
+              <p>// free to draft · export when it&apos;s ready · no account wall</p>
+              <Link href="/dashboard" className="btn btn-pen">Start a draft <span aria-hidden="true">→</span></Link>
+            </div>
+          </div>
+        </section>
+
+        {/* ---------- FOOTER ---------- */}
+        <footer className="lp-footer">
+          <div className="page-wrap lp-foot-inner">
+            <div className="lp-foot-l">
+              <b>ResumeAI<span style={{ color: "var(--pen)" }}>.</span></b>
+              <p>A resume studio for the people doing the applying. Built for the job hunt, not for a pitch deck.</p>
+            </div>
+            <div className="lp-foot-cols">
+              <div><span className="lp-h">product</span><Link href="/dashboard">Editor</Link><a href="#inside">ATS check</a><Link href="/tracker">Tracker</Link></div>
+              <div><span className="lp-h">sources</span><a href="#sources">GitHub</a><a href="#sources">LeetCode</a><a href="#sources">Upload</a></div>
+              <div><span className="lp-h">company</span><a href="#">About</a><a href="#">Privacy</a><a href="#">Contact</a></div>
+            </div>
+          </div>
+        </footer>
       </main>
-
-      <footer className="border-t border-white/10 bg-background px-6 py-8">
-        <div className="mx-auto flex max-w-7xl flex-col justify-between gap-4 text-sm text-zinc-500 sm:flex-row">
-          <span>ResumeAI</span>
-          <span>Built for engineers who need signal, not decoration.</span>
-        </div>
-      </footer>
-    </div>
+    </>
   );
 }
+
+const LANDING_CSS = `
+.lp-nav{position:relative;z-index:6;}
+.lp-nav-inner{display:flex;align-items:center;justify-content:space-between;padding:26px 28px 0;max-width:1180px;margin:0 auto;}
+.lp-brand{display:flex;align-items:baseline;gap:9px;}
+.lp-brand b{font-family:var(--font-bricolage),sans-serif;font-weight:800;font-size:24px;letter-spacing:-.02em;}
+.lp-dot{color:var(--pen);}
+.lp-brand small{font-family:var(--font-spline-mono),monospace;font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--ink-soft);}
+.lp-nav-links{display:flex;align-items:center;gap:30px;}
+.lp-nav-links a:not(.btn){font-family:var(--font-spline-mono),monospace;font-size:13px;color:var(--ink);text-decoration:none;}
+.lp-nav-links a:not(.btn):hover{color:var(--pen);}
+
+.lp-hero{padding:56px 0 40px;position:relative;}
+.lp-hero-grid{display:grid;grid-template-columns:1.05fr .95fr;gap:30px;align-items:start;}
+.lp-h1{font-family:var(--font-bricolage),sans-serif;font-weight:800;font-size:clamp(40px,6.2vw,76px);line-height:.98;letter-spacing:-.03em;max-width:13ch;margin-top:18px;}
+.lp-u{position:relative;white-space:nowrap;}
+.lp-lede{font-size:19px;line-height:1.5;color:#36322a;max-width:46ch;margin-top:26px;}
+.lp-cta-row{display:flex;align-items:center;gap:22px;margin-top:34px;flex-wrap:wrap;}
+.lp-proof{margin-top:30px;display:flex;gap:26px;align-items:flex-start;flex-wrap:wrap;}
+.lp-n{font-family:var(--font-bricolage),sans-serif;font-weight:800;font-size:30px;line-height:1;}
+.lp-l{font-family:var(--font-spline-mono),monospace;font-size:11px;letter-spacing:.08em;color:var(--ink-soft);text-transform:uppercase;margin-top:7px;max-width:15ch;}
+
+.lp-collage{position:relative;min-height:500px;}
+.lp-piece{position:absolute;}
+.lp-bullet-card{width:328px;top:0;right:0;transform:rotate(1.4deg);}
+.lp-bullet-tab{position:absolute;top:-14px;left:18px;transform:rotate(-1.4deg);}
+.lp-bullet-old{color:var(--ink-soft);font-size:14.5px;line-height:1.5;display:inline-block;}
+.lp-bullet-new{font-size:15px;line-height:1.5;font-weight:600;margin-top:14px;}
+.lp-bullet-new b{background:linear-gradient(transparent 62%, rgba(242,168,29,.7) 62%);}
+.lp-score{width:152px;top:312px;right:28px;transform:rotate(-3.5deg);text-align:center;}
+.lp-score-big{font-family:var(--font-bricolage),sans-serif;font-weight:800;font-size:46px;line-height:1;}
+.lp-score-lbl{font-family:var(--font-spline-mono),monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;margin-top:4px;}
+.lp-scrap{width:206px;top:232px;left:-8px;transform:rotate(-2deg);background:var(--sheet);padding:14px 16px;box-shadow:2px 4px 0 rgba(33,30,24,.10),8px 14px 20px rgba(33,30,24,.10);}
+.lp-src{display:flex;align-items:center;gap:9px;font-family:var(--font-spline-mono),monospace;font-size:12.5px;padding:5px 0;color:#37332b;}
+.lp-src i{width:8px;height:8px;display:inline-block;flex:0 0 auto;}
+
+.lp-board{position:relative;display:grid;grid-template-columns:repeat(3,1fr);gap:26px 30px;align-items:center;}
+.lp-src-card{padding:18px 20px;}
+.lp-src-card .tab{position:absolute;top:-13px;left:16px;}
+.lp-src-card h4{font-size:18px;font-weight:700;margin:8px 0 5px;letter-spacing:-.01em;}
+.lp-src-card p{font-family:var(--font-spline-mono),monospace;font-size:12px;color:var(--ink-soft);line-height:1.5;}
+.lp-src-card.r1{transform:rotate(-1.5deg);}
+.lp-src-card.r2{transform:rotate(1.2deg);}
+.lp-src-card.r3{transform:rotate(-.8deg);}
+.lp-src-card.r4{transform:rotate(1.6deg);}
+.lp-src-card.center{text-align:center;transform:rotate(.5deg);padding:26px 20px;box-shadow:3px 4px 0 rgba(33,30,24,.16),10px 16px 24px rgba(33,30,24,.12);}
+.lp-src-card.center h4{color:#fff;font-size:21px;}
+.lp-src-card.center p{color:#bdb9ac;}
+.lp-board-note{font-size:19px;grid-column:3;text-align:center;transform:rotate(-3deg);}
+
+.lp-flow{display:grid;grid-template-columns:repeat(3,1fr);gap:40px;position:relative;}
+.lp-step{position:relative;padding-top:18px;}
+.lp-num{font-family:var(--font-bricolage),sans-serif;font-weight:800;font-size:15px;color:#fff;background:var(--pen);width:38px;height:38px;display:grid;place-items:center;box-shadow:2px 3px 0 var(--ink);}
+.lp-step h3{font-size:23px;font-weight:700;margin:20px 0 10px;letter-spacing:-.01em;}
+.lp-step p{font-size:15.5px;line-height:1.55;color:#3a362d;}
+.lp-note{margin-top:14px;font-size:15px;}
+
+.lp-surfaces{display:grid;grid-template-columns:1.1fr .9fr;gap:30px;}
+.lp-rw{font-size:15.5px;line-height:1.55;}
+.lp-old{color:var(--ink-soft);display:inline;}
+.lp-arrow-line{font-family:var(--font-spline-mono),monospace;font-size:12px;color:var(--pen);margin:14px 0;display:block;letter-spacing:.05em;}
+.lp-new{font-weight:600;}
+.lp-new b{color:var(--pen);}
+.lp-tone{margin-top:18px;display:flex;gap:8px;flex-wrap:wrap;}
+.lp-gauge-wrap{display:flex;gap:22px;align-items:center;}
+.lp-pct{font-family:var(--font-bricolage),sans-serif;font-weight:800;font-size:44px;line-height:1;}
+.lp-pl{font-family:var(--font-spline-mono),monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft);margin-top:4px;}
+.lp-rules{margin-top:20px;display:grid;gap:9px;}
+.lp-rule{display:flex;align-items:center;gap:11px;font-size:14px;}
+.lp-rule .m{font-family:var(--font-spline-mono),monospace;font-weight:600;width:18px;}
+.lp-rule.ok .m{color:#1f7a3f;}
+.lp-rule.no .m{color:var(--pen);}
+.lp-rule.no{color:var(--ink-soft);}
+
+.lp-tracker{margin-top:30px;}
+.lp-cork{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;}
+.lp-col h5{font-family:var(--font-spline-mono),monospace;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:14px;border-bottom:1.5px dashed var(--ink-soft);padding-bottom:8px;}
+.lp-app{background:var(--sheet);padding:14px 15px;margin-bottom:16px;position:relative;box-shadow:2px 3px 0 rgba(33,30,24,.10),6px 10px 16px rgba(33,30,24,.08);}
+.lp-app.s1{transform:rotate(-1.2deg);}
+.lp-app.s2{transform:rotate(.9deg);}
+.lp-app.s3{transform:rotate(-.6deg);}
+.lp-app.offer{background:var(--marigold);}
+.lp-co{font-weight:700;font-size:16px;letter-spacing:-.01em;}
+.lp-ro{font-family:var(--font-spline-mono),monospace;font-size:11.5px;color:var(--ink-soft);margin-top:3px;}
+.lp-app .pin{top:-5px;right:12px;}
+
+.lp-cta{background:var(--ink);color:var(--paper);padding:64px 48px;position:relative;box-shadow:5px 7px 0 rgba(33,30,24,.18);}
+.lp-cta h2{font-family:var(--font-bricolage),sans-serif;font-weight:800;font-size:clamp(30px,4.4vw,52px);letter-spacing:-.025em;line-height:1;max-width:16ch;}
+.lp-cta p{font-family:var(--font-spline-mono),monospace;font-size:14px;color:#cfcbbe;margin-top:18px;letter-spacing:.03em;}
+.lp-cta .btn{margin-top:30px;box-shadow:3px 4px 0 var(--paper);}
+.lp-cta .btn:hover{box-shadow:5px 7px 0 var(--paper);}
+
+.lp-footer{padding:54px 0 70px;}
+.lp-foot-inner{display:flex;justify-content:space-between;align-items:flex-end;gap:30px;flex-wrap:wrap;border-top:1.5px solid var(--ink);padding-top:24px;}
+.lp-foot-l{max-width:40ch;}
+.lp-foot-l b{font-family:var(--font-bricolage),sans-serif;font-weight:800;font-size:20px;}
+.lp-foot-l p{font-family:var(--font-spline-mono),monospace;font-size:12px;color:var(--ink-soft);margin-top:8px;line-height:1.6;}
+.lp-foot-cols{display:flex;gap:48px;}
+.lp-foot-cols div{display:flex;flex-direction:column;gap:9px;}
+.lp-foot-cols a{font-family:var(--font-spline-mono),monospace;font-size:12.5px;color:var(--ink);text-decoration:none;}
+.lp-foot-cols a:hover{color:var(--pen);}
+.lp-foot-cols .lp-h{font-family:var(--font-spline-mono),monospace;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft);margin-bottom:3px;}
+
+@media(max-width:900px){
+  .lp-hero-grid{grid-template-columns:1fr;}
+  .lp-collage{min-height:520px;margin-top:20px;}
+  .lp-surfaces{grid-template-columns:1fr;}
+  .lp-board{grid-template-columns:repeat(2,1fr);}
+  .lp-flow{grid-template-columns:1fr;gap:30px;}
+  .lp-cork{grid-template-columns:1fr;}
+  .lp-nav-links a:not(.btn){display:none;}
+}
+@media(max-width:560px){
+  .lp-board{grid-template-columns:1fr;}
+  .lp-cta{padding:42px 26px;}
+}
+`;

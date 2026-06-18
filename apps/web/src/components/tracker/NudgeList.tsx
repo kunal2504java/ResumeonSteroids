@@ -3,66 +3,56 @@
 import Link from "next/link";
 import type { Nudge } from "@/types/tracker";
 
-interface Props {
+function priorityInk(priority: Nudge["priority"]) {
+  if (priority === "high") return "#e23b17";
+  if (priority === "medium") return "#b07a12";
+  return "#6b6557";
+}
+
+export function NudgeList({ nudges, onDismiss, onComplete }: {
   nudges: Nudge[];
   onDismiss: (id: string) => void;
   onComplete: (id: string) => void;
-}
-
-function priorityClass(priority: Nudge["priority"]) {
-  if (priority === "high") return "border-[#F97316] text-[#FDBA74]";
-  if (priority === "medium") return "border-[#EAB308] text-[#FDE68A]";
-  return "border-[#334155] text-[#A1A1AA]";
-}
-
-export function NudgeList({ nudges, onDismiss, onComplete }: Props) {
+}) {
   if (nudges.length === 0) {
     return (
-      <aside className="rounded-2xl border border-white/10 bg-zinc-900/30 p-5 shadow-[0_18px_60px_rgba(0,0,0,0.22)] backdrop-blur-md">
-        <h2 className="text-sm font-semibold text-white">Next actions</h2>
-        <p className="mt-3 text-sm leading-6 text-zinc-500">
-          You are on top of everything. Check back after the next tracker update.
+      <aside className="surf" data-frame>
+        <span className="surf-label">next actions</span>
+        <p className="hand" style={{ fontSize: 18 }}>you&apos;re on top of everything ✓</p>
+        <p style={{ marginTop: 8, fontSize: 14, color: "var(--ink-soft)", lineHeight: 1.6 }}>
+          Check back after the next tracker update.
         </p>
       </aside>
     );
   }
 
   return (
-    <aside className="overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/30 shadow-[0_18px_60px_rgba(0,0,0,0.22)] backdrop-blur-md">
-      <div className="border-b border-white/10 p-5">
-        <h2 className="text-sm font-semibold text-white">Next actions</h2>
-        <p className="mt-1 text-xs text-zinc-500">{nudges.length} active nudges</p>
+    <aside className="surf" data-frame style={{ padding: 0 }}>
+      <div style={{ padding: "20px 22px", borderBottom: "1.5px dashed var(--ink-soft)" }}>
+        <span className="surf-label" style={{ marginBottom: 4 }}>next actions</span>
+        <p className="mono" style={{ fontSize: 12, color: "var(--ink-soft)" }}>{nudges.length} on the list</p>
       </div>
-      <div className="divide-y divide-white/10">
-        {nudges.map((nudge) => (
-          <div key={nudge.id} className="p-5">
+      <div>
+        {nudges.map((nudge, i) => (
+          <div key={nudge.id} style={{ padding: "18px 22px", borderTop: i === 0 ? "none" : "1.5px solid var(--hairline)" }}>
             <div className="flex items-start justify-between gap-3">
-              <span className={`border px-2 py-1 text-[10px] uppercase tracking-[0.16em] ${priorityClass(nudge.priority)}`}>
+              <span className="mono" style={{ border: `1.5px solid ${priorityInk(nudge.priority)}`, color: priorityInk(nudge.priority), padding: "3px 8px", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.14em" }}>
                 {nudge.priority}
               </span>
-              <button
-                onClick={() => onDismiss(nudge.id)}
-                className="text-xs text-zinc-500 transition hover:text-white"
-              >
+              <button onClick={() => onDismiss(nudge.id)} className="mono" style={{ fontSize: 12, color: "var(--ink-soft)", cursor: "pointer" }}>
                 Dismiss
               </button>
             </div>
-            <h3 className="mt-3 text-sm font-medium text-white">{nudge.title}</h3>
-            <p className="mt-2 text-xs leading-5 text-zinc-500">{nudge.body}</p>
+            <h3 style={{ marginTop: 12, fontSize: 15, fontWeight: 700, letterSpacing: "-0.01em" }}>{nudge.title}</h3>
+            <p style={{ marginTop: 6, fontSize: 13.5, lineHeight: 1.5, color: "var(--ink-soft)" }}>{nudge.body}</p>
             {nudge.due_date && (
-              <p className="mt-3 text-[11px] text-zinc-600">Due {new Date(nudge.due_date).toLocaleDateString()}</p>
+              <p className="hand hand-blue" style={{ marginTop: 8, fontSize: 14 }}>due {new Date(nudge.due_date).toLocaleDateString()}</p>
             )}
             <div className="mt-4 flex gap-2">
-              <Link
-                href={`/tracker/${nudge.application_id}`}
-                className="flex-1 rounded-lg bg-[var(--accent)] px-3 py-2 text-center text-xs font-semibold text-black transition hover:brightness-95"
-              >
+              <Link href={`/tracker/${nudge.application_id}`} className="btn btn-pen btn-sm" style={{ flex: 1, justifyContent: "center" }}>
                 {nudge.action_label || "Open"}
               </Link>
-              <button
-                onClick={() => onComplete(nudge.id)}
-                className="rounded-lg border border-zinc-800 bg-zinc-900/30 px-3 py-2 text-xs text-zinc-300 transition hover:border-zinc-700 hover:text-white"
-              >
+              <button onClick={() => onComplete(nudge.id)} className="tk-mini" style={{ cursor: "pointer" }}>
                 Done
               </button>
             </div>

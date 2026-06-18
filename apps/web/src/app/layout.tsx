@@ -1,54 +1,40 @@
 import type { Metadata } from "next";
-import { DM_Sans, Inter, JetBrains_Mono } from "next/font/google";
+import { Bricolage_Grotesque, Spline_Sans_Mono, Shantell_Sans } from "next/font/google";
 import "./globals.css";
 
-const themeBootScript = `
-(() => {
-  try {
-    const stored = window.localStorage.getItem("resumeai-theme");
-    const theme = stored === "light" ? "light" : "dark";
-    const root = document.documentElement;
-    root.dataset.theme = theme;
-    root.classList.toggle("dark", theme === "dark");
-    root.style.colorScheme = theme;
-  } catch {
-    document.documentElement.dataset.theme = "dark";
-    document.documentElement.style.colorScheme = "dark";
-  }
-})();
-`;
-
-const inter = Inter({
-  variable: "--font-inter",
+// Display + UI — the wonky-modern backbone
+const bricolage = Bricolage_Grotesque({
+  variable: "--font-bricolage",
   subsets: ["latin"],
   display: "swap",
-  weight: ["400", "500", "600", "700", "800"],
 });
 
-const dmSans = DM_Sans({
-  variable: "--font-dm-sans",
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["400", "500", "600", "700"],
-});
-
-const jetbrains = JetBrains_Mono({
-  variable: "--font-jetbrains",
+// Data, labels, eyebrows — the "spec sheet" voice
+const splineMono = Spline_Sans_Mono({
+  variable: "--font-spline-mono",
   subsets: ["latin"],
   display: "swap",
   weight: ["400", "500", "600"],
 });
 
+// Handwritten marginalia only — kept sparing
+const shantell = Shantell_Sans({
+  variable: "--font-shantell",
+  subsets: ["latin"],
+  display: "swap",
+});
+
 export const metadata: Metadata = {
-  title: { default: "ResumeAI", template: "%s | ResumeAI" },
+  title: { default: "ResumeAI — a resume you'd pin to the wall", template: "%s | ResumeAI" },
   description:
-    "AI-powered resume builder. Connect GitHub, LeetCode, Codeforces — we write your resume in seconds.",
+    "A resume studio for students and job seekers. Pull from GitHub, LeetCode, or your old PDF — we mark up every bullet, fix what the ATS chokes on, and hand you a clean draft.",
   keywords: [
     "resume builder",
     "AI resume",
     "GitHub resume",
     "LeetCode resume",
-    "software engineer resume",
+    "ATS resume checker",
+    "student resume",
   ],
   authors: [{ name: "ResumeAI" }],
   openGraph: {
@@ -56,21 +42,19 @@ export const metadata: Metadata = {
     locale: "en_US",
     url: process.env.NEXT_PUBLIC_APP_URL,
     siteName: "ResumeAI",
-    title: "ResumeAI — Your resume, written by AI",
+    title: "ResumeAI — scattered wins, into a resume that lands",
     description:
-      "Connect GitHub, LeetCode, Codeforces. Upload your old resume. AI builds a job-winning resume in seconds.",
+      "Connect GitHub, LeetCode, Codeforces, or your old resume. We mark it up like a mentor with a red pen and get it past the ATS.",
     images: [{ url: "/og-image.png", width: 1200, height: 630 }],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ResumeAI — Your resume, written by AI",
-    description: "AI-powered resume builder for engineers.",
+    title: "ResumeAI — a resume studio for the job hunt",
+    description: "Mark up your resume like a mentor would. Built for students and job seekers.",
     images: ["/og-image.png"],
   },
   robots: { index: true, follow: true },
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"
-  ),
+  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
 };
 
 export default function RootLayout({
@@ -81,14 +65,16 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      data-theme="dark"
+      data-theme="paper"
       suppressHydrationWarning
-      className={`${inter.variable} ${dmSans.variable} ${jetbrains.variable} antialiased`}
+      className={`${bricolage.variable} ${splineMono.variable} ${shantell.variable} antialiased`}
     >
-      <head>
-        <script dangerouslySetInnerHTML={{ __html: themeBootScript }} />
-      </head>
-      <body className="min-h-screen">{children}</body>
+      <body className="min-h-screen">
+        {/* fixed background layers: engineering grid + paper grain */}
+        <div aria-hidden="true" className="paper-layer paper-grid" />
+        <div aria-hidden="true" className="paper-layer paper-grain" />
+        {children}
+      </body>
     </html>
   );
 }
