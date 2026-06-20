@@ -59,11 +59,11 @@ export default function Phase2_Inputs({
         animate={{ opacity: 1, y: 0 }}
         className="text-center mb-8"
       >
-        <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
+        <h1 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(26px,3.6vw,36px)", letterSpacing: "-0.02em", color: "var(--ink)", marginBottom: 8 }}>
           {title}
         </h1>
-        <p className="text-sm text-zinc-400">
-          Enter your details for each source.
+        <p className="hand hand-ink" style={{ fontSize: 16 }}>
+          drop in your details — we read the rest
         </p>
       </motion.div>
 
@@ -100,25 +100,14 @@ export default function Phase2_Inputs({
         transition={{ delay: 0.3 }}
         className="flex gap-3"
       >
-        <button
-          onClick={onBack}
-          className="px-6 py-3 rounded-xl text-sm text-zinc-400 border border-white/10 hover:text-white hover:border-white/20 transition-colors cursor-pointer"
-        >
-          &larr; Back
-        </button>
+        <button onClick={onBack} className="btn-mini">&larr; Back</button>
         <button
           onClick={onAnalyze}
           disabled={!canProceed}
-          className={`
-            flex-1 py-3 rounded-xl text-sm font-semibold transition-all
-            ${
-              canProceed
-                ? "bg-indigo-500 hover:bg-indigo-400 text-white shadow-lg shadow-indigo-500/20 cursor-pointer"
-                : "bg-white/5 text-zinc-600 cursor-not-allowed"
-            }
-          `}
+          className="btn btn-pen"
+          style={{ flex: 1, justifyContent: "center", ...(canProceed ? {} : { opacity: 0.45, cursor: "not-allowed", boxShadow: "none" }) }}
         >
-          Analyze my profiles &rarr;
+          Analyze my profiles <span aria-hidden="true">→</span>
         </button>
       </motion.div>
     </div>

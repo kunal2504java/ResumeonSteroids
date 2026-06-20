@@ -23,9 +23,7 @@ export default function PersonalInfo() {
 
   return (
     <div className="space-y-4 px-6 py-6">
-      <h3 className="mb-4 text-xs font-semibold uppercase tracking-[0.22em] text-zinc-400">
-        Personal Information
-      </h3>
+      <h3 className="ed-section-title mb-4">Personal Information</h3>
       {fields.map((f) => (
         <div key={f.key}>
           <label className="mb-1.5 block text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500">

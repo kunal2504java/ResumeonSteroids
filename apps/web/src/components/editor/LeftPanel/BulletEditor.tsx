@@ -9,23 +9,10 @@ interface BulletEditorProps {
   parentType: "experience" | "project";
 }
 
-const textareaClass =
-  "w-full resize-none rounded-xl border border-white/10 bg-white/[0.045] px-2.5 py-1.5 text-xs text-white shadow-inner shadow-black/40 outline-none backdrop-blur-md transition placeholder:text-zinc-600 focus:border-white/25 focus:bg-white/[0.07]";
-
-export default function BulletEditor({
-  bullets,
-  parentId,
-  parentType,
-}: BulletEditorProps) {
-  const addBullet = useResumeStore((s) =>
-    parentType === "experience" ? s.addBullet : s.addProjectBullet
-  );
-  const updateBullet = useResumeStore((s) =>
-    parentType === "experience" ? s.updateBullet : s.updateProjectBullet
-  );
-  const removeBullet = useResumeStore((s) =>
-    parentType === "experience" ? s.removeBullet : s.removeProjectBullet
-  );
+export default function BulletEditor({ bullets, parentId, parentType }: BulletEditorProps) {
+  const addBullet = useResumeStore((s) => (parentType === "experience" ? s.addBullet : s.addProjectBullet));
+  const updateBullet = useResumeStore((s) => (parentType === "experience" ? s.updateBullet : s.updateProjectBullet));
+  const removeBullet = useResumeStore((s) => (parentType === "experience" ? s.removeBullet : s.removeProjectBullet));
   const [rewritingIdx, setRewritingIdx] = useState<number | null>(null);
   const [streamText, setStreamText] = useState("");
   const addToast = useResumeStore((s) => s.addToast);
@@ -73,67 +60,42 @@ export default function BulletEditor({
   }
 
   return (
-    <div className="space-y-2">
+    <div className="mt-3 space-y-2">
       <div className="flex items-center justify-between">
-        <label className="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
-          Bullet Points
-        </label>
-        <button
-          onClick={() => addBullet(parentId)}
-          className="cursor-pointer rounded-full border border-white/10 bg-white/[0.04] px-2.5 py-1 text-[10px] text-zinc-300 transition hover:border-white/20 hover:text-white"
-        >
-          + Add bullet
-        </button>
+        <label className="text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500">Bullet points</label>
+        <button onClick={() => addBullet(parentId)} className="ed-add" style={{ fontSize: 11 }}>+ Add bullet</button>
       </div>
 
       {bullets.map((bullet, i) => (
         <div key={i} className="group relative">
           <div className="flex gap-2">
-            <span className="mt-2 shrink-0 font-mono text-[10px] text-zinc-500">
-              {i + 1}.
-            </span>
+            <span className="ed-index mt-2 shrink-0">{i + 1}.</span>
             <div className="flex-1">
               <textarea
                 value={rewritingIdx === i ? streamText || bullet : bullet}
                 onChange={(e) => updateBullet(parentId, i, e.target.value)}
                 readOnly={rewritingIdx === i}
-                placeholder="Describe your achievement..."
+                placeholder="Describe your achievement…"
                 rows={2}
-                className={textareaClass}
+                className="w-full resize-none px-2.5 py-1.5 text-xs outline-none"
               />
 
-              <div className="mt-1 flex items-center gap-1 opacity-0 transition-opacity group-hover:opacity-100">
+              <div className="mt-1 flex items-center gap-2 opacity-0 transition-opacity group-hover:opacity-100">
                 {rewritingIdx === i ? (
-                  <span className="animate-pulse text-[10px] text-zinc-300">
-                    Rewriting...
-                  </span>
+                  <span className="ed-index animate-pulse">Rewriting…</span>
                 ) : (
-                  <>
-                    {(
-                      [
-                        ["stronger", "Stronger"],
-                        ["metrics", "Add metrics"],
-                        ["concise", "Concise"],
-                        ["different", "Different"],
-                      ] as const
-                    ).map(([mode, label]) => (
-                      <button
-                        key={mode}
-                        onClick={() => handleRewrite(i, mode)}
-                        className="cursor-pointer rounded-full border border-white/10 bg-white/[0.04] px-2 py-0.5 text-[9px] text-zinc-300 transition-colors hover:border-white/20 hover:text-white"
-                      >
-                        {label}
-                      </button>
-                    ))}
-                  </>
+                  ([
+                    ["stronger", "Stronger"],
+                    ["metrics", "Add metrics"],
+                    ["concise", "Concise"],
+                    ["different", "Different"],
+                  ] as const).map(([mode, label]) => (
+                    <button key={mode} onClick={() => handleRewrite(i, mode)} className="ed-pill">
+                      {label}
+                    </button>
+                  ))
                 )}
-
-                <button
-                  onClick={() => removeBullet(parentId, i)}
-                  className="ml-auto cursor-pointer text-[9px] text-red-400/50 transition-colors hover:text-red-400"
-                >
-                  x
-                </button>
+                <button onClick={() => removeBullet(parentId, i)} className="ed-remove ml-auto">×</button>
               </div>
             </div>
           </div>

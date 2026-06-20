@@ -303,6 +303,48 @@
   .ed-panel textarea:focus { border-color: var(--pen) !important; }
 }
 
+/* ---- inner editors: entries as notebook margin rules, not boxes ---- */
+@layer components {
+  .ed-section-title {
+    font-family: var(--font-spline-mono), monospace; font-size: 11px; font-weight: 600;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--ink-soft);
+  }
+  .ed-entry {
+    position: relative; padding: 2px 0 16px 18px; margin-bottom: 14px;
+    border-left: 2px solid var(--hairline);
+  }
+  .ed-entry::before {
+    content: ""; position: absolute; left: -5px; top: 5px;
+    width: 8px; height: 8px; background: var(--pen);
+  }
+  .ed-index { font-family: var(--font-spline-mono), monospace; font-size: 10px; color: var(--ink-soft); }
+  .ed-add {
+    font-family: var(--font-spline-mono), monospace; font-size: 12px; color: var(--pen);
+    background: none; border: none; cursor: pointer; padding: 4px 0; letter-spacing: 0.02em;
+  }
+  .ed-add:hover { color: var(--pen-deep); text-decoration: underline; text-underline-offset: 3px; }
+  .ed-empty {
+    width: 100%; cursor: pointer; border: 2px dashed var(--ink-soft); background: transparent;
+    padding: 26px; color: var(--ink-soft); font-family: var(--font-bricolage), sans-serif; font-size: 14px;
+    transition: border-color 0.14s ease, color 0.14s ease;
+  }
+  .ed-empty:hover { border-color: var(--pen); color: var(--ink); }
+  .ed-pill {
+    font-family: var(--font-spline-mono), monospace; font-size: 10px; color: var(--ink-soft);
+    background: none; border: none; cursor: pointer; padding: 2px 4px; transition: color 0.12s ease;
+  }
+  .ed-pill:hover { color: var(--pen); }
+  .ed-tag {
+    display: inline-flex; align-items: center; font-family: var(--font-spline-mono), monospace;
+    font-size: 10px; color: #3a3120; background: var(--kraft); padding: 3px 8px; letter-spacing: 0.02em;
+  }
+  .ed-remove {
+    font-family: var(--font-spline-mono), monospace; font-size: 11px; color: var(--ink-soft);
+    background: none; border: none; cursor: pointer; transition: color 0.12s ease;
+  }
+  .ed-remove:hover { color: var(--pen); }
+}
+
 /* ---- paper form fields (baseline; component utilities still win) ---- */
 @layer base {
   input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
@@ -348,6 +390,14 @@
   }
   .text-\[\#6366f1\], .text-\[\#6366F1\], .text-\[\#818cf8\], .text-\[\#818CF8\] { color: var(--pen) !important; }
   .bg-\[\#6366f1\], .bg-\[\#6366F1\] { background-color: var(--pen) !important; }
+
+  /* indigo / electric-blue accents (connect flow) → red pen */
+  .text-indigo-300, .text-indigo-400, .text-indigo-500 { color: var(--pen) !important; }
+  .bg-indigo-400, .bg-indigo-500, .hover\:bg-indigo-400:hover { background-color: var(--pen) !important; }
+  .bg-indigo-500\/10, .bg-indigo-500\/15, .bg-indigo-500\/20 { background-color: rgba(226, 59, 23, 0.1) !important; }
+  .border-indigo-400, .border-indigo-500, .border-indigo-500\/20, .border-indigo-500\/30 { border-color: var(--pen) !important; }
+  .shadow-indigo-500\/10, .shadow-indigo-500\/20 { --tw-shadow-color: rgba(226, 59, 23, 0.18) !important; }
+  .ring-indigo-500, .ring-indigo-500\/20 { --tw-ring-color: var(--pen) !important; }
 
   /* amber notes (e.g. 2-page banner) → readable marigold on paper */
   .text-amber-100, .text-amber-200, .text-amber-300, .text-amber-100\/80 { color: #8a6410 !important; }

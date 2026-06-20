@@ -9,8 +9,7 @@ const categories = [
   { key: "databases", label: "Databases", placeholder: "PostgreSQL, MongoDB, Redis" },
 ];
 
-const inputClass =
-  "w-full rounded-xl border border-white/10 bg-white/[0.045] px-3 py-2 text-sm text-white shadow-inner shadow-black/40 outline-none backdrop-blur-md transition placeholder:text-zinc-600 focus:border-white/25 focus:bg-white/[0.07]";
+const labelClass = "mb-1 block text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500";
 
 export default function SkillsEditor() {
   const skills = useResumeStore((s) => s.resume?.skills);
@@ -22,52 +21,35 @@ export default function SkillsEditor() {
 
   return (
     <div className="space-y-5 px-6 py-6">
-      <h3 className="text-xs font-semibold uppercase tracking-[0.22em] text-zinc-400">
-        Technical Skills
-      </h3>
+      <h3 className="ed-section-title">Technical Skills</h3>
 
       {categories.map((cat) => (
         <div key={cat.key}>
-          <label className="mb-1 block text-[10px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
-            {cat.label}
-          </label>
+          <label className={labelClass}>{cat.label}</label>
           <input
             type="text"
             value={(skills as unknown as Record<string, string[]>)[cat.key]?.join(", ") || ""}
             onChange={(e) => {
-              const values = e.target.value
-                .split(",")
-                .map((s) => s.trim())
-                .filter(Boolean);
+              const values = e.target.value.split(",").map((s) => s.trim()).filter(Boolean);
               updateSkills(cat.key, values);
             }}
             placeholder={cat.placeholder}
-            className={inputClass}
+            className="w-full text-sm"
           />
-          <div className="flex flex-wrap gap-1 mt-1.5">
+          <div className="mt-2 flex flex-wrap gap-1.5">
             {(skills as unknown as Record<string, string[]>)[cat.key]?.map(
-              (skill, i) =>
-                skill && (
-                  <span
-                    key={i}
-                    className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/[0.06] px-2 py-0.5 text-[10px] text-zinc-300"
-                  >
-                    {skill}
-                  </span>
-                )
+              (skill, i) => skill && <span key={i} className="ed-tag">{skill}</span>,
             )}
           </div>
         </div>
       ))}
 
       {/* Achievements inline */}
-      <div className="border-t border-white/10 pt-4">
-        <h3 className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-zinc-400">
-          Achievements
-        </h3>
+      <div style={{ borderTop: "1.5px solid var(--hairline)", paddingTop: 18 }}>
+        <h3 className="ed-section-title mb-3">Achievements</h3>
         <div className="space-y-2">
           {achievements.map((a, i) => (
-            <div key={i} className="flex gap-2">
+            <div key={i} className="flex items-center gap-2">
               <input
                 type="text"
                 value={a}
@@ -76,23 +58,15 @@ export default function SkillsEditor() {
                   next[i] = e.target.value;
                   updateAchievements(next);
                 }}
-                placeholder="Achievement..."
-                className={`${inputClass} flex-1`}
+                placeholder="Achievement…"
+                className="w-full flex-1 text-sm"
               />
-              <button
-                onClick={() => {
-                  updateAchievements(achievements.filter((_, j) => j !== i));
-                }}
-                className="text-xs text-red-400/50 hover:text-red-400 px-2 cursor-pointer"
-              >
+              <button onClick={() => updateAchievements(achievements.filter((_, j) => j !== i))} className="ed-remove">
                 ×
               </button>
             </div>
           ))}
-          <button
-            onClick={() => updateAchievements([...achievements, ""])}
-            className="cursor-pointer rounded-full border border-white/10 bg-white/[0.04] px-3 py-1.5 text-xs text-zinc-300 transition hover:border-white/20 hover:text-white"
-          >
+          <button onClick={() => updateAchievements([...achievements, ""])} className="ed-add">
             + Add achievement
           </button>
         </div>
