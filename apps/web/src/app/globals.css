@@ -267,6 +267,40 @@
   }
   .ed-tab:hover { color: var(--ink); border-color: var(--hairline); }
   .ed-tab.is-active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+
+  /* toolbar text buttons (no boxes) */
+  .btn-tool {
+    font-family: var(--font-spline-mono), monospace; font-size: 12.5px; color: var(--ink-soft);
+    background: none; border: none; cursor: pointer; padding: 7px 4px; letter-spacing: 0.01em;
+    transition: color 0.12s ease; text-decoration: none; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-tool:hover { color: var(--pen); }
+  .btn-tool:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-tool:disabled:hover { color: var(--ink-soft); }
+}
+
+/* ---- editor form fields: write-on-the-line, not boxes ---- */
+@layer utilities {
+  .ed-panel input:where([type="text"], [type="email"], [type="url"], [type="tel"], [type="number"], :not([type])) {
+    border: 0 !important;
+    border-bottom: 1.6px solid var(--hairline) !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    padding: 7px 2px !important;
+    color: var(--ink) !important;
+    transition: border-color 0.14s ease, background 0.14s ease;
+  }
+  .ed-panel input:focus {
+    border-bottom-color: var(--pen) !important;
+    background: rgba(242, 168, 29, 0.09) !important;
+  }
+  .ed-panel textarea {
+    border: 1.6px solid var(--hairline) !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: var(--ink) !important;
+  }
+  .ed-panel textarea:focus { border-color: var(--pen) !important; }
 }
 
 /* ---- paper form fields (baseline; component utilities still win) ---- */
@@ -293,6 +327,10 @@
   .bg-black, .bg-zinc-950, .bg-zinc-900, .bg-zinc-900\/50, .bg-zinc-800, .bg-zinc-800\/50,
   .bg-\[\#0A0A0A\], .bg-\[\#0a0a0a\], .bg-\[\#121212\], .bg-\[\#0D0D14\], .bg-\[\#0D1117\] {
     background-color: var(--sheet) !important;
+  }
+  /* preview / editor dark canvases → the paper desk */
+  .bg-\[\#0f0f0f\], .bg-\[\#0F0F0F\], .bg-zinc-900\/30, .bg-zinc-900\/20, .bg-zinc-900\/40, .bg-zinc-900\/60 {
+    background-color: var(--paper) !important;
   }
   .bg-white\/5, .bg-white\/10, .bg-white\/15,
   .bg-white\/\[0\.02\], .bg-white\/\[0\.03\], .bg-white\/\[0\.04\], .bg-white\/\[0\.05\],

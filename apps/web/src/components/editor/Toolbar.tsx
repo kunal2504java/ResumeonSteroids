@@ -28,7 +28,7 @@ export default function Toolbar({
       style={{ borderBottom: "1.5px solid var(--ink)", background: "var(--paper)" }}
     >
       <div className="flex min-w-0 items-center gap-3">
-        <a href="/dashboard" className="btn-mini" aria-label="Back to dashboard" style={{ padding: "7px 9px" }}>
+        <a href="/dashboard" className="btn-tool" aria-label="Back to dashboard" style={{ color: "var(--ink)" }}>
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
@@ -42,18 +42,19 @@ export default function Toolbar({
             Unsaved
           </span>
         )}
-        {isSaving && <span className="mono" style={{ fontSize: 11, color: "var(--ink-soft)" }}>saving…</span>}
       </div>
 
-      <div className="flex items-center gap-2">
-        <button onClick={onCommandPalette} className="btn-mini" aria-label="Command palette">
+      <div className="flex items-center gap-4">
+        <button onClick={onCommandPalette} className="btn-tool" aria-label="Command palette">
           <kbd style={{ fontSize: 11 }}>⌘K</kbd>
         </button>
-        <button onClick={onTailor} className="btn-mini">Tailor to job</button>
-        <button onClick={onAIAssistant} className="btn-mini">AI assistant</button>
-        <button onClick={onCopyLaTeX} className="btn-mini">Copy LaTeX</button>
+        <button onClick={onTailor} className="btn-tool">Tailor</button>
+        <button onClick={onAIAssistant} className="btn-tool">AI assistant</button>
+        <button onClick={onCopyLaTeX} className="btn-tool">Copy LaTeX</button>
+        <button onClick={() => save()} disabled={!isDirty || isSaving} className="btn-tool">
+          {isSaving ? "Saving…" : "Save"}
+        </button>
         <button onClick={onDownloadPDF} className="btn btn-pen btn-sm">Download PDF</button>
-        <button onClick={() => save()} disabled={!isDirty || isSaving} className="btn-mini">Save</button>
       </div>
     </header>
   );

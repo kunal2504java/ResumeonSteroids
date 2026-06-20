@@ -256,7 +256,7 @@ export default function EditorLayout() {
           style={{ width: dividerX, borderRight: "1.5px solid var(--ink)", background: "var(--sheet)" }}
         >
           <SectionTabs />
-          <div className="flex-1 overflow-y-auto scrollbar-thin">
+          <div className="ed-panel flex-1 overflow-y-auto scrollbar-thin">
             {sectionComponents[activeSection]}
           </div>
         </div>

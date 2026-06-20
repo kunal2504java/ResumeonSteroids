@@ -28,6 +28,10 @@ export default function InkGauge({ value = 92, size = 120 }: { value?: number; s
       });
       svg.appendChild(track);
       const sweep = full * Math.min(1, Math.max(0, value / 100));
+      // rough.js arc() infinite-loops when the angular sweep is ~0
+      // (its step becomes 0 → `for (a=start; a<=start; a+=0)` never ends).
+      // Skip the value arc entirely for a zero/near-zero score.
+      if (sweep <= 0.02) return;
       const val = rc.arc(c, c, rad * 2, rad * 2, start, start + sweep, false, {
         stroke: "#e23b17", strokeWidth: 7, roughness: 1.5,
       });

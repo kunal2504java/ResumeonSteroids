@@ -82,11 +82,13 @@ export function ATSReportPanel({
     <div className="surf" style={{ height: "100%", overflow: "hidden", padding: 0 }}>
       <div className="h-full overflow-y-auto p-4 sm:p-5">
         <div className="space-y-4">
-          <ATSScoreGauge
-            score={report?.total_score ?? 0}
-            grade={report?.grade ?? "F"}
-            loading={loading && !report}
-          />
+          {(report || loading) && (
+            <ATSScoreGauge
+              score={report?.total_score ?? 0}
+              grade={report?.grade ?? "F"}
+              loading={loading && !report}
+            />
+          )}
 
           {report && report.critical_failures.length > 0 ? (
             <CriticalFailureBanner
