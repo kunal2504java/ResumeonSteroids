@@ -240,17 +240,7 @@ export default function EditorLayout() {
   };
 
   return (
-    <div className="theme-adaptive relative flex h-screen flex-col overflow-hidden bg-[#0f0f0f] text-foreground">
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 opacity-50"
-        style={{
-          backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.022) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.022) 1px, transparent 1px)",
-          backgroundSize: "44px 44px",
-        }}
-      />
-      <div className="pointer-events-none absolute left-1/2 top-[-16rem] h-[30rem] w-[58rem] -translate-x-1/2 rounded-full bg-white/5 blur-[120px]" />
+    <div className="relative flex h-screen flex-col overflow-hidden" style={{ background: "var(--paper)", color: "var(--ink)" }}>
       <Toolbar
         onDownloadPDF={handleDownloadLatexPDF}
         onCopyLaTeX={handleCopyLaTeX}
@@ -262,8 +252,8 @@ export default function EditorLayout() {
       <div className="relative z-10 flex flex-1 overflow-hidden">
         {/* Left Panel */}
         <div
-          className="flex flex-col overflow-hidden border-r border-white/10 bg-zinc-950/55 backdrop-blur-xl"
-          style={{ width: dividerX }}
+          className="flex flex-col overflow-hidden"
+          style={{ width: dividerX, borderRight: "1.5px solid var(--ink)", background: "var(--sheet)" }}
         >
           <SectionTabs />
           <div className="flex-1 overflow-y-auto scrollbar-thin">
@@ -273,7 +263,8 @@ export default function EditorLayout() {
 
         {/* Divider */}
         <div
-          className="w-px shrink-0 cursor-col-resize bg-white/10 transition-colors hover:bg-white/20"
+          className="shrink-0 cursor-col-resize"
+          style={{ width: 2, background: "var(--hairline)" }}
           onMouseDown={() => {
             dragging.current = true;
             document.body.style.cursor = "col-resize";
@@ -282,7 +273,7 @@ export default function EditorLayout() {
         />
 
         {/* Right Panel */}
-        <div className="flex-1 overflow-hidden bg-[#0f0f0f]" data-resume-preview-container>
+        <div className="flex-1 overflow-hidden" style={{ background: "var(--paper)" }} data-resume-preview-container>
           <div className="flex h-full flex-col gap-4 p-4">
             {canOfferTwoPages && (
               <div className="rounded-2xl border border-amber-400/20 bg-amber-500/10 p-4 shadow-[0_18px_60px_rgba(0,0,0,0.25)] backdrop-blur-xl">

@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
 import { AddApplicationModal } from "@/components/tracker/AddApplicationModal";
 import { ApplicationBoard } from "@/components/tracker/ApplicationBoard";
 import { NudgeList } from "@/components/tracker/NudgeList";
@@ -86,11 +85,7 @@ export default function TrackerPage() {
       <AppHeader active="tracker" />
 
       <main className="page-wrap" style={{ maxWidth: 1500, paddingTop: 36, paddingBottom: 70, position: "relative", zIndex: 1 }}>
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="tk-page-head"
-        >
+        <div className="tk-page-head">
           <div>
             <span className="eyebrow">your pipeline {LOCAL_MODE && "· local mode"}</span>
             <h1 style={{ fontFamily: "var(--font-bricolage), sans-serif", fontWeight: 800, fontSize: "clamp(32px,4.4vw,48px)", letterSpacing: "-0.03em", lineHeight: 1, marginTop: 12 }}>
@@ -116,7 +111,7 @@ export default function TrackerPage() {
               <span aria-hidden="true">+</span> Add application
             </button>
           </div>
-        </motion.div>
+        </div>
 
         {error && (
           <div style={{ marginBottom: 20, border: "1.5px solid var(--pen)", background: "rgba(226,59,23,0.08)", padding: "12px 16px", fontSize: 14, color: "var(--pen-deep)" }}>

@@ -79,7 +79,7 @@ export function ATSReportPanel({
       };
 
   return (
-    <div className="relative h-full overflow-hidden rounded-2xl border border-white/10 bg-zinc-900/30 shadow-[0_0_60px_rgba(0,0,0,0.45)] backdrop-blur-md">
+    <div className="surf" style={{ height: "100%", overflow: "hidden", padding: 0 }}>
       <div className="h-full overflow-y-auto p-4 sm:p-5">
         <div className="space-y-4">
           <ATSScoreGauge
@@ -95,7 +95,7 @@ export function ATSReportPanel({
               loading={loading}
             />
           ) : report ? (
-            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 text-sm text-zinc-300">
+            <div className="p-4 text-sm" style={{ border: "1.5px solid var(--hairline)", background: "var(--sheet)", color: "var(--ink-soft)" }}>
               Your resume is ATS-ready. No critical parser failures were detected.
             </div>
           ) : null}
@@ -112,7 +112,7 @@ export function ATSReportPanel({
               <KeywordCoverage coverage={report.keyword_coverage} onFix={onFix} loading={loading} />
 
               {error && (
-                <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 text-sm text-zinc-300">
+                <div className="p-4 text-sm" style={{ border: "1.5px solid var(--hairline)", background: "var(--sheet)", color: "var(--ink-soft)" }}>
                   {error}
                 </div>
               )}
@@ -122,9 +122,10 @@ export function ATSReportPanel({
                   <details
                     key={category}
                     open={category === "parsing"}
-                    className="rounded-2xl border border-white/10 bg-zinc-900/30 p-4 backdrop-blur-md"
+                    className="p-4"
+                    style={{ border: "1.5px solid var(--hairline)", background: "var(--paper-2)" }}
                   >
-                    <summary className="cursor-pointer list-none text-sm font-medium text-white">
+                    <summary className="cursor-pointer list-none" style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)" }}>
                       {CATEGORY_LABELS[category]}
                     </summary>
                     <div className="mt-4 space-y-3">
@@ -143,25 +144,21 @@ export function ATSReportPanel({
           )}
 
           {!report && error && (
-            <div className="rounded-2xl border border-white/10 bg-white/[0.035] p-4 text-sm text-zinc-300">
+            <div className="p-4 text-sm" style={{ border: "1.5px solid var(--hairline)", background: "var(--sheet)", color: "var(--ink-soft)" }}>
               ATS report unavailable. Resume preview is still available. {error}
             </div>
           )}
 
           {!report && !loading && (
-            <div className="rounded-2xl border border-dashed border-white/12 bg-zinc-900/30 p-6 text-sm text-white/55 backdrop-blur-md">
-              <div className="text-sm font-semibold text-white">Run ATS simulation</div>
-              <p className="mt-2 leading-6">
+            <div className="p-6 text-sm" style={{ border: "2px dashed var(--ink-soft)", background: "var(--paper-2)", color: "var(--ink-soft)" }}>
+              <span className="surf-label" style={{ marginBottom: 10 }}>run ATS simulation</span>
+              <p style={{ lineHeight: 1.55 }}>
                 Paste a job description to check parser compatibility, keyword placement,
                 formatting, and content quality against this resume.
               </p>
               {onRequestAnalysis && (
-                <button
-                  type="button"
-                  onClick={onRequestAnalysis}
-                  className="mt-5 inline-flex h-10 items-center justify-center rounded-lg border border-zinc-800 bg-zinc-900/40 px-4 text-sm font-medium text-zinc-300 transition hover:border-zinc-700 hover:text-white"
-                >
-                  Check ATS score
+                <button type="button" onClick={onRequestAnalysis} className="btn btn-pen btn-sm" style={{ marginTop: 18 }}>
+                  Check ATS score <span aria-hidden="true">→</span>
                 </button>
               )}
             </div>

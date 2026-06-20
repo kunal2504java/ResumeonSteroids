@@ -33,8 +33,8 @@ export default function InkGauge({ value = 92, size = 120 }: { value?: number; s
       });
       svg.appendChild(val);
       if (!reduce) {
-        val.querySelectorAll("path").forEach((p) => {
-          const path = p as SVGPathElement;
+        val.querySelectorAll("path").forEach((p: SVGPathElement) => {
+          const path = p;
           let len = 0;
           try { len = path.getTotalLength(); } catch { return; }
           if (!len) return;

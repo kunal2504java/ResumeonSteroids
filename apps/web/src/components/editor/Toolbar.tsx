@@ -1,6 +1,5 @@
 "use client";
 
-import ThemeToggle from "@/components/theme/ThemeToggle";
 import { useResumeStore } from "@/lib/store/resumeStore";
 
 interface ToolbarProps {
@@ -24,72 +23,37 @@ export default function Toolbar({
   const resumeName = useResumeStore((s) => s.resume?.name) || "Untitled";
 
   return (
-    <header className="relative z-20 flex h-14 shrink-0 items-center justify-between border-b border-white/10 bg-[#0f0f0f]/85 px-4 text-white backdrop-blur-xl">
+    <header
+      className="relative z-20 flex h-14 shrink-0 items-center justify-between px-4"
+      style={{ borderBottom: "1.5px solid var(--ink)", background: "var(--paper)" }}
+    >
       <div className="flex min-w-0 items-center gap-3">
-        <a
-          href="/dashboard"
-          className="rounded-lg border border-zinc-800 bg-zinc-900/30 p-2 text-zinc-400 transition-colors hover:border-zinc-700 hover:text-white"
-        >
+        <a href="/dashboard" className="btn-mini" aria-label="Back to dashboard" style={{ padding: "7px 9px" }}>
           <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
             <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
           </svg>
         </a>
-        <span className="max-w-48 truncate text-sm font-medium tracking-tight text-white">
+        <span className="max-w-48 truncate" style={{ fontWeight: 700, fontSize: 15, letterSpacing: "-0.01em", color: "var(--ink)" }}>
           {resumeName}
         </span>
         {isDirty && (
-          <span className="flex items-center gap-1 rounded-full border border-amber-400/20 bg-amber-500/10 px-2 py-1 text-[10px] text-amber-300">
-            <span className="h-1.5 w-1.5 rounded-full bg-amber-400" />
+          <span className="mono" style={{ display: "inline-flex", alignItems: "center", gap: 6, border: "1.5px solid var(--marigold)", color: "#8a6410", padding: "3px 8px", fontSize: 10, textTransform: "uppercase", letterSpacing: "0.12em" }}>
+            <span style={{ width: 6, height: 6, background: "var(--marigold)" }} />
             Unsaved
           </span>
         )}
-        {isSaving && <span className="text-[10px] text-zinc-500">Saving...</span>}
+        {isSaving && <span className="mono" style={{ fontSize: 11, color: "var(--ink-soft)" }}>saving…</span>}
       </div>
 
       <div className="flex items-center gap-2">
-        <button
-          onClick={onCommandPalette}
-          className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900/30 px-2.5 py-1.5 text-[11px] text-zinc-500 backdrop-blur-md transition-colors hover:border-zinc-700 hover:text-white"
-        >
-          <kbd className="text-[10px]">⌘K</kbd>
+        <button onClick={onCommandPalette} className="btn-mini" aria-label="Command palette">
+          <kbd style={{ fontSize: 11 }}>⌘K</kbd>
         </button>
-
-        <button
-          onClick={onTailor}
-          className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900/30 px-3 py-1.5 text-[11px] font-medium text-zinc-400 transition-colors hover:border-zinc-700 hover:text-white"
-        >
-          Tailor to Job
-        </button>
-
-        <button
-          onClick={onAIAssistant}
-          className="flex cursor-pointer items-center gap-1.5 rounded-lg border border-zinc-800 bg-zinc-900/30 px-3 py-1.5 text-[11px] font-medium text-zinc-400 transition-colors hover:border-zinc-700 hover:text-white"
-        >
-          AI Assistant
-        </button>
-
-        <button
-          onClick={onCopyLaTeX}
-          className="cursor-pointer rounded-lg border border-zinc-800 bg-zinc-900/30 px-3 py-1.5 text-[11px] text-zinc-500 backdrop-blur-md transition-colors hover:border-zinc-700 hover:text-white"
-        >
-          Copy LaTeX
-        </button>
-
-        <button
-          onClick={onDownloadPDF}
-          className="cursor-pointer rounded-lg bg-[var(--accent)] px-3 py-1.5 text-[11px] font-semibold text-black shadow-[0_0_26px_rgba(250,255,105,0.16),inset_0_1px_0_rgba(255,255,255,0.45)] transition hover:brightness-95"
-        >
-          Download PDF
-        </button>
-
-        <button
-          onClick={() => save()}
-          disabled={!isDirty || isSaving}
-          className="cursor-pointer rounded-lg border border-zinc-800 bg-zinc-900/30 px-3 py-1.5 text-[11px] text-zinc-500 backdrop-blur-md transition-colors hover:border-zinc-700 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
-        >
-          Save
-        </button>
-        <ThemeToggle className="h-8 w-8" />
+        <button onClick={onTailor} className="btn-mini">Tailor to job</button>
+        <button onClick={onAIAssistant} className="btn-mini">AI assistant</button>
+        <button onClick={onCopyLaTeX} className="btn-mini">Copy LaTeX</button>
+        <button onClick={onDownloadPDF} className="btn btn-pen btn-sm">Download PDF</button>
+        <button onClick={() => save()} disabled={!isDirty || isSaving} className="btn-mini">Save</button>
       </div>
     </header>
   );

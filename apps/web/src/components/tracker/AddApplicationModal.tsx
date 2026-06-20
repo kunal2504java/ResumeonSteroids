@@ -17,6 +17,25 @@ interface Props {
   }) => void;
 }
 
+const fieldStyle: React.CSSProperties = {
+  marginTop: 8,
+  width: "100%",
+  padding: "9px 12px",
+  fontSize: 14,
+  border: "1.5px solid var(--hairline)",
+  background: "var(--sheet)",
+  color: "var(--ink)",
+  outline: "none",
+};
+
+const labelStyle: React.CSSProperties = {
+  fontFamily: "var(--font-spline-mono), monospace",
+  fontSize: 11,
+  letterSpacing: "0.12em",
+  textTransform: "uppercase",
+  color: "var(--ink-soft)",
+};
+
 export function AddApplicationModal({ open, loading, onClose, onCreate }: Props) {
   const [company, setCompany] = useState("");
   const [role, setRole] = useState("");
@@ -28,77 +47,57 @@ export function AddApplicationModal({ open, loading, onClose, onCreate }: Props)
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/65 px-4 backdrop-blur-md">
-      <div className="w-full max-w-2xl overflow-hidden rounded-2xl border border-white/10 bg-[#0f0f0f] shadow-[0_34px_120px_rgba(0,0,0,0.78)]">
-        <div className="flex items-center justify-between border-b border-white/10 bg-zinc-900/30 px-6 py-4">
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center px-4"
+      style={{ background: "rgba(33,30,24,0.5)", backdropFilter: "blur(3px)" }}
+      onClick={onClose}
+    >
+      <div
+        className="w-full max-w-2xl overflow-hidden"
+        style={{ background: "var(--sheet)", border: "1.5px solid var(--ink)", boxShadow: "6px 8px 0 rgba(33,30,24,0.18), 16px 26px 44px rgba(33,30,24,0.2)" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-6 py-4" style={{ borderBottom: "1.5px solid var(--hairline)", background: "var(--paper-2)" }}>
           <div>
-            <h2 className="text-base font-semibold text-white">Add application</h2>
-            <p className="mt-1 text-xs text-zinc-500">Save the target role before outreach and nudges begin.</p>
+            <h2 style={{ fontSize: 18, fontWeight: 800, letterSpacing: "-0.01em", color: "var(--ink)" }}>Add an application</h2>
+            <p className="hand hand-ink" style={{ fontSize: 14, marginTop: 2 }}>pin the target before outreach &amp; nudges begin</p>
           </div>
-          <button onClick={onClose} className="rounded-lg border border-zinc-800 bg-zinc-900/30 px-3 py-1.5 text-xs text-zinc-400 hover:text-white">
-            Close
-          </button>
+          <button onClick={onClose} className="btn-mini">Close</button>
         </div>
+
         <div className="grid gap-4 p-6">
           <div className="grid gap-4 md:grid-cols-2">
-            <label className="text-xs font-medium text-zinc-400">
+            <label style={labelStyle}>
               Company
-              <input
-                value={company}
-                onChange={(event) => setCompany(event.target.value)}
-                className="mt-2 w-full rounded-lg border border-white/10 bg-white/[0.035] px-3 py-2 text-sm text-white outline-none focus:border-white/20"
-              />
+              <input value={company} onChange={(e) => setCompany(e.target.value)} style={fieldStyle} />
             </label>
-            <label className="text-xs font-medium text-zinc-400">
+            <label style={labelStyle}>
               Role title
-              <input
-                value={role}
-                onChange={(event) => setRole(event.target.value)}
-                className="mt-2 w-full rounded-lg border border-white/10 bg-white/[0.035] px-3 py-2 text-sm text-white outline-none focus:border-white/20"
-              />
+              <input value={role} onChange={(e) => setRole(e.target.value)} style={fieldStyle} />
             </label>
           </div>
           <div className="grid gap-4 md:grid-cols-2">
-            <label className="text-xs font-medium text-zinc-400">
+            <label style={labelStyle}>
               JD URL
-              <input
-                value={jdUrl}
-                onChange={(event) => setJdUrl(event.target.value)}
-                className="mt-2 w-full rounded-lg border border-white/10 bg-white/[0.035] px-3 py-2 text-sm text-white outline-none focus:border-white/20"
-              />
+              <input value={jdUrl} onChange={(e) => setJdUrl(e.target.value)} style={fieldStyle} />
             </label>
-            <label className="text-xs font-medium text-zinc-400">
+            <label style={labelStyle}>
               Location
-              <input
-                value={location}
-                onChange={(event) => setLocation(event.target.value)}
-                className="mt-2 w-full rounded-lg border border-white/10 bg-white/[0.035] px-3 py-2 text-sm text-white outline-none focus:border-white/20"
-              />
+              <input value={location} onChange={(e) => setLocation(e.target.value)} style={fieldStyle} />
             </label>
           </div>
-          <label className="text-xs font-medium text-zinc-400">
+          <label style={labelStyle}>
             Job description
-            <textarea
-              value={jdText}
-              onChange={(event) => setJdText(event.target.value)}
-              rows={5}
-              className="mt-2 w-full rounded-lg border border-white/10 bg-white/[0.035] px-3 py-2 text-sm text-white outline-none focus:border-white/20"
-            />
+            <textarea value={jdText} onChange={(e) => setJdText(e.target.value)} rows={5} style={fieldStyle} />
           </label>
-          <label className="text-xs font-medium text-zinc-400">
+          <label style={labelStyle}>
             Resume bullets or notes
-            <textarea
-              value={notes}
-              onChange={(event) => setNotes(event.target.value)}
-              rows={4}
-              className="mt-2 w-full rounded-lg border border-white/10 bg-white/[0.035] px-3 py-2 text-sm text-white outline-none focus:border-white/20"
-            />
+            <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={4} style={fieldStyle} />
           </label>
         </div>
-        <div className="flex justify-end gap-3 border-t border-white/10 bg-zinc-900/20 px-6 py-4">
-          <button onClick={onClose} className="px-4 py-2 text-sm text-zinc-500 hover:text-white">
-            Cancel
-          </button>
+
+        <div className="flex justify-end gap-3 px-6 py-4" style={{ borderTop: "1.5px solid var(--hairline)", background: "var(--paper-2)" }}>
+          <button onClick={onClose} className="btn-mini">Cancel</button>
           <button
             disabled={loading || !company.trim() || !role.trim()}
             onClick={() =>
@@ -112,9 +111,10 @@ export function AddApplicationModal({ open, loading, onClose, onCreate }: Props)
                 source: "other",
               })
             }
-            className="rounded-lg bg-[var(--accent)] px-5 py-2 text-sm font-semibold text-black transition hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-50"
+            className="btn btn-pen btn-sm"
+            style={loading || !company.trim() || !role.trim() ? { opacity: 0.5, cursor: "not-allowed" } : undefined}
           >
-            {loading ? "Saving..." : "Save application"}
+            {loading ? "Saving…" : "Save application"}
           </button>
         </div>
       </div>

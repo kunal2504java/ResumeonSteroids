@@ -247,6 +247,40 @@
     text-transform: capitalize; outline: none; cursor: pointer;
   }
   .tk-select:focus { border-color: var(--ink); }
+
+  /* ---- generic mini button (toolbars) ---- */
+  .btn-mini {
+    display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px;
+    border: 1.5px solid var(--ink); background: var(--sheet); color: var(--ink);
+    font-family: var(--font-spline-mono), monospace; font-size: 11.5px; cursor: pointer;
+    text-decoration: none; transition: background 0.12s ease, color 0.12s ease;
+  }
+  .btn-mini:hover { background: var(--ink); color: var(--paper); }
+  .btn-mini:disabled { opacity: 0.4; cursor: not-allowed; }
+  .btn-mini:disabled:hover { background: var(--sheet); color: var(--ink); }
+
+  /* ---- editor chrome ---- */
+  .ed-tab {
+    flex-shrink: 0; cursor: pointer; padding: 8px 13px; font-size: 12px; font-weight: 600;
+    border: 1.5px solid transparent; color: var(--ink-soft); background: transparent;
+    font-family: var(--font-bricolage), sans-serif; transition: all 0.14s ease;
+  }
+  .ed-tab:hover { color: var(--ink); border-color: var(--hairline); }
+  .ed-tab.is-active { background: var(--ink); color: var(--paper); border-color: var(--ink); }
+}
+
+/* ---- paper form fields (baseline; component utilities still win) ---- */
+@layer base {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="file"]),
+  textarea,
+  select {
+    background: var(--sheet);
+    color: var(--ink);
+    border: 1.5px solid var(--hairline);
+    font-family: var(--font-bricolage), system-ui, sans-serif;
+  }
+  input:focus, textarea:focus, select:focus { border-color: var(--ink); outline: none; }
+  ::placeholder { color: var(--ink-soft); opacity: 1; }
 }
 
 /* ============================================================
@@ -276,6 +310,18 @@
   }
   .text-\[\#6366f1\], .text-\[\#6366F1\], .text-\[\#818cf8\], .text-\[\#818CF8\] { color: var(--pen) !important; }
   .bg-\[\#6366f1\], .bg-\[\#6366F1\] { background-color: var(--pen) !important; }
+
+  /* amber notes (e.g. 2-page banner) → readable marigold on paper */
+  .text-amber-100, .text-amber-200, .text-amber-300, .text-amber-100\/80 { color: #8a6410 !important; }
+  .bg-amber-500\/10, .bg-amber-500\/15, .bg-amber-400\/10 { background-color: rgba(242, 168, 29, 0.16) !important; }
+  .border-amber-400\/20, .border-amber-400\/30, .border-amber-500\/20 { border-color: var(--marigold) !important; }
+  /* red destructive accents → pen */
+  .text-red-400, .text-red-300, .text-red-400\/60, .text-red-200 { color: var(--pen) !important; }
+  .border-red-400\/20, .border-red-500\/20 { border-color: var(--pen) !important; }
+  .bg-red-500\/10 { background-color: rgba(226, 59, 23, 0.1) !important; }
+  /* white solid buttons → ink (keep contrast) */
+  .bg-white { background-color: var(--sheet) !important; }
+  .text-black, .text-\[\#0D1117\], .text-\[\#0f0f0f\] { color: var(--ink) !important; }
 }
 
 /* ---- scrollbars (square, paper) ---- */
