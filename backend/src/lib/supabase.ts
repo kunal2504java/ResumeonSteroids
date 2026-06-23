@@ -8,7 +8,7 @@ export function getSupabaseAdmin(): SupabaseClient {
     const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
     if (!url || !key) {
       throw new Error(
-        "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY. Add them to apps/api/.env"
+        "Missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY. Add them to backend/.env"
       );
     }
     _client = createClient(url, key);

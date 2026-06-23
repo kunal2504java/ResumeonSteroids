@@ -45,5 +45,5 @@ next-env.d.ts
 .turbo
 
 # python pipeline runs
-resume_pipeline/runs/
-resume_pipeline/logs/
+backend/resume_pipeline/runs/
+backend/resume_pipeline/logs/

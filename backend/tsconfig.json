@@ -13,8 +13,8 @@
     "declaration": true,
     "sourceMap": true,
     "paths": {
-      "@resumeai/shared": ["../../packages/shared/src"],
-      "@resumeai/shared/*": ["../../packages/shared/src/*"]
+      "@resumeai/shared": ["../shared/src"],
+      "@resumeai/shared/*": ["../shared/src/*"]
     }
   },
   "include": ["src/**/*"],

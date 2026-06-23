@@ -5,18 +5,18 @@
 This repository is a `pnpm` + Turborepo monorepo for an AI-assisted resume builder.
 There are two product layers that currently coexist:
 
-1. A browser-first editing experience in `apps/web` that stores resumes in `localStorage`.
-2. A backend in `apps/api` that supports AI imports, resume CRUD, ATS analysis, and LaTeX/PDF generation with optional Supabase-backed auth and persistence.
+1. A browser-first editing experience in `frontend` that stores resumes in `localStorage`.
+2. A backend in `backend` that supports AI imports, resume CRUD, ATS analysis, and LaTeX/PDF generation with optional Supabase-backed auth and persistence.
 
 Any agent changing this codebase needs to understand that these two layers are not fully unified yet. Do not assume there is a single source of truth.
 
 ## Monorepo Layout
 
-- `apps/web`: Next.js 16 + React 19 frontend.
-- `apps/api`: Hono API running on Node via `tsx`.
-- `packages/shared`: shared TypeScript types and Zod schemas used by both apps.
-- `supabase/schema.sql`: intended database schema for the backend persistence layer.
-- `apps/api/templates/resume.tex`: LaTeX template used for PDF export.
+- `frontend`: Next.js 16 + React 19 frontend.
+- `backend`: Hono API running on Node via `tsx`.
+- `shared`: shared TypeScript types and Zod schemas used by both apps.
+- `backend/supabase/schema.sql`: intended database schema for the backend persistence layer.
+- `backend/templates/resume.tex`: LaTeX template used for PDF export.
 
 ## Key Runtime Architecture
 
@@ -24,12 +24,12 @@ Any agent changing this codebase needs to understand that these two layers are n
 
 The web app is centered around:
 
-- `apps/web/src/app/dashboard/page.tsx`: local dashboard of resumes.
-- `apps/web/src/app/editor/[id]/page.tsx`: editor bootstrap.
-- `apps/web/src/app/editor/[id]/connect/page.tsx`: animated source connection flow.
-- `apps/web/src/app/editor/[id]/import/page.tsx`: older import wizard flow.
-- `apps/web/src/components/editor/EditorLayout.tsx`: main editor shell.
-- `apps/web/src/lib/store/resumeStore.ts`: Zustand store for editor state and save behavior.
+- `frontend/src/app/dashboard/page.tsx`: local dashboard of resumes.
+- `frontend/src/app/editor/[id]/page.tsx`: editor bootstrap.
+- `frontend/src/app/editor/[id]/connect/page.tsx`: animated source connection flow.
+- `frontend/src/app/editor/[id]/import/page.tsx`: older import wizard flow.
+- `frontend/src/components/editor/EditorLayout.tsx`: main editor shell.
+- `frontend/src/lib/store/resumeStore.ts`: Zustand store for editor state and save behavior.
 
 Current frontend persistence behavior:
 
@@ -39,7 +39,7 @@ Current frontend persistence behavior:
 
 ### Backend
 
-The API entrypoint is `apps/api/src/index.ts`.
+The API entrypoint is `backend/src/index.ts`.
 
 Main route groups:
 
@@ -62,7 +62,7 @@ There are two resume shapes in the repo.
 
 ### Editor resume shape
 
-Defined in `packages/shared/src/types/resume.ts`.
+Defined in `shared/src/types/resume.ts`.
 
 This is the shape used by the web editor and local browser state:
 
@@ -77,7 +77,7 @@ This is the shape used by the web editor and local browser state:
 
 ### Pipeline normalized shape
 
-Defined in `apps/api/src/agents/pipeline.types.ts`.
+Defined in `backend/src/agents/pipeline.types.ts`.
 
 This shape is used by the multi-agent pipeline:
 
@@ -96,11 +96,11 @@ Do not conflate these two models. Agent 4 explicitly bridges the pipeline shape 
 
 Primary files:
 
-- `apps/web/src/components/connection/ConnectionFlow.tsx`
-- `apps/web/src/hooks/useConnectionFlow.ts`
-- `apps/web/src/lib/connectionStages.ts`
-- `apps/web/src/lib/sourceMeta.ts`
-- `apps/web/src/lib/store/resumeStore.ts` via `mergeImportedData`
+- `frontend/src/components/connection/ConnectionFlow.tsx`
+- `frontend/src/hooks/useConnectionFlow.ts`
+- `frontend/src/lib/connectionStages.ts`
+- `frontend/src/lib/sourceMeta.ts`
+- `frontend/src/lib/store/resumeStore.ts` via `mergeImportedData`
 
 Behavior:
 
@@ -112,7 +112,7 @@ Behavior:
 
 Primary file:
 
-- `apps/web/src/components/editor/ImportWizard.tsx`
+- `frontend/src/components/editor/ImportWizard.tsx`
 
 This flow performs its own fetches and merge logic instead of using `useConnectionFlow`.
 If you modify import behavior, check both paths. They are partially duplicated.
@@ -121,17 +121,17 @@ If you modify import behavior, check both paths. They are partially duplicated.
 
 Primary files:
 
-- `apps/api/src/routes/ai/rewrite.ts`
-- `apps/api/src/routes/ai/tailor.ts`
-- `apps/api/src/lib/prompts.ts`
-- `apps/api/src/lib/resumeHelpers.ts`
+- `backend/src/routes/ai/rewrite.ts`
+- `backend/src/routes/ai/tailor.ts`
+- `backend/src/lib/prompts.ts`
+- `backend/src/lib/resumeHelpers.ts`
 
 These routes currently require auth middleware.
 Before changing frontend calls, verify whether the caller is actually attaching a Bearer token. Some current UI code calls relative `/api/...` routes with no token, which may not work unless a separate proxy/auth layer is introduced.
 
 ## Full Multi-Agent Pipeline
 
-The end-to-end pipeline lives under `apps/api/src/agents` and is orchestrated by `apps/api/src/routes/build-resume.ts`.
+The end-to-end pipeline lives under `backend/src/agents` and is orchestrated by `backend/src/routes/build-resume.ts`.
 
 Pipeline stages:
 
@@ -151,10 +151,10 @@ Current code indicates an intended Supabase-backed product, but the shipped web 
 
 What is real today:
 
-- `apps/api/src/middleware/auth.ts` validates Bearer tokens with Supabase.
-- `apps/api/src/routes/resume/index.ts` performs CRUD against the `resumes` table.
-- `apps/web/src/app/dashboard/page.tsx` and editor routes ignore Supabase and load from browser storage.
-- `apps/web/src/lib/api-client.ts` is written for token-based backend access, but much of the UI bypasses it.
+- `backend/src/middleware/auth.ts` validates Bearer tokens with Supabase.
+- `backend/src/routes/resume/index.ts` performs CRUD against the `resumes` table.
+- `frontend/src/app/dashboard/page.tsx` and editor routes ignore Supabase and load from browser storage.
+- `frontend/src/lib/api-client.ts` is written for token-based backend access, but much of the UI bypasses it.
 
 Guidance:
 
@@ -204,27 +204,27 @@ Run from repo root:
 ### When touching the editor
 
 - Audit `dashboard`, `editor/[id]`, `editor/[id]/connect`, and `editor/[id]/import`.
-- Check whether your change needs to update `createDefaultResume()` in `packages/shared`.
+- Check whether your change needs to update `createDefaultResume()` in `shared`.
 - Verify `resumeStore.mergeImportedData()` if imports are involved.
 
 ### When touching imports or AI routes
 
 - Check both the animated connection flow and the older import wizard.
-- Keep request/response shapes aligned with `packages/shared` schemas where applicable.
+- Keep request/response shapes aligned with `shared` schemas where applicable.
 - Preserve meaningful error messages because the UI surfaces API failures directly.
 
 ### When touching export or template code
 
 - Audit both:
-  - `apps/api/src/routes/export/latex.ts`
-  - `apps/web/src/lib/pdf/latex.ts`
+  - `backend/src/routes/export/latex.ts`
+  - `frontend/src/lib/pdf/latex.ts`
 - The web app supports two PDF paths:
   - real LaTeX compilation through the API
   - quick client-side HTML snapshot export
 
 ### When touching persistence
 
-- Inspect `apps/web/src/lib/api-client.ts`, `apps/web/src/lib/store/resumeStore.ts`, and `apps/api/src/routes/resume/index.ts` together.
+- Inspect `frontend/src/lib/api-client.ts`, `frontend/src/lib/store/resumeStore.ts`, and `backend/src/routes/resume/index.ts` together.
 - Be careful with naming mismatches:
   - editor type uses `name`
   - backend row uses `title`
@@ -235,14 +235,14 @@ Run from repo root:
 These are current repo realities and should be treated carefully during changes:
 
 - The main README is still the default Next.js scaffold and does not describe the actual product.
-- The frontend has no visible Next route handlers under `apps/web/src/app/api`, yet some components still call relative `/api/...` endpoints.
+- The frontend has no visible Next route handlers under `frontend/src/app/api`, yet some components still call relative `/api/...` endpoints.
 - Local browser persistence and Supabase-backed persistence are both present.
 - Import logic exists in both `ConnectionFlow` and `ImportWizard`.
 - Several files contain encoding artifacts in comments and string literals; avoid spreading them when editing.
 
 ## Recommended Workflow For Future Agents
 
-1. Determine whether the task belongs to `apps/web`, `apps/api`, `packages/shared`, or multiple layers.
+1. Determine whether the task belongs to `frontend`, `backend`, `shared`, or multiple layers.
 2. Identify whether the affected flow is local-only, backend-only, or hybrid.
 3. Trace the data contract end-to-end before editing.
 4. Update duplicated paths when the behavior is intentionally shared.
@@ -251,16 +251,16 @@ These are current repo realities and should be treated carefully during changes:
 
 ## Files Worth Reading First
 
-- `apps/web/src/lib/store/resumeStore.ts`
-- `apps/web/src/components/editor/EditorLayout.tsx`
-- `apps/web/src/components/connection/ConnectionFlow.tsx`
-- `apps/web/src/hooks/useConnectionFlow.ts`
-- `apps/api/src/index.ts`
-- `apps/api/src/routes/ai/index.ts`
-- `apps/api/src/routes/resume/index.ts`
-- `apps/api/src/routes/build-resume.ts`
-- `apps/api/src/agents/pipeline.types.ts`
-- `packages/shared/src/types/resume.ts`
+- `frontend/src/lib/store/resumeStore.ts`
+- `frontend/src/components/editor/EditorLayout.tsx`
+- `frontend/src/components/connection/ConnectionFlow.tsx`
+- `frontend/src/hooks/useConnectionFlow.ts`
+- `backend/src/index.ts`
+- `backend/src/routes/ai/index.ts`
+- `backend/src/routes/resume/index.ts`
+- `backend/src/routes/build-resume.ts`
+- `backend/src/agents/pipeline.types.ts`
+- `shared/src/types/resume.ts`
 
 ## Editing Principle
 

@@ -20,8 +20,8 @@
     ],
     "paths": {
       "@/*": ["./src/*"],
-      "@resumeai/shared": ["../../packages/shared/src"],
-      "@resumeai/shared/*": ["../../packages/shared/src/*"]
+      "@resumeai/shared": ["../shared/src"],
+      "@resumeai/shared/*": ["../shared/src/*"]
     }
   },
   "include": [

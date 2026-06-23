@@ -10,7 +10,7 @@ const config: NextConfig = {
   },
 
   turbopack: {
-    root: "../../",
+    root: "../",
     resolveAlias: {
       "fflate/node": "fflate",
     },

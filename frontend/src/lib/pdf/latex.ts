@@ -3,7 +3,7 @@
  * Outputs a complete .tex file using Jake's Resume template that
  * compiles correctly in Overleaf / pdflatex.
  *
- * This mirrors apps/api/src/lib/fillTemplate.ts exactly so the
+ * This mirrors backend/src/lib/fillTemplate.ts exactly so the
  * output matches what the server-side compilation produces.
  */
 
