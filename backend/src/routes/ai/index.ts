@@ -8,6 +8,7 @@ import { resumeImportRoute } from "./import/resume";
 import { linkedinImportRoute } from "./import/linkedin";
 import { enrichExperienceRoute } from "./enrich-experience";
 import { fixResumeRoute } from "./fix-resume";
+import { evidenceRoute } from "./evidence";
 
 const aiRoutes = new Hono();
 
@@ -20,5 +21,6 @@ aiRoutes.route("/import/resume", resumeImportRoute);
 aiRoutes.route("/import/linkedin", linkedinImportRoute);
 aiRoutes.route("/enrich-experience", enrichExperienceRoute);
 aiRoutes.route("/fix-resume", fixResumeRoute);
+aiRoutes.route("/evidence", evidenceRoute);
 
 export { aiRoutes };

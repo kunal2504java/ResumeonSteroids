@@ -35,13 +35,13 @@ function isRoot(dir: string): boolean {
 export async function findRepoRoot(start = process.cwd()): Promise<string> {
   let current = path.resolve(start);
   while (true) {
-    const bridgePath = path.join(current, "resume_pipeline", "ats_bridge.py");
+    const bridgePath = path.join(current, "backend", "resume_pipeline", "ats_bridge.py");
     try {
       await fs.access(bridgePath);
       return current;
     } catch {
       if (isRoot(current)) {
-        throw new Error("Could not locate repo root containing resume_pipeline/ats_bridge.py");
+        throw new Error("Could not locate repo root containing backend/resume_pipeline/ats_bridge.py");
       }
       current = path.dirname(current);
     }
@@ -70,7 +70,7 @@ async function runPythonBridge<T>(
   payload?: unknown,
 ): Promise<T> {
   const repoRoot = await findRepoRoot();
-  const bridgePath = path.join(repoRoot, "resume_pipeline", "ats_bridge.py");
+  const bridgePath = path.join(repoRoot, "backend", "resume_pipeline", "ats_bridge.py");
   const input = payload === undefined ? "" : JSON.stringify(payload);
   const failures: string[] = [];
 
@@ -158,7 +158,7 @@ export function estimateMaxPages(resume: Resume): number {
 
 async function snapshotPath(runId: string): Promise<string> {
   const repoRoot = await findRepoRoot();
-  return path.join(repoRoot, "resume_pipeline", "runs", "ats-web", runId, "ats_snapshot.json");
+  return path.join(repoRoot, "backend", "resume_pipeline", "runs", "ats-web", runId, "ats_snapshot.json");
 }
 
 async function writeSnapshot(snapshot: ATSSnapshot): Promise<void> {

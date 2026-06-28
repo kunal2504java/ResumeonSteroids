@@ -76,7 +76,7 @@ export async function normalizeAllSources(
   const truncated = rawJson.length > 30000 ? rawJson.slice(0, 30000) + "\n...(truncated)" : rawJson;
 
   const res = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-sonnet-4-6",
     max_tokens: 4000,
     system: NORMALIZE_SYSTEM_PROMPT,
     messages: [

@@ -162,3 +162,90 @@ export async function inspectGitHubRepo(
     packageFiles: packageFiles.filter((file) => file.content.trim().length > 0),
   };
 }
+
+export interface RepoContribution {
+  name: string;
+  stars: number;
+  language: string | null;
+  topics: string[];
+  /** The owner's own commit count on this repo (anti-vanity-repo signal). */
+  authorCommits: number;
+  totalContributors: number;
+  /** >1 contributor ⇒ collaborative; sole contributor ⇒ personal project. */
+  projectType: "open_source" | "self_project";
+}
+
+/**
+ * Fetch a repo's contributor list to derive the owner's commit share and a
+ * collaborative-vs-personal classification — the real OSS signal a keyword ATS
+ * (and HackerRank's >1-contributor heuristic) can't see on its own.
+ */
+export async function fetchRepoContribution(
+  username: string,
+  repo: GitHubRepo,
+): Promise<RepoContribution> {
+  const url = `https://api.github.com/repos/${encodeURIComponent(username)}/${encodeURIComponent(repo.name)}/contributors?per_page=100`;
+  const contributors = await fetchRepoJson<Array<{ login: string; contributions: number }>>(url);
+  const list = Array.isArray(contributors) ? contributors : [];
+  const mine = list.find((c) => c.login?.toLowerCase() === username.toLowerCase());
+  const totalContributors = list.length;
+  return {
+    name: repo.name,
+    stars: repo.stargazers_count,
+    language: repo.language,
+    topics: repo.topics ?? [],
+    authorCommits: mine?.contributions ?? 0,
+    totalContributors,
+    projectType: totalContributors > 1 ? "open_source" : "self_project",
+  };
+}
+
+export interface ExternalContributions {
+  /** Total merged PRs authored by the user across all of GitHub. */
+  totalMergedPrs: number;
+  /** Distinct repos NOT owned by the user that they have merged PRs into. */
+  externalRepoCount: number;
+  /** Top external repos by stars, with the candidate's merged-PR count. */
+  externalRepos: Array<{ repo: string; stars: number; prCount: number }>;
+}
+
+/**
+ * The gold-standard open-source signal: the candidate's MERGED pull requests into
+ * repositories they do NOT own. Uses the search API (separate, stricter rate limit:
+ * 1 call here), then fetches stars for the top external repos to weight by popularity.
+ */
+export async function fetchExternalContributions(
+  username: string,
+): Promise<ExternalContributions | null> {
+  const q = encodeURIComponent(`author:${username} type:pr is:merged`);
+  const search = await fetchRepoJson<{
+    total_count: number;
+    items: Array<{ repository_url: string }>;
+  }>(`https://api.github.com/search/issues?q=${q}&per_page=100&sort=created&order=desc`);
+  if (!search || !Array.isArray(search.items)) return null;
+
+  const counts = new Map<string, number>();
+  for (const item of search.items) {
+    const m = item.repository_url?.match(/\/repos\/([^/]+\/[^/]+)$/);
+    if (!m) continue;
+    const full = m[1]; // owner/repo
+    if (full.split("/")[0].toLowerCase() === username.toLowerCase()) continue; // external only
+    counts.set(full, (counts.get(full) ?? 0) + 1);
+  }
+
+  const top = [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8);
+  const externalRepos = await Promise.all(
+    top.map(async ([full, prCount]) => {
+      const repo = await fetchRepoJson<{ stargazers_count: number }>(
+        `https://api.github.com/repos/${full}`,
+      );
+      return { repo: full, stars: repo?.stargazers_count ?? 0, prCount };
+    }),
+  );
+
+  return {
+    totalMergedPrs: search.total_count ?? 0,
+    externalRepoCount: counts.size,
+    externalRepos: externalRepos.sort((a, b) => b.stars - a.stars),
+  };
+}

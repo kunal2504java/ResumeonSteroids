@@ -18,6 +18,8 @@ import ToastContainer from "@/components/ui/Toast";
 import { ATSReportPanel } from "@/components/ats/ATSReportPanel";
 import { ResumePreviewPanel } from "@/components/resume/ResumePreviewPanel";
 import { useATSReport } from "@/hooks/useATSReport";
+import { EvidencePanel } from "@/components/evidence/EvidencePanel";
+import { useEvidenceReport } from "@/hooks/useEvidenceReport";
 import {
   estimateResumePages,
   prepareResumeForOutput,
@@ -41,6 +43,7 @@ export default function EditorLayout() {
   const [jobDescription, setJobDescription] = useState("");
   const [highlightedSection, setHighlightedSection] = useState<string | undefined>();
   const [mobileTab, setMobileTab] = useState<"resume" | "ats">("resume");
+  const [rightView, setRightView] = useState<"ats" | "evidence">("ats");
   const [pagePreference, setPagePreference] = useState<1 | 2 | null>(null);
   const [assistantOpen, setAssistantOpen] = useState(false);
   const dragging = useRef(false);
@@ -65,6 +68,12 @@ export default function EditorLayout() {
     jobDescription,
     effectiveMaxPages,
   );
+  const {
+    report: evidenceReport,
+    loading: evLoading,
+    error: evError,
+    run: runEvidence,
+  } = useEvidenceReport(outputResume, jobDescription);
 
   useEffect(() => {
     if (!resumeId) {
@@ -348,15 +357,34 @@ export default function EditorLayout() {
                   maxPages={effectiveMaxPages}
                 />
               </div>
-              <div className="min-w-0 flex-[2]">
-                <ATSReportPanel
-                  report={report}
-                  loading={atsLoading}
-                  error={atsError}
-                  onFix={triggerFix}
-                  onHighlightSection={setHighlightedSection}
-                  onRequestAnalysis={() => setTailorOpen(true)}
-                />
+              <div className="min-w-0 flex-[2] flex flex-col gap-3">
+                <div style={{ display: "flex", gap: 6 }}>
+                  <button type="button" onClick={() => setRightView("ats")} className={`ed-tab ${rightView === "ats" ? "is-active" : ""}`}>
+                    ATS
+                  </button>
+                  <button type="button" onClick={() => setRightView("evidence")} className={`ed-tab ${rightView === "evidence" ? "is-active" : ""}`}>
+                    Substance
+                  </button>
+                </div>
+                <div className="min-h-0 flex-1">
+                  {rightView === "ats" ? (
+                    <ATSReportPanel
+                      report={report}
+                      loading={atsLoading}
+                      error={atsError}
+                      onFix={triggerFix}
+                      onHighlightSection={setHighlightedSection}
+                      onRequestAnalysis={() => setTailorOpen(true)}
+                    />
+                  ) : (
+                    <EvidencePanel
+                      report={evidenceReport}
+                      loading={evLoading}
+                      error={evError}
+                      onRun={runEvidence}
+                    />
+                  )}
+                </div>
               </div>
             </div>
 
@@ -395,6 +423,10 @@ export default function EditorLayout() {
         jobDescription={jobDescription}
         onApplyResume={(fixedResume) => setResume(fixedResume, { markDirty: true })}
         onToast={addToast}
+        atsReport={report}
+        evidenceReport={evidenceReport}
+        runId={atsRunId}
+        maxPages={effectiveMaxPages}
       />
       <CommandPalette
         commands={commands}

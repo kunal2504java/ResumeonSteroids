@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import type { Resume } from "@resumeai/shared";
+import type { ATSReport } from "@/types/ats";
+import type { EvidenceReport } from "@/types/evidence";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { sendResumeCommand } from "@/lib/trackerApi";
 
@@ -20,6 +22,13 @@ interface AIAssistantModalProps {
   jobDescription: string;
   onApplyResume: (resume: Resume) => void;
   onToast: (message: string, type: "success" | "error" | "info") => void;
+  /** Latest ATS scan for this resume — fed into the fix so edits target real findings. */
+  atsReport?: ATSReport | null;
+  /** GitHub-grounded substance evaluation — fed into the fix to surface real work. */
+  evidenceReport?: EvidenceReport | null;
+  /** ATS run id, used to re-simulate and verify the score after a fix. */
+  runId?: string | null;
+  maxPages?: 1 | 2;
 }
 
 interface FixResumeResponse {
@@ -60,6 +69,18 @@ function makeId(prefix: string) {
   return `${prefix}-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 }
 
+function mergeFixed(base: Resume, incoming: Resume): Resume {
+  return {
+    ...base,
+    ...incoming,
+    id: base.id,
+    userId: base.userId,
+    template: base.template,
+    createdAt: base.createdAt,
+    updatedAt: new Date().toISOString(),
+  };
+}
+
 export default function AIAssistantModal({
   isOpen,
   onClose,
@@ -67,6 +88,10 @@ export default function AIAssistantModal({
   jobDescription,
   onApplyResume,
   onToast,
+  atsReport,
+  evidenceReport,
+  runId,
+  maxPages = 1,
 }: AIAssistantModalProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([INITIAL_MESSAGE]);
   const [input, setInput] = useState("");
@@ -98,68 +123,110 @@ export default function AIAssistantModal({
     return null;
   }
 
+  const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
+
+  /** Call the LLM fixer with the resume + ATS findings; returns the parsed response. */
+  async function postFix(
+    instruction: string,
+    baseResume: Resume,
+    report: ATSReport | null | undefined,
+    history: { role: ChatRole; content: string }[],
+  ): Promise<FixResumeResponse> {
+    const res = await fetch(`${API_URL}/api/ai/fix-resume`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        resume: baseResume,
+        jobDescription,
+        instruction,
+        messages: history,
+        atsReport: report ?? undefined,
+        evidenceReport: evidenceReport ?? undefined,
+      }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({ error: "AI assistant failed" }));
+      throw new Error((err as { error?: string }).error ?? `HTTP ${res.status}`);
+    }
+    return (await res.json()) as FixResumeResponse;
+  }
+
+  /** Re-run the ATS scan on a candidate resume to verify the fix. Best-effort. */
+  async function simulate(candidate: Resume): Promise<ATSReport | null> {
+    if (!runId) return null;
+    try {
+      const res = await fetch(`/api/ats/simulate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          run_id: runId,
+          assembled_resume: candidate,
+          job_description: jobDescription,
+          max_pages: maxPages,
+        }),
+      });
+      if (!res.ok) return null;
+      return (await res.json()) as ATSReport;
+    } catch {
+      return null;
+    }
+  }
+
   async function sendMessage(promptOverride?: string) {
     const prompt = (promptOverride ?? input).trim();
     if (!prompt || !resume || loading) return;
 
-    const userMessage: ChatMessage = {
-      id: makeId("user"),
-      role: "user",
-      content: prompt,
-    };
-
+    const userMessage: ChatMessage = { id: makeId("user"), role: "user", content: prompt };
     const nextMessages = [...messages, userMessage];
     setMessages(nextMessages);
     setInput("");
     setLoading(true);
 
+    const history = nextMessages.map(({ role, content }) => ({ role, content }));
+
     try {
-      const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:4000";
-      const res = await fetch(`${API_URL}/api/ai/fix-resume`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          resume,
-          jobDescription,
-          instruction: prompt,
-          messages: nextMessages.map(({ role, content }) => ({ role, content })),
-        }),
-      });
+      // Pass 1 — fix against the current ATS scan.
+      const data = await postFix(prompt, resume, atsReport, history);
+      let applied = mergeFixed(resume, data.resume);
+      onApplyResume(applied);
 
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({ error: "AI assistant failed" }));
-        throw new Error((err as { error?: string }).error ?? `HTTP ${res.status}`);
-      }
-
-      const data = (await res.json()) as FixResumeResponse;
-      const fixedResume: Resume = {
-        ...resume,
-        ...data.resume,
-        id: resume.id,
-        userId: resume.userId,
-        template: resume.template,
-        createdAt: resume.createdAt,
-        updatedAt: new Date().toISOString(),
-      };
-
-      onApplyResume(fixedResume);
-      const assistantText =
+      let text =
         data.assistant_message ||
         data.changes?.join(" ") ||
         "I applied the requested resume changes.";
 
+      // Verify loop — re-simulate, show the delta, and do ONE corrective pass
+      // if the score did not improve or critical failures remain.
+      const before = atsReport?.total_score;
+      const report1 = await simulate(applied);
+      if (report1) {
+        text += `\n\nATS: ${before != null ? `${Math.round(before)} → ` : ""}${Math.round(report1.total_score)}/100 (grade ${report1.grade}).`;
+        const notImproved = before != null && report1.total_score <= before;
+        const stillCritical = (report1.critical_failures?.length ?? 0) > 0;
+        if (notImproved || stillCritical) {
+          const corrective =
+            "The ATS scan still shows issues after that edit. Fix the remaining content findings below, keeping everything truthful.";
+          const data2 = await postFix(corrective, applied, report1, [
+            ...history,
+            { role: "assistant" as ChatRole, content: text },
+          ]);
+          applied = mergeFixed(applied, data2.resume);
+          onApplyResume(applied);
+          const report2 = await simulate(applied);
+          if (report2) {
+            text += `\nSecond pass: ${Math.round(report1.total_score)} → ${Math.round(report2.total_score)}/100 (grade ${report2.grade}).`;
+          }
+          if (data2.assistant_message) text += `\n\n${data2.assistant_message}`;
+        }
+      }
+
       setMessages((current) => [
         ...current,
-        {
-          id: makeId("assistant"),
-          role: "assistant",
-          content: assistantText,
-        },
+        { id: makeId("assistant"), role: "assistant", content: text },
       ]);
-      onToast(data.changes?.[0] ?? "AI assistant updated the resume.", "success");
+      onToast(data.changes?.[0] ?? "Resume updated against the ATS scan.", "success");
     } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "AI assistant failed";
+      const message = error instanceof Error ? error.message : "AI assistant failed";
       setMessages((current) => [
         ...current,
         {

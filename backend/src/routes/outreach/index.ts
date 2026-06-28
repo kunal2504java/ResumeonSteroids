@@ -111,7 +111,7 @@ function extractJson<T>(text: string): T {
 
 async function callJsonModel<T>(prompt: string, maxTokens = 900): Promise<T> {
   const response = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-sonnet-4-6",
     max_tokens: maxTokens,
     temperature: 0.4,
     messages: [{ role: "user", content: prompt }],

@@ -89,7 +89,7 @@ export async function runAgent3(
     : `Score this resume:\n${JSON.stringify(writtenContent, null, 2)}`;
 
   const res = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-sonnet-4-6",
     max_tokens: 2000,
     system: SCORER_SYSTEM_PROMPT,
     messages: [

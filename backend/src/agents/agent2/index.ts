@@ -68,7 +68,7 @@ export async function runAgent2(
     : `Rewrite and optimize this resume data for maximum impact.\n\nResume Data:\n${JSON.stringify(normalizedData, null, 2)}`;
 
   const res = await anthropic.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: "claude-sonnet-4-6",
     max_tokens: 4000,
     system: WRITER_SYSTEM_PROMPT,
     messages: [

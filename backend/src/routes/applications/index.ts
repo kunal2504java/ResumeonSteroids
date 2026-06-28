@@ -124,7 +124,7 @@ async function generateStarAnswers(input: {
 }): Promise<StarAnswer[]> {
   try {
     const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 2200,
       temperature: 0.4,
       messages: [
@@ -215,7 +215,7 @@ async function generateNegotiationDraft(input: {
 }): Promise<string> {
   try {
     const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-20250514",
+      model: "claude-sonnet-4-6",
       max_tokens: 900,
       temperature: 0.4,
       messages: [
