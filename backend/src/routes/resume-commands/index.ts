@@ -1,17 +1,13 @@
 import { Hono } from "hono";
 import type { Context } from "hono";
 import type { Resume } from "@resumeai/shared";
-import { anthropic } from "../../lib/anthropic";
 import { fillTemplate, type ResumeData } from "../../lib/fillTemplate";
 import { compileLatexToPdf } from "../../lib/pdflatex";
 import { sendEmail } from "../../lib/emailDelivery";
 import { getSupabaseAdmin } from "../../lib/supabase";
+import { tailorResume } from "../../lib/resumeTailor";
 import { optionalAuthMiddleware } from "../../middleware/auth";
-import {
-  buildFixPrompt,
-  parseJsonObject,
-  type ChatMessage,
-} from "../ai/fix-resume";
+import { type ChatMessage } from "../ai/fix-resume";
 
 const resumeCommandRoutes = new Hono();
 
@@ -163,33 +159,12 @@ resumeCommandRoutes.post("/", optionalAuthMiddleware, async (c) => {
     const run = await createRun(body, authUserId);
     runId = run?.id ?? null;
 
-    const response = await anthropic.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: 7000,
-      messages: [
-        {
-          role: "user",
-          content: buildFixPrompt(
-            sourceResume,
-            body.job_description,
-            body.instruction,
-            body.messages,
-          ),
-        },
-      ],
-    });
-
-    const text = response.content[0]?.type === "text" ? response.content[0].text : "";
-    const fixed = parseJsonObject(text);
-    const outputResume: Resume = {
-      ...sourceResume,
-      ...fixed.resume,
-      id: sourceResume.id,
-      userId: sourceResume.userId,
-      template: sourceResume.template,
-      createdAt: sourceResume.createdAt,
-      updatedAt: new Date().toISOString(),
-    };
+    const { outputResume, changes, assistantMessage } = await tailorResume(
+      sourceResume,
+      body.job_description,
+      body.instruction,
+      body.messages,
+    );
 
     const texContent = fillTemplate(asResumeData(outputResume));
     const { pdfBuffer } = await compileLatexToPdf(texContent, "resume-command-");
@@ -199,8 +174,8 @@ resumeCommandRoutes.post("/", optionalAuthMiddleware, async (c) => {
       to: recipient,
       replyTo: outputResume.personalInfo.email || undefined,
       subject: `Your updated resume PDF is ready`,
-      text: `Your resume has been updated and attached as ${filename}.\n\nChanges:\n${fixed.changes.map((change) => `- ${change}`).join("\n")}`,
-      html: `<p>Your resume has been updated and attached as <strong>${filename}</strong>.</p><ul>${fixed.changes.map((change) => `<li>${change}</li>`).join("")}</ul>`,
+      text: `Your resume has been updated and attached as ${filename}.\n\nChanges:\n${changes.map((change) => `- ${change}`).join("\n")}`,
+      html: `<p>Your resume has been updated and attached as <strong>${filename}</strong>.</p><ul>${changes.map((change) => `<li>${change}</li>`).join("")}</ul>`,
       attachments: [
         {
           filename,
@@ -224,7 +199,7 @@ resumeCommandRoutes.post("/", optionalAuthMiddleware, async (c) => {
       {
         status: "completed",
         output_resume: outputResume,
-        changes: fixed.changes,
+        changes,
       },
       authUserId,
     );
@@ -240,8 +215,8 @@ resumeCommandRoutes.post("/", optionalAuthMiddleware, async (c) => {
         provider_message_id: email.providerMessageId,
       },
       resume: outputResume,
-      changes: fixed.changes,
-      assistant_message: fixed.assistant_message,
+      changes,
+      assistant_message: assistantMessage,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Resume command failed";

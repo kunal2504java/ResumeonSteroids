@@ -12,6 +12,7 @@ import { outreachRoutes } from "./routes/outreach";
 import { nudgeRoutes } from "./routes/nudges";
 import { resumeCommandRoutes } from "./routes/resume-commands";
 import { opportunityRoutes } from "./routes/opportunities";
+import { deckRoutes } from "./routes/deck";
 
 const app = new Hono();
 
@@ -34,6 +35,7 @@ app.route("/api/outreach", outreachRoutes);
 app.route("/api/nudges", nudgeRoutes);
 app.route("/api/resume-commands", resumeCommandRoutes);
 app.route("/api/opportunities", opportunityRoutes);
+app.route("/api/deck", deckRoutes);
 
 app.get("/health", (c) => c.json({ status: "ok" }));
 
